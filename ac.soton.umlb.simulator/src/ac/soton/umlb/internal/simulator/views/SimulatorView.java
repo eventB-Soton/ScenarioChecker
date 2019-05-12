@@ -225,7 +225,7 @@ public class SimulatorView extends StateBasedViewPart {
 		// Switch to umlb simulation perspective.
 		final IWorkbench workbench = PlatformUI.getWorkbench(); //activeWorkbenchWindow.getWorkbench(); //
 		try {
-			workbench.showPerspective(SimPerspective.PERSPECTIVE_ID, workbench.getActiveWorkbenchWindow());   //activeWorkbenchWindow);
+			workbench.showPerspective(SimPerspective.PERSPECTIVE_ID, workbench.getActiveWorkbenchWindow(), this);   //activeWorkbenchWindow);
 		} catch (WorkbenchException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
