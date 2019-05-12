@@ -16,9 +16,13 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.IHandler;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.WorkbenchException;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.eventb.core.IMachineRoot;
 
+import ac.soton.umlb.internal.simulator.perspectives.SimPerspective;
 import ac.soton.umlb.internal.simulator.views.SimulatorView;
 
 
@@ -51,6 +55,15 @@ public class SimulateHandler extends AbstractHandler implements IHandler {
 		// Return if the current selection is not a machine root.
 		if (mchRoot == null) return null;
 
+		// Switch to umlb simulation perspective.
+		IWorkbench workbench = PlatformUI.getWorkbench();
+		try {
+			workbench.showPerspective(SimPerspective.PERSPECTIVE_ID, HandlerUtil.getActiveWorkbenchWindow(event));   //activeWorkbenchWindow);
+		} catch (WorkbenchException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		SimulatorView.getSimulator().initialise(mchRoot); //, HandlerUtil.getActiveWorkbenchWindow(event));
 	
 		return null;
