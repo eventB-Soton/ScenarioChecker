@@ -12,7 +12,6 @@ package ac.soton.umlb.internal.simulator;
 
 import java.io.IOException;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -37,7 +36,6 @@ import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.edit.command.AddCommand;
-import org.eclipse.emf.transaction.Transaction;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.emf.transaction.util.TransactionUtil;
 import org.eclipse.emf.workspace.AbstractEMFOperation;
@@ -305,14 +303,8 @@ public class OracleHandler {
 		assert(playback == false);
 		playback = true;
 		if (debug) System.out.println("Oracle startPlayback");
-		
-		try {
-			if (currentPlaybackRun == null || repeat==false){
-				currentPlaybackRun = getGoldRun();
-			}
-		} catch (CoreException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		if (currentPlaybackRun == null || repeat==false){
+			currentPlaybackRun = getGoldRun();
 		}
 		//if acquiring gold run failed, revert to recording mode
 		if (currentPlaybackRun == null) playback = false;
@@ -489,7 +481,8 @@ public class OracleHandler {
 		return ret;
 	}
 	
-	private Run getGoldRun() throws CoreException {
+	private Run getGoldRun() {
+	try {
 	   FileDialog dialog = new FileDialog(shell, SWT.OPEN);
 	   dialog.setFilterExtensions(new String [] {"*."+goldOracleExtension, "*."+oracleExtension,"*.*"});
 	   dialog.setFilterPath(oracleFolder.getRawLocation().toString());
@@ -497,15 +490,23 @@ public class OracleHandler {
 	   String rawLocation = dialog.open();
 	   if (rawLocation==null) return null;
 	   IPath rawPath = new Path(rawLocation);
-	   IPath workspacePath = ResourcesPlugin.getWorkspace().getRoot().getRawLocation();
-	   IPath workspaceRelativePath = rawPath.makeRelativeTo(workspacePath);
-	   IPath path = new Path("platform:/resource");
-		path = path.append(workspaceRelativePath);
-	   URI uri = URI.createURI(path.toString());
+	   
+//	   IPath workspacePath = ResourcesPlugin.getWorkspace().getRoot().getRawLocation();
+//	   IPath workspaceRelativePath = rawPath.makeRelativeTo(workspacePath);   
+//	   IPath path = new Path("platform:/resource");
+//	   path = path.append(workspaceRelativePath);
+//	   URI uri = URI.createURI(path.toString()); 
+	   
+	   URI uri = URI.createFileURI(rawPath.toString());
 	   ResourceSet rset = editingDomain.getResourceSet();
 	   Resource resource = rset.getResource(uri, true);	   
 	   Run run = loadRun(resource);
 	   return run;
+	}catch (Exception e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+		return null;
+	}
 	}
 	
 
@@ -608,7 +609,7 @@ public class OracleHandler {
 
 		public SaveRunCommand(TransactionalEditingDomain editingDomain, Resource resource, Shell shell, Run run) {
 			super(editingDomain, "what can I say?");
-			setOptions(Collections.singletonMap(Transaction.OPTION_UNPROTECTED, Boolean.TRUE));
+			//setOptions(Collections.singletonMap(Transaction.OPTION_UNPROTECTED, Boolean.TRUE));
 			this.resource = resource;
 			this.run = run;
 		}
@@ -637,7 +638,7 @@ public class OracleHandler {
 				if (addCommand.canExecute()) addCommand.execute();
 			}
 			final Map<Object, Object> saveOptions = new HashMap<Object, Object>();
-			saveOptions.put(Resource.OPTION_SAVE_ONLY_IF_CHANGED, Resource.OPTION_SAVE_ONLY_IF_CHANGED_MEMORY_BUFFER);
+			//saveOptions.put(Resource.OPTION_SAVE_ONLY_IF_CHANGED, Resource.OPTION_SAVE_ONLY_IF_CHANGED_MEMORY_BUFFER);
 			try {
 				resource.save(saveOptions);
 			}
