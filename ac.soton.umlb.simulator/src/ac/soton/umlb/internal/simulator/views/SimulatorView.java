@@ -152,6 +152,7 @@ public class SimulatorView extends StateBasedViewPart {
 		machine = (Machine) emfRodinDB.loadEventBComponent(mchRoot);		
 		project = mchRoot.getRodinProject().getProject();
 		historyPosition=0;
+		clock.reset();
 		eventPriorities.clear();
 		eventInternal.clear();
 		eventMap.clear();
@@ -715,6 +716,7 @@ public class SimulatorView extends StateBasedViewPart {
  */
 	@Override
 	protected void stateChanged(final State activeState, final Operation operation) {
+		if (animator==null) return;
 		History history = animator.getHistory();
 		if (historyPosition ==0 || history.getCurrentPosition()>historyPosition) {
 			Map<String, Variable> stateMap = animator.getCurrentState().getValues();
