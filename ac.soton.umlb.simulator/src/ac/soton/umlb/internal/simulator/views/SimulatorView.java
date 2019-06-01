@@ -102,15 +102,24 @@ public class SimulatorView extends StateBasedViewPart {
 
 	private Animator animator;
 	public Animator getAnimator() {
+		if (animator==null) {
+			animator = Animator.getAnimator();
+		}
 		return animator;
 	}
+	
+	
 	public void restartAnimator(){
 		try {
 			project.refreshLocal(IResource.DEPTH_ONE, null);
 			//restart animator
-			LanguageDependendAnimationPart ldp = animator.getLanguageDependendPart();
+			LanguageDependendAnimationPart ldp = getAnimator().getLanguageDependendPart();
 			if (ldp!= null)
-					ldp.reload(Animator.getAnimator());
+					ldp.reload(getAnimator());
+			
+			BMSStarter.restartBMS(bmsFiles, getAnimator());
+			umlbPerspective();
+			
 		} catch (CoreException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -196,10 +205,9 @@ public class SimulatorView extends StateBasedViewPart {
 		
 		// start ProB animator
 		System.out.println("Starting ProB for " + machine);
-		animator = Animator.getAnimator();
 		try {
 			project.refreshLocal(IResource.DEPTH_ONE, null); // ensure files seen in workspace
-			LoadEventBModelCommand.load(animator, mchRoot);
+			LoadEventBModelCommand.load(getAnimator(), mchRoot);
 		} catch (ProBException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -476,8 +484,7 @@ public class SimulatorView extends StateBasedViewPart {
 								statusText = "Recording";
 							}
 							updateStatusTable();
-							BMSStarter.restartBMS(bmsFiles, animator);
-							umlbPerspective();
+							restartAnimator();
 					}
 				});
 				toolkit.adapt(btnRestart, true, true);
@@ -512,8 +519,7 @@ public class SimulatorView extends StateBasedViewPart {
 						}
 						statusText = "Playback";
 						updateStatusTable();
-						BMSStarter.restartBMS(bmsFiles, animator);
-						umlbPerspective();
+						restartAnimator();
 					}
 				});
 				btnReplay.setText("Replay");
@@ -641,8 +647,11 @@ public class SimulatorView extends StateBasedViewPart {
 		mbox.open();
 	}
 	
+	/*
+	 * check whether the context needs to be set up
+	 */
 	private boolean inSetup(){
-		List<Operation> enabledOperations = animator.getCurrentState().getEnabledOperations();
+		List<Operation> enabledOperations = getAnimator().getCurrentState().getEnabledOperations();
 		for (Operation op : enabledOperations){
 			if ("SETUP_CONTEXT".equals(op.getName()) ){
 				adviseUser("Use Step button to execute SETUP_CONTEXT");
@@ -704,10 +713,9 @@ public class SimulatorView extends StateBasedViewPart {
  */
 	@Override
 	protected void stateChanged(final State activeState, final Operation operation) {
-		if (animator==null) return;
-		History history = animator.getHistory();
+		History history = getAnimator().getHistory();
 		if (historyPosition ==0 || history.getCurrentPosition()>historyPosition) {
-			Map<String, Variable> stateMap = animator.getCurrentState().getValues();
+			Map<String, Variable> stateMap = getAnimator().getCurrentState().getValues();
 			UpdateStateLists.getInstance().execute(stateMap);
 			UpdateEnabledOpsList.getInstance().execute();
 			
