@@ -223,15 +223,14 @@ public class SimulatorView extends StateBasedViewPart {
 	 */
 	private void umlbPerspective() {
 		// Switch to umlb simulation perspective.
-		final IWorkbench workbench = PlatformUI.getWorkbench(); //activeWorkbenchWindow.getWorkbench(); //
+		final IWorkbench workbench = PlatformUI.getWorkbench();
 		try {
-			workbench.showPerspective(SimPerspective.PERSPECTIVE_ID, workbench.getActiveWorkbenchWindow(), this);   //activeWorkbenchWindow);
+			workbench.showPerspective(SimPerspective.PERSPECTIVE_ID, workbench.getActiveWorkbenchWindow());
 		} catch (WorkbenchException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
-
 
 	private final FormToolkit toolkit = new FormToolkit(Display.getCurrent());
 	private Button btnTickN;
@@ -285,10 +284,6 @@ public class SimulatorView extends StateBasedViewPart {
 		col.setText(getStatusText());
 		col.pack();
 		timeGroup.layout();
-//		clockText.setText(clock.getValue()); trying to get a text field in the button group to update but it won't
-//		clockText.redraw();
-//		clockText.update();
-//		buttonGroup.update();
 	}
 
 	public Group getClassGroup() {
@@ -298,11 +293,8 @@ public class SimulatorView extends StateBasedViewPart {
 	public Table getMethodsTable() {
 		return methodsTable;
 	}
-
-
+	
 	private Operation manuallySelectedOp = null;
-//	private Operation waitingForOperation;
-//	private List<Operation> queue = new ArrayList<Operation>();
 	private int historyPosition=0;
 	
 	/**
@@ -328,7 +320,7 @@ public class SimulatorView extends StateBasedViewPart {
 			methodsTable.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseUp(MouseEvent e) {
-					// Note the selected operation for 
+					// Select operation for later execution
 					
 					// Manual selection of events is disabled during playback
 					if (oracle!=null && oracle.isPlayback()){
@@ -341,12 +333,11 @@ public class SimulatorView extends StateBasedViewPart {
 					
 					TableItem selected = methodsTable.getItem(methodsTable.getSelectionIndex());
 					manuallySelectedOp = UpdateEnabledOpsList.getInstance().findOperation(selected.getText(0));
-
 				}
 				
 				@Override
 				public void mouseDoubleClick(MouseEvent e) {
-					// Execute the selected operation
+					// Execute the selected operation (as a big step)
 					
 					// Manual selection of events is disabled during playback
 					if (oracle!=null && oracle.isPlayback()){
@@ -383,14 +374,12 @@ public class SimulatorView extends StateBasedViewPart {
 			for(int i = 0; i < lastColumnIndex; i++){
 				methodsTable.getColumn(i).pack();
 			}
-//			methodsTable.getColumn(0).pack();
-//			methodsTable.getColumn(1).pack(); //setWidth(1000);
-//			methodsTable.computeSize(50, 1000);
 
 			createNewGroups();
 		}
 		initializeToolBar();
 		initializeMenu();
+		setup(); 
 		return container;
 	}
 
@@ -398,7 +387,6 @@ public class SimulatorView extends StateBasedViewPart {
 		{
 			buttonGroup = new Group(container, SWT.BORDER);
 			fd_methodsTable.left = new FormAttachment(buttonGroup, 29);
-			//fd_methodsTable.right = new FormAttachment(buttonGroup, 263, SWT.RIGHT);
 			fd_methodsTable.top = new FormAttachment(0, 10);
 			fd_buttonGroup = new FormData();
 			fd_buttonGroup.top = new FormAttachment(0, 100);
@@ -407,7 +395,7 @@ public class SimulatorView extends StateBasedViewPart {
 			toolkit.adapt(buttonGroup);
 			toolkit.paintBordersFor(buttonGroup);
 			buttonGroup.setLayout(null);
-			{	//BBIG STEP
+			{	//BIG STEP
 				btnTickN = new Button(buttonGroup, SWT.NONE);
 				btnTickN.setBounds(10, 10, 85, 25);
 				btnTickN.addMouseListener(new MouseAdapter() {
