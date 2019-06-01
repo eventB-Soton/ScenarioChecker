@@ -357,16 +357,20 @@ public class SimulatorView extends StateBasedViewPart {
 					}
 					
 					TableItem selected = methodsTable.getItem(methodsTable.getSelectionIndex());
-					executeOperation(UpdateEnabledOpsList.getInstance().findOperation(selected.getText(0)), false);
-					
+					manuallySelectedOp = UpdateEnabledOpsList.getInstance().findOperation(selected.getText(0));
+					try {
+						bigStep();
+					} catch (ProBException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
 				}
 			});
 			fd_methodsTable = new FormData();
-			fd_methodsTable.width=3000;
+			fd_methodsTable.width=2000;
 			methodsTable.setLayoutData(fd_methodsTable);
 
-
-			String[] title = {"         Enabled Operation                      "};
+			String[] title = {"         Enabled External Operations                 "};
 
 			int lastColumnIndex = title.length;
 			for (int loopIndex = 0; loopIndex < lastColumnIndex; loopIndex++) {
