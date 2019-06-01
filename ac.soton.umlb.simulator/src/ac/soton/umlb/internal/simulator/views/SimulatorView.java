@@ -761,14 +761,16 @@ public class SimulatorView extends StateBasedViewPart {
 					int pos = i-history.getCurrentPosition();
 					Operation op = history.getHistoryItem(pos).getOperation();
 					
-					//TODO: should we only record external events? If so need to change findNextOperation
-					if (op!=null) { //&& !isExternal(findEvent(op.getName()))) {
+					//we only record external events
+					if (op!=null && isExternal(op)) {
 						oracle.addStepToTrace(machine.getName(), op, clock.getValue());	
 						oracle.startSnapshot(clock.getValue());
 						//the post state of an operation is in the next history item. 
 						stateMap = history.getHistoryItem(pos+1).getState().getValues();
 						for (Entry<String, Variable> entry : stateMap.entrySet()) {
-							oracle.addValueToSnapshot(entry.getKey(), entry.getValue().getValue(), clock.getValue());
+							if (!isPrivate(entry.getKey())){
+								oracle.addValueToSnapshot(entry.getKey(), entry.getValue().getValue(), clock.getValue());
+							}
 						}
 						oracle.stopSnapshot(clock.getValue());
 					}
@@ -801,26 +803,28 @@ public class SimulatorView extends StateBasedViewPart {
 	private Map<Event, Integer> eventPriorities = new HashMap<Event,Integer>();
 	private Map<Event, Boolean> eventInternal = new HashMap<Event,Boolean>();
 	private Map<String, Event> eventMap = new HashMap<String, Event>();
+	private Map<String, org.eventb.emf.core.machine.Variable> variableMap = new HashMap<String, org.eventb.emf.core.machine.Variable>();
+	private Map<org.eventb.emf.core.machine.Variable, Boolean> privateVariables = new HashMap<org.eventb.emf.core.machine.Variable,Boolean>();	
+	
 	
 	/**
 	 * finds the next operation to be executed.
-	 * when in playback mode, it is the next operation in the oracle being replayed,
-	 * when not in playback mode, it is randomly selected from those that are enabled.
+	 * when not in playback mode, it is manually (or randomly) selected from those that are enabled according to priority (internal first)
+	 * when in playback mode, external events are given by the next operation in the oracle being replayed,
 	 * 
 	 * @param animator
 	 * @return
 	 */
 	private Operation findNextOperation() {	
 		Operation nextOp = null;
-		if (oracle.isPlayback()){
-			
-			nextOp = oracle.findNextOperation(animator);
-		}else{
-			State currentState = animator.getCurrentState();	
-			List<Operation> ops = prioritise(currentState.getEnabledOperations());
-			nextOp = 	ops.isEmpty()? null: 
-						ops.contains(manuallySelectedOp) ? manuallySelectedOp :
-						ops.get(random.nextInt(ops.size()));
+		State currentState = getAnimator().getCurrentState();	
+		List<Operation> ops = prioritise(currentState.getEnabledOperations());
+		nextOp = 	ops.isEmpty()? null: 
+					ops.contains(manuallySelectedOp) ? manuallySelectedOp :
+					ops.get(random.nextInt(ops.size()));
+
+		if (oracle.isPlayback() && isExternal(nextOp)){
+			nextOp = oracle.findNextOperation(getAnimator());
 		}
 		return nextOp;
 	}
@@ -865,12 +869,12 @@ public class SimulatorView extends StateBasedViewPart {
 	private boolean executeOperation(Operation operation, boolean silent){
 		if (operation==null) return false;
 		try {
-			if (oracle.isPlayback()) {
+			if (oracle.isPlayback() && isExternal(operation)) {
 				oracle.consumeNextStep();
 			}
-			ExecuteOperationCommand.executeOperation(animator, operation, silent);
+			ExecuteOperationCommand.executeOperation(getAnimator(), operation, silent);
 			//waitingForOperation = operation;
-			if (isExternal(findEvent(operation.getName()))) clock.inc();
+			if (isExternal(operation)) clock.inc();
 		} catch (ProBException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -910,6 +914,22 @@ public class SimulatorView extends StateBasedViewPart {
 		return eventInternal.get(ev);
 	}
 	
+	/**
+	 * return true if the given variable is private 
+	 * @param name
+	 * @return
+	 */
+	private boolean isPrivate(String name) {
+		org.eventb.emf.core.machine.Variable var = findVariable(name);
+		if (var == null) return false;
+		if (!privateVariables.containsKey(var)) {
+			String comment = var.getComment();
+			privateVariables.put(var,comment!=null && comment.contains("<PRIVATE>"));
+		}
+		return privateVariables.get(var);
+	}
+	
+
 	private Integer getPriority(Event ev) {
 		if (ev == null) return -1;
 		if (!eventPriorities.containsKey(ev)) {
@@ -944,6 +964,25 @@ public class SimulatorView extends StateBasedViewPart {
 			eventMap.put(name, found);
 		}
 		return eventMap.get(name);
+	}
+	
+	
+	private org.eventb.emf.core.machine.Variable findVariable(String name) {
+		if (!variableMap.containsKey(name)) {
+			org.eventb.emf.core.machine.Variable found = null;
+			for (org.eventb.emf.core.machine.Variable var : machine.getVariables()) {
+				if (name.equals(var.getName())) {
+					found = var;
+				}
+			}
+			variableMap.put(name, found);
+		}
+		return variableMap.get(name);
+	}
+
+	public boolean isNextOp(Operation op) {
+		return op==manuallySelectedOp || 
+				(oracle.isPlayback() && op==oracle.findNextOperation(getAnimator()));
 	}
 
 }
