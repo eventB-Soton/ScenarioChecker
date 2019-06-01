@@ -663,10 +663,42 @@ public class SimulatorView extends StateBasedViewPart {
 		return false;
 	}
 	
+	/*
+	 * run the context set-up operation if enabled
+	 */
+	private boolean setup(){
+		boolean ret = false;
+		if (getAnimator().getCurrentState()==null) {
+			ret= false;
+		}else {
+			List<Operation> enabledOperations = getAnimator().getCurrentState().getEnabledOperations();
+			for (Operation op : enabledOperations){
+				if ("SETUP_CONTEXT".equals(op.getName()) ){
+					executeOperation(op,false);
+					ret=true;
+				}
+			}
+//	 EXECUTING INITIALISATION AUTOMATICALLY DOES NOT WORK WITH REPLAY 
+//			enabledOperations = animator.getCurrentState().getEnabledOperations();	
+//			for (Operation op : enabledOperations){
+//				if ("INITIALISATION".equals(op.getName()) ){
+//					try {
+//						bigStep(op);
+//						ret=true;
+//					} catch (ProBException e) {
+//						// TODO Auto-generated catch block
+//						e.printStackTrace();
+//					}
+//				}
+//			}
+		}
+		return ret;
+	}
+	
 	private boolean nonDeterministicChoiceInClass() {
 		int foundComponentOpEnabled;
 		// if there is a choice of operations then stop the animation
-		List<Operation> enabledOps = animator.getCurrentState().getEnabledOperations();
+		List<Operation> enabledOps = getAnimator().getCurrentState().getEnabledOperations();
 		List<String> enabledOpNames = new ArrayList<String>();
 		for (Operation op : enabledOps) {
 			enabledOpNames.add(op.getName());
