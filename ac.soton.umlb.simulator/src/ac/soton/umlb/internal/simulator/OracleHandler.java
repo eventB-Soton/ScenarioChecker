@@ -56,7 +56,6 @@ import ac.soton.eventb.emf.oracle.OraclePackage;
 import ac.soton.eventb.emf.oracle.Run;
 import ac.soton.eventb.emf.oracle.Snapshot;
 import ac.soton.eventb.emf.oracle.Step;
-import ac.soton.umlb.internal.simulator.views.SimulatorView;
 import ac.soton.umlb.simulator.Activator;
 import de.prob.core.Animator;
 import de.prob.core.domainobjects.Operation;
@@ -137,7 +136,8 @@ public class OracleHandler {
 	 * @return
 	 */
 	public void startRecording(){
-		SimulatorView.getSimulator().restartAnimator();
+		//SimulatorView.getSimulator().restartAnimator();
+		
 	}
 	
 	private void doStartRecording(){
@@ -296,7 +296,7 @@ public class OracleHandler {
 	public void startPlayback(boolean repeat){
 		playback = true;
 		this.repeat = repeat;
-		SimulatorView.getSimulator().restartAnimator();
+		//SimulatorView.getSimulator().restartAnimator();
 	}
 	
 	private void doStartPlayback(){
