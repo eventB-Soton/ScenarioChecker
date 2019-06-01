@@ -78,6 +78,8 @@ public class UpdateEnabledOpsList {
 //		String className = new String("");
 //		
 		// for each enabled operation in the ProB model
+		int select = -1;
+		int j=0;
 		for(Operation op: enabledOps){
 //			for(Class class_: classList){		//CURRENTLY NOT ADDING CLASS NAME TO TABLE
 //				for(ClassMethod method: class_.getMethods()){
@@ -92,16 +94,23 @@ public class UpdateEnabledOpsList {
 //					}
 //				}
 //			}
-			TableItem tableItem = new TableItem(methodsTable, SWT.NULL);
-			String[] rowString = {operationInStringFormat(op)}; 
-//			String[] rowString = {className, operationInStringFormat(op)};
-			tableItem.setText(rowString);
-			//className = "";
+			if (SimulatorView.getSimulator().isExternal(op)) {
+				TableItem tableItem = new TableItem(methodsTable, SWT.NULL);
+				String[] rowString = {operationInStringFormat(op)}; 
+	//			String[] rowString = {className, operationInStringFormat(op)};
+				tableItem.setText(rowString);
+				if (SimulatorView.getSimulator().isNextOp(op)) {
+					select = j;
+				}
+				//className = "";
+				j++;
+			}
 		}
 		
 		for(int i = 0; i < methodsTable.getColumnCount(); i++){
 			methodsTable.getColumn(i).pack();
 		}
+		if (select>-1) methodsTable.select(select);
 	}
 
 	/**
