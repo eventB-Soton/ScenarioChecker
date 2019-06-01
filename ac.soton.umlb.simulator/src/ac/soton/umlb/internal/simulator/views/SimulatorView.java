@@ -597,18 +597,16 @@ public class SimulatorView extends StateBasedViewPart {
 	////////////////////////////////////////////
 	
 	// implements the big step behaviour where we 
-	// fire the next operations and then run to completion of all internal operations
+	// fire the next operation and then run to completion of all internal operations
 	private boolean bigStep() throws ProBException {	
 		if (inSetup()) return false;	
+		Operation op = findNextOperation();
 		//Animator animator = Animator.getAnimator();
 		boolean progress = true;
 		//execute at least one
-		Operation op = findNextOperation();
 		progress = executeOperation(op, false);
 		//continue executing any internal operations
-		while (progress && (op = findNextOperation())!=null &&
-				isInternal(findEvent(op.getName()))) {
-			//queue.add(op);
+		while (progress && (op = findNextOperation())!=null && isInternal(op)) {
 			progress = executeOperation(op, false);
 		}
 		return progress;
@@ -851,9 +849,18 @@ public class SimulatorView extends StateBasedViewPart {
 		return true;
 	}
 
+	public boolean isExternal (Operation op) {
+		return isExternal(findEvent(op.getName()));
+	}
+	
 	private boolean isExternal(Event ev) {
 		if (ev == null) return false;
 		return !isInternal(ev);
+	}
+	
+	
+	public boolean isInternal(Operation op) {
+		return isInternal(findEvent(op.getName()));
 	}
 	
 	/**
