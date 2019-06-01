@@ -1,7 +1,9 @@
 package ac.soton.umlb.internal.simulator;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -30,6 +32,7 @@ public class BMSStarter {
 	private BMSStarter() {} //prevent instantiation
 	
 	private static boolean running=false;
+	private static Map<IFile,BMotionStudioEditor> bmsEditors = new HashMap<IFile,BMotionStudioEditor>();
 	
 	public static boolean restartBMS(List<IFile> bmsFiles, Animator probAnimator) {
 		running = false;
@@ -77,13 +80,14 @@ public class BMSStarter {
 	 * @throws PartInitException
 	 */
 	private static BMotionStudioEditor getBmotionStudioEditor(IFile bmsFile) throws PartInitException{
-	    IEditorDescriptor desc = PlatformUI.getWorkbench().getEditorRegistry().getDefaultEditor(bmsFile.getName());
-		IEditorPart part = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().openEditor(new FileEditorInput(bmsFile), desc.getId());
-	    if (part instanceof BMotionStudioEditor) {
-	        return (BMotionStudioEditor) part;
-	    }else{
-	    	return null;
-	    }
+		if (!bmsEditors.containsKey(bmsFile)) {
+		    IEditorDescriptor desc = PlatformUI.getWorkbench().getEditorRegistry().getDefaultEditor(bmsFile.getName());
+			IEditorPart part = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().openEditor(new FileEditorInput(bmsFile), desc.getId());
+		    if (part instanceof BMotionStudioEditor) {
+		    	bmsEditors.put(bmsFile, (BMotionStudioEditor) part); //return (BMotionStudioEditor) part;
+		    }
+		}
+		return bmsEditors.get(bmsFile);
 }
 	
 	/**
