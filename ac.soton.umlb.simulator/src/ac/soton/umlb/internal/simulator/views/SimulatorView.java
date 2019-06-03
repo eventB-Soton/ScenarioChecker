@@ -395,6 +395,9 @@ public class SimulatorView extends StateBasedViewPart {
 		return container;
 	}
 
+	/**
+	 * creates new groups - note this is called to update state as well as initial setup
+	 */
 	public void createNewGroups() {
 		{
 			buttonGroup = new Group(container, SWT.BORDER);
@@ -673,7 +676,10 @@ public class SimulatorView extends StateBasedViewPart {
 		}else {
 			List<Operation> enabledOperations = getAnimator().getCurrentState().getEnabledOperations();
 			for (Operation op : enabledOperations){
-				if ("SETUP_CONTEXT".equals(op.getName()) ){
+				if ("SETUP_CONTEXT".equals(op.getName())){
+					if (oracle.isPlayback() && "SETUP_CONTEXT".equals(oracle.findNextOperation(animator).getName())){
+						oracle.consumeNextStep();
+					}
 					executeOperation(op,false);
 					ret=true;
 				}
@@ -762,7 +768,7 @@ public class SimulatorView extends StateBasedViewPart {
 					Operation op = history.getHistoryItem(pos).getOperation();
 					
 					//we only record external events
-					if (op!=null && isExternal(op)) {
+					if (op!=null && (isExternal(op) || op.getName().equals("SETUP_CONTEXT"))) {
 						oracle.addStepToTrace(machine.getName(), op, clock.getValue());	
 						oracle.startSnapshot(clock.getValue());
 						//the post state of an operation is in the next history item. 
@@ -886,7 +892,11 @@ public class SimulatorView extends StateBasedViewPart {
 	}
 
 	public boolean isExternal (Operation op) {
-		return isExternal(findEvent(op.getName()));
+		return isExternal(op.getName());
+	}
+	
+	public boolean isExternal(String name) {
+		return isExternal(findEvent(name));
 	}
 	
 	private boolean isExternal(Event ev) {
@@ -896,7 +906,11 @@ public class SimulatorView extends StateBasedViewPart {
 	
 	
 	public boolean isInternal(Operation op) {
-		return isInternal(findEvent(op.getName()));
+		return isInternal(op.getName());
+	}
+	
+	public boolean isInternal(String name) {
+		return isInternal(findEvent(name));
 	}
 	
 	/**
@@ -984,5 +998,7 @@ public class SimulatorView extends StateBasedViewPart {
 		return op==manuallySelectedOp || 
 				(oracle.isPlayback() && op==oracle.findNextOperation(getAnimator()));
 	}
+
+
 
 }
