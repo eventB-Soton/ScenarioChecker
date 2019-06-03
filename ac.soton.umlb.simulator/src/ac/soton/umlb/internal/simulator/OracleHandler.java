@@ -56,6 +56,7 @@ import ac.soton.eventb.emf.oracle.OraclePackage;
 import ac.soton.eventb.emf.oracle.Run;
 import ac.soton.eventb.emf.oracle.Snapshot;
 import ac.soton.eventb.emf.oracle.Step;
+import ac.soton.umlb.internal.simulator.views.SimulatorView;
 import ac.soton.umlb.simulator.Activator;
 import de.prob.core.Animator;
 import de.prob.core.domainobjects.Operation;
@@ -408,7 +409,8 @@ public class OracleHandler {
 			int oldStepPointer = stepPointer;
 			do{
 				stepPointer = stepPointer+1;
-			}while (stepPointer < oracleEntries.size() && !(oracleEntries.get(stepPointer) instanceof Step)) ;
+			}while (stepPointer < oracleEntries.size() && (!(oracleEntries.get(stepPointer) instanceof Step) ||
+					SimulatorView.getSimulator().isInternal(((Step)oracleEntries.get(stepPointer)).getName()))) ;
 			if (stepPointer < oracleEntries.size()){
 				nextStep = (Step)oracleEntries.get(stepPointer);
 				return true;
