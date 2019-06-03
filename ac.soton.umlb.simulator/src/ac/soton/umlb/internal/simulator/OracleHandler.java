@@ -351,12 +351,12 @@ public class OracleHandler {
 	public Operation findNextOperation(Animator animator) {
 		
 		List<Operation> ops = animator.getCurrentState().getEnabledOperations();
-		if (!hasNextStep()){
+		if (!hasNextStep() && isPlayback()){
+			stopPlayback(false);
 			MessageBox mbox = new MessageBox(shell, SWT.ICON_INFORMATION | SWT.OK);
 			mbox.setText("Playback Finished");
 			mbox.setMessage("Playback has completed the trace");
 			mbox.open();
-			stopPlayback(false);
 			return null;
 		}
 		
