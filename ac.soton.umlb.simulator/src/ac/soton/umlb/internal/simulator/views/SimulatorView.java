@@ -23,6 +23,8 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.workspace.util.WorkspaceSynchronizer;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.swt.SWT;
@@ -52,17 +54,22 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.WorkbenchException;
 import org.eclipse.ui.forms.widgets.FormToolkit;
+import org.eventb.core.IEventBRoot;
 import org.eventb.core.IMachineRoot;
 import org.eventb.emf.core.AbstractExtension;
+import org.eventb.emf.core.EventBElement;
 import org.eventb.emf.core.machine.Event;
 import org.eventb.emf.core.machine.Machine;
 import org.eventb.emf.core.machine.MachinePackage;
 import org.eventb.emf.persistence.EMFRodinDB;
+import org.rodinp.core.IRodinProject;
+import org.rodinp.core.RodinCore;
 
 import ac.soton.eventb.classdiagrams.Class;
 import ac.soton.eventb.classdiagrams.ClassMethod;
 import ac.soton.eventb.classdiagrams.Classdiagram;
 import ac.soton.eventb.statemachines.Statemachine;
+import ac.soton.eventb.statemachines.animation.DiagramAnimator;
 import ac.soton.eventb.statemachines.diagram.part.StatemachinesDiagramEditor;
 import ac.soton.umlb.internal.simulator.BMSStarter;
 import ac.soton.umlb.internal.simulator.Clock;
@@ -154,28 +161,36 @@ public class SimulatorView extends StateBasedViewPart {
 	List<IFile> bmsFiles = new ArrayList<IFile>();
 
 
-	
 	public void initialise(IMachineRoot mchRoot) {
-		//load machine as EMF
-		EMFRodinDB emfRodinDB = new EMFRodinDB();
-		machine = (Machine) emfRodinDB.loadEventBComponent(mchRoot);		
 		project = mchRoot.getRodinProject().getProject();
+		String machineName = mchRoot.getComponentName();
 		historyPosition=0;
 		clock.reset();
 		eventPriorities.clear();
 		eventInternal.clear();
 		eventMap.clear();
 
-		// Find all the statemachines of the machine
-		// (these must come from the editors as each editor has a different
-		// local copy)
+		// start ProB animator
+		System.out.println("Starting ProB for " + machine);
+		try {
+			project.refreshLocal(IResource.DEPTH_ONE, null); // ensure files seen in workspace
+			LoadEventBModelCommand.load(getAnimator(), mchRoot);
+		} catch (ProBException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CoreException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		// Find all the state-machines and bmsFiles of the machine
+		// (these must come from the editors as each editor has a different local copy)
 		for (IWorkbenchPage page : PlatformUI.getWorkbench().getActiveWorkbenchWindow().getPages()) {   //   activeWorkbenchWindow.getPages()) {
 			for (IEditorReference editorRef : page.getEditorReferences()) {
 				IEditorPart editor = editorRef.getEditor(true);
 				if (editor instanceof StatemachinesDiagramEditor) {
 					Statemachine statemachine = (Statemachine) ((StatemachinesDiagramEditor) editor).getDiagram().getElement();
-					if (machine.equals(statemachine.getContaining(MachinePackage.Literals.MACHINE))){
-
+					if (mchRoot.equals(getEventBRoot(statemachine))) {
 						if (editor.isDirty()) {
 							editor.doSave(new NullProgressMonitor());
 						}
@@ -194,7 +209,7 @@ public class SimulatorView extends StateBasedViewPart {
 	    			if (bmspf instanceof IFile && BMOTION_STUDIO_EXT.equals(((IFile)bmspf).getFileExtension())){
 		    			String bmsMachineName = bmsEditor.getVisualization().getMachineName();
 		    			IProject bmsproject = ((IFile)bmspf).getProject();
-	    				if (bmsMachineName.startsWith(machine.getName()) && project.equals(bmsproject)){
+	    				if (bmsMachineName.startsWith(machineName) && project.equals(bmsproject)){
 	    					if (!bmsFiles.contains(bmspf)) bmsFiles.add(((IFile)bmspf));
 	    				}
 	    			}
@@ -202,27 +217,31 @@ public class SimulatorView extends StateBasedViewPart {
 
 			}
 		}
-		
-		// start ProB animator
-		System.out.println("Starting ProB for " + machine);
+
+		if (stateMachines.size() != 0) {
+			machine = (Machine) stateMachines.get(0).getContaining(MachinePackage.Literals.MACHINE);
+		}else {
+			EMFRodinDB emfRodinDB = new EMFRodinDB();
+			machine = (Machine) emfRodinDB.loadEventBComponent(mchRoot);
+		}
+		DiagramAnimator diagramAnimator = DiagramAnimator.getAnimator();
 		try {
-			project.refreshLocal(IResource.DEPTH_ONE, null); // ensure files seen in workspace
-			LoadEventBModelCommand.load(getAnimator(), mchRoot);
+			diagramAnimator.start(machine, stateMachines, mchRoot, bmsFiles);
 		} catch (ProBException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (CoreException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
-		//start any BMS visualisations
-		BMSStarter.restartBMS(bmsFiles, animator);
+
+		
+//		//start any BMS visualisations
+//		BMSStarter.restartBMS(bmsFiles, animator); >>>>>>>>now done by diagram animator
+		
 		//switch to UML-B simulator perspective
 		umlbPerspective();
 		//initialise oracle in record mode
 		getOracle().initialise(machine);
 	}
+	
 	
 	
 	/**
@@ -240,6 +259,20 @@ public class SimulatorView extends StateBasedViewPart {
 		}
 	}
 
+	private static IEventBRoot getEventBRoot(EventBElement element) {
+		Resource resource = element.eResource();
+		if (resource != null && resource.isLoaded()) {
+			IFile file = WorkspaceSynchronizer.getFile(resource);
+			IRodinProject rodinProject = RodinCore.getRodinDB()
+					.getRodinProject(file.getProject().getName());
+			IEventBRoot root = (IEventBRoot) rodinProject.getRodinFile(
+					file.getName()).getRoot();
+			return root;
+		}
+		return null;
+	}
+	
+	///////////////////////////////////
 	private final FormToolkit toolkit = new FormToolkit(Display.getCurrent());
 	private Button btnTickN;
 	private Button btnSave;
@@ -827,7 +860,7 @@ public class SimulatorView extends StateBasedViewPart {
 		List<Operation> ops = prioritise(currentState.getEnabledOperations());
 		nextOp = 	ops.isEmpty()? null: 
 					ops.contains(manuallySelectedOp) ? manuallySelectedOp :
-					ops.get(random.nextInt(ops.size()));
+					pickFrom(ops);
 
 		if (oracle.isPlayback() && isExternal(nextOp)){
 			nextOp = oracle.findNextOperation(getAnimator());
@@ -835,6 +868,11 @@ public class SimulatorView extends StateBasedViewPart {
 		return nextOp;
 	}
 
+	private Operation pickFrom(List<Operation> ops) {
+		Operation op = ops.get(random.nextInt(ops.size()));
+		return op;
+	}
+	
 	/**
 	 * filter the given list of operations so that it contains the subset with the highest eventPriorities
 	 * 
@@ -850,7 +888,6 @@ public class SimulatorView extends StateBasedViewPart {
 			Integer priority;
 			Event ev = findEvent(op.getName());
 			priority = ev==null? -1 : getPriority(ev);
-
 			if (priority>current) continue; 	//ignore lesser (i.e. higher int) eventPriorities
 			if (priority<current) {				//found a better eventPriorities
 				filtered.clear();
