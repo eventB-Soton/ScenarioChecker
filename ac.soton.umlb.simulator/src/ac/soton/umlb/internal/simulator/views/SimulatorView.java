@@ -231,13 +231,8 @@ public class SimulatorView extends StateBasedViewPart {
 			e.printStackTrace();
 		}
 		
+		restartAnimator();
 
-		
-//		//start any BMS visualisations
-//		BMSStarter.restartBMS(bmsFiles, animator); >>>>>>>>now done by diagram animator
-		
-		//switch to UML-B simulator perspective
-		umlbPerspective();
 		//initialise oracle in record mode
 		getOracle().initialise(machine);
 	}
