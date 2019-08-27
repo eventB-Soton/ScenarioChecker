@@ -169,6 +169,9 @@ public class SimulatorView extends StateBasedViewPart {
 		eventPriorities.clear();
 		eventInternal.clear();
 		eventMap.clear();
+		machine = null;
+		stateMachines.clear();
+		bmsFiles.clear();
 
 		// start ProB animator
 		System.out.println("Starting ProB for " + machine);
