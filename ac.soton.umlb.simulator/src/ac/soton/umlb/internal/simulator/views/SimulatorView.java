@@ -160,16 +160,16 @@ public class SimulatorView extends StateBasedViewPart {
 	List<Statemachine> stateMachines = new ArrayList<Statemachine>(); 
 	List<IFile> bmsFiles = new ArrayList<IFile>();
 
-
 	public void initialise(IMachineRoot mchRoot) {
 		project = mchRoot.getRodinProject().getProject();
 		String machineName = mchRoot.getComponentName();
+		EMFRodinDB emfRodinDB = new EMFRodinDB();
+		machine = (Machine) emfRodinDB.loadEventBComponent(mchRoot);
 		historyPosition=0;
 		clock.reset();
 		eventPriorities.clear();
 		eventInternal.clear();
 		eventMap.clear();
-		machine = null;
 		stateMachines.clear();
 		bmsFiles.clear();
 
