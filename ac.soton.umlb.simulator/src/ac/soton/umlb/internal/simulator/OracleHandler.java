@@ -141,7 +141,7 @@ public class OracleHandler {
 		
 	}
 	
-	private void doStartRecording(){
+	public void doStartRecording(){
 		if (debug) System.out.println("Oracle start recording");
 		currentRecordRun = makeRun();
 		currentSnapshot = null;
@@ -410,7 +410,7 @@ public class OracleHandler {
 			do{
 				stepPointer = stepPointer+1;
 			}while (stepPointer < oracleEntries.size() && (!(oracleEntries.get(stepPointer) instanceof Step) ||
-					SimulatorView.getSimulator().isInternal(((Step)oracleEntries.get(stepPointer)).getName()))) ;
+					SimulatorView.getSimulatorView().isInternal(((Step)oracleEntries.get(stepPointer)).getName()))) ;
 			if (stepPointer < oracleEntries.size()){
 				nextStep = (Step)oracleEntries.get(stepPointer);
 				return true;

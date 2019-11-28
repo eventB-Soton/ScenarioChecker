@@ -36,7 +36,6 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
-import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -60,7 +59,6 @@ import org.eventb.emf.core.AbstractExtension;
 import org.eventb.emf.core.EventBElement;
 import org.eventb.emf.core.machine.Event;
 import org.eventb.emf.core.machine.Machine;
-import org.eventb.emf.core.machine.MachinePackage;
 import org.eventb.emf.persistence.EMFRodinDB;
 import org.rodinp.core.IRodinProject;
 import org.rodinp.core.RodinCore;
@@ -90,21 +88,20 @@ import de.prob.exceptions.ProBException;
 import de.prob.ui.StateBasedViewPart;
 import swing2swt.layout.FlowLayout;
 
-
 public class SimulatorView extends StateBasedViewPart {
 	
 	public static final String ID = "ac.soton.umlb.internal.simulator.views.SimulatorView"; //$NON-NLS-1$
 	private static final String BMOTION_STUDIO_EXT = "bmso";
 	
-	private static SimulatorView simulator = null;
+	private static SimulatorView simulatorView = null;
 	public SimulatorView() {
-		simulator = this;
+		simulatorView = this; //may be called on restarting Rodin to re-create the views
 	}
-
-	public static SimulatorView getSimulator() {
-		if (simulator==null)
-			simulator = new SimulatorView();
-		return simulator;
+	public static SimulatorView getSimulatorView() {
+		if (simulatorView==null){
+			simulatorView = new  SimulatorView();
+		}
+		return simulatorView;
 	}
 
 	private Animator animator;
@@ -114,7 +111,6 @@ public class SimulatorView extends StateBasedViewPart {
 		}
 		return animator;
 	}
-	
 	
 	public void restartAnimator(){
 		try {
@@ -221,12 +217,6 @@ public class SimulatorView extends StateBasedViewPart {
 			}
 		}
 
-		if (stateMachines.size() != 0) {
-			machine = (Machine) stateMachines.get(0).getContaining(MachinePackage.Literals.MACHINE);
-		}else {
-			EMFRodinDB emfRodinDB = new EMFRodinDB();
-			machine = (Machine) emfRodinDB.loadEventBComponent(mchRoot);
-		}
 		DiagramAnimator diagramAnimator = DiagramAnimator.getAnimator();
 		try {
 			diagramAnimator.start(machine, stateMachines, mchRoot, bmsFiles);
@@ -297,16 +287,16 @@ public class SimulatorView extends StateBasedViewPart {
 	private Group buttonGroup;
 	private Group timeGroup;
 	private Table statusTable;
-	private Group classGroup;
-	private Group associationGroup;
-	private FormData fd_classGroup;
-	private FormData fd_associationGroup;
+//	private Group classGroup;
+//	private Group associationGroup;
+//	private FormData fd_classGroup;
+//	private FormData fd_associationGroup;
 	private FormData fd_timeGroup;
 	private Clock clock = Clock.getInstance();
 
-	public Group getAssociationGroup() {
-		return associationGroup;
-	}
+//	public Group getAssociationGroup() {
+//		return associationGroup;
+//	}
 
 	public Group getTimeGroup() {
 		return timeGroup;
@@ -325,9 +315,9 @@ public class SimulatorView extends StateBasedViewPart {
 		timeGroup.layout();
 	}
 
-	public Group getClassGroup() {
-		return classGroup;
-	}
+//	public Group getClassGroup() {
+//		return classGroup;
+//	}
 
 	public Table getMethodsTable() {
 		return methodsTable;
@@ -371,7 +361,7 @@ public class SimulatorView extends StateBasedViewPart {
 					}
 					
 					TableItem selected = methodsTable.getItem(methodsTable.getSelectionIndex());
-					manuallySelectedOp = UpdateEnabledOpsList.getInstance().findOperation(selected.getText(0));
+					manuallySelectedOp = UpdateEnabledOpsList.findOperation(getAnimator(), selected.getText(0));
 				}
 				
 				@Override
@@ -388,7 +378,7 @@ public class SimulatorView extends StateBasedViewPart {
 					}
 					
 					TableItem selected = methodsTable.getItem(methodsTable.getSelectionIndex());
-					manuallySelectedOp = UpdateEnabledOpsList.getInstance().findOperation(selected.getText(0));
+					manuallySelectedOp = UpdateEnabledOpsList.findOperation(getAnimator(), selected.getText(0));
 					try {
 						bigStep();
 					} catch (ProBException e1) {
@@ -602,30 +592,30 @@ public class SimulatorView extends StateBasedViewPart {
 			toolkit.adapt(timeGroup);
 			toolkit.paintBordersFor(timeGroup);
 		}
-		{
-			classGroup = new Group(container, SWT.BORDER);
-			classGroup.setText("Classes");
-			classGroup.setLayout(new RowLayout(SWT.HORIZONTAL));
-			fd_classGroup = new FormData();
-			fd_classGroup.top = new FormAttachment(0, 10);
-			fd_classGroup.left = new FormAttachment(0, 69);
-			fd_classGroup.right = new FormAttachment(buttonGroup, -12);
-			classGroup.setLayoutData(fd_classGroup);
-			toolkit.adapt(classGroup);
-			toolkit.paintBordersFor(classGroup);
-		}
-		{
-			associationGroup = new Group(container, SWT.BORDER);
-			associationGroup.setText("Associations");
-			associationGroup.setLayout(new RowLayout(SWT.HORIZONTAL));
-			fd_associationGroup = new FormData();
-			fd_associationGroup.top = new FormAttachment(classGroup, 12);
-			fd_associationGroup.left = new FormAttachment(0, 67);
-			fd_associationGroup.right = new FormAttachment(buttonGroup, -12);
-			associationGroup.setLayoutData(fd_associationGroup);
-			toolkit.adapt(associationGroup);
-			toolkit.paintBordersFor(associationGroup);
-		}
+//		{
+//			classGroup = new Group(container, SWT.BORDER);
+//			classGroup.setText("Classes");
+//			classGroup.setLayout(new RowLayout(SWT.HORIZONTAL));
+//			fd_classGroup = new FormData();
+//			fd_classGroup.top = new FormAttachment(0, 10);
+//			fd_classGroup.left = new FormAttachment(0, 69);
+//			fd_classGroup.right = new FormAttachment(buttonGroup, -12);
+//			classGroup.setLayoutData(fd_classGroup);
+//			toolkit.adapt(classGroup);
+//			toolkit.paintBordersFor(classGroup);
+//		}
+//		{
+//			associationGroup = new Group(container, SWT.BORDER);
+//			associationGroup.setText("Associations");
+//			associationGroup.setLayout(new RowLayout(SWT.HORIZONTAL));
+//			fd_associationGroup = new FormData();
+//			fd_associationGroup.top = new FormAttachment(classGroup, 12);
+//			fd_associationGroup.left = new FormAttachment(0, 67);
+//			fd_associationGroup.right = new FormAttachment(buttonGroup, -12);
+//			associationGroup.setLayoutData(fd_associationGroup);
+//			toolkit.adapt(associationGroup);
+//			toolkit.paintBordersFor(associationGroup);
+//		}
 	}
 
 	////////////////////////////////////////////
@@ -708,7 +698,7 @@ public class SimulatorView extends StateBasedViewPart {
 			List<Operation> enabledOperations = getAnimator().getCurrentState().getEnabledOperations();
 			for (Operation op : enabledOperations){
 				if ("SETUP_CONTEXT".equals(op.getName())){
-					if (oracle.isPlayback() && "SETUP_CONTEXT".equals(oracle.findNextOperation(animator).getName())){
+					if (oracle.isPlayback() && "SETUP_CONTEXT".equals(oracle.findNextOperation(getAnimator()).getName())){
 						oracle.consumeNextStep();
 					}
 					executeOperation(op,false);
@@ -787,8 +777,8 @@ public class SimulatorView extends StateBasedViewPart {
 		History history = getAnimator().getHistory();
 		if (historyPosition ==0 || history.getCurrentPosition()>historyPosition) {
 			Map<String, Variable> stateMap = getAnimator().getCurrentState().getValues();
-			UpdateStateLists.getInstance().execute(stateMap);
-			UpdateEnabledOpsList.getInstance().execute();
+			UpdateStateLists.execute(this, clock, stateMap);
+			UpdateEnabledOpsList.execute(this);
 			
 			OracleHandler oracle = getOracle();
 			if (oracle!=null) {

@@ -30,37 +30,26 @@ import de.prob.core.domainobjects.Operation;
 import de.prob.core.domainobjects.State;
 import de.prob.exceptions.ProBException;
 
+
 public class UpdateEnabledOpsList {
 	
-	private static UpdateEnabledOpsList instance = null;
-	private List<Class> classList = new ArrayList<Class>();
 	private UpdateEnabledOpsList(){ //prevent instantiation
 	}
 	
 	/**
 	 * 
-	 * @return
 	 */
-	public static UpdateEnabledOpsList getInstance(){
-		if (instance == null)
-			instance = new UpdateEnabledOpsList();
-		return instance;
-	}
-	
-	/**
-	 * 
-	 */
-	public void execute(){
+	public static void execute(SimulatorView simulatorView){
 		// return if there is no simulator view
-		SimulatorView simulator = SimulatorView.getSimulator();
-		if(simulator == null){
+		if(simulatorView == null){
 			return;
 		}
 
-		Machine mch = simulator.getMachine();
+		Machine mch = simulatorView.getMachine();
 		if(mch == null) return;
 
-		EList<AbstractExtension> exts = simulator.getMachine().getExtensions();
+		List<Class> classList = new ArrayList<Class>();
+		EList<AbstractExtension> exts = simulatorView.getMachine().getExtensions();
 		// go through each extension and process components
 		for (AbstractExtension ext : exts) {
 			if (ext instanceof Classdiagram) {
@@ -71,7 +60,7 @@ public class UpdateEnabledOpsList {
 		Animator animator = Animator.getAnimator();
 		State currentState = animator.getCurrentState();
 		List<Operation> enabledOps = currentState.getEnabledOperations();
-		Table methodsTable = simulator.getMethodsTable();
+		Table methodsTable = simulatorView.getMethodsTable();
 		if (methodsTable == null) return;
 		methodsTable.removeAll();
 		
@@ -94,12 +83,12 @@ public class UpdateEnabledOpsList {
 //					}
 //				}
 //			}
-			if (SimulatorView.getSimulator().isExternal(op)) {
+			if (simulatorView.isExternal(op)) {
 				TableItem tableItem = new TableItem(methodsTable, SWT.NULL);
 				String[] rowString = {operationInStringFormat(op)}; 
 	//			String[] rowString = {className, operationInStringFormat(op)};
 				tableItem.setText(rowString);
-				if (SimulatorView.getSimulator().isNextOp(op)) {
+				if (simulatorView.isNextOp(op)) {
 					select = j;
 				}
 				//className = "";
@@ -118,8 +107,7 @@ public class UpdateEnabledOpsList {
 	 * @param opSignature
 	 * @return
 	 */
-	public Operation findOperation(String opSignature) {
-		Animator animator = SimulatorView.getSimulator().getAnimator();
+	public static Operation findOperation(Animator animator, String opSignature) {
 		List<Operation> enabledOpsList = null;
 		try {
 			enabledOpsList = GetEnabledOperationsCommand.getOperations(
@@ -143,7 +131,7 @@ public class UpdateEnabledOpsList {
 	 * @param op
 	 * @return
 	 */
-	private String operationInStringFormat(Operation op) {
+	private static String operationInStringFormat(Operation op) {
 		return op.toString().replaceFirst("\\(", " (");
 	}
 }

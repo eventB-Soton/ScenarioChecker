@@ -64,8 +64,8 @@ public class SimulateHandler extends AbstractHandler implements IHandler {
 			e.printStackTrace();
 		}
 		
-		SimulatorView.getSimulator().initialise(mchRoot); //, HandlerUtil.getActiveWorkbenchWindow(event));
-	
+		SimulatorView.getSimulatorView().initialise(mchRoot);
+
 		return null;
 	}
 
