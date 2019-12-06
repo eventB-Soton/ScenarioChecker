@@ -149,7 +149,7 @@
                moveable="true"
                ratio="0.6f"
                relationship="right"
-               relative="org.eclipse.ui.views.PropertySheet"
+               relative="ac.soton.umlb.simulator.SimulatorView"
                visible="true">
          </view>
          <view

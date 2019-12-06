@@ -28,11 +28,11 @@ import org.eclipse.emf.workspace.util.WorkspaceSynchronizer;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.CBanner;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
@@ -43,7 +43,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorPart;
@@ -72,13 +71,13 @@ import ac.soton.eventb.statemachines.diagram.part.StatemachinesDiagramEditor;
 import ac.soton.umlb.internal.simulator.BMSStarter;
 import ac.soton.umlb.internal.simulator.Clock;
 import ac.soton.umlb.internal.simulator.OracleHandler;
-import ac.soton.umlb.internal.simulator.UpdateEnabledOpsList;
-import ac.soton.umlb.internal.simulator.UpdateStateLists;
 import ac.soton.umlb.internal.simulator.perspectives.SimPerspective;
 import de.bmotionstudio.gef.editor.BMotionStudioEditor;
 import de.prob.core.Animator;
 import de.prob.core.LanguageDependendAnimationPart;
 import de.prob.core.command.ExecuteOperationCommand;
+import de.prob.core.command.GetCurrentStateIdCommand;
+import de.prob.core.command.GetEnabledOperationsCommand;
 import de.prob.core.command.LoadEventBModelCommand;
 import de.prob.core.domainobjects.History;
 import de.prob.core.domainobjects.Operation;
@@ -86,12 +85,16 @@ import de.prob.core.domainobjects.State;
 import de.prob.core.domainobjects.Variable;
 import de.prob.exceptions.ProBException;
 import de.prob.ui.StateBasedViewPart;
-import swing2swt.layout.FlowLayout;
 
 public class SimulatorView extends StateBasedViewPart {
 	
 	public static final String ID = "ac.soton.umlb.internal.simulator.views.SimulatorView"; //$NON-NLS-1$
 	private static final String BMOTION_STUDIO_EXT = "bmso";
+	
+	Display display = Display.getCurrent();
+	Color red = display.getSystemColor(SWT.COLOR_RED);
+	Color green = display.getSystemColor(SWT.COLOR_GREEN);
+	Color blue = display.getSystemColor(SWT.COLOR_BLUE);
 	
 	private static SimulatorView simulatorView = null;
 	public SimulatorView() {
@@ -105,7 +108,7 @@ public class SimulatorView extends StateBasedViewPart {
 	}
 
 	private Animator animator;
-	public Animator getAnimator() {
+	private Animator getAnimator() {
 		if (animator==null) {
 			animator = Animator.getAnimator();
 		}
@@ -134,8 +137,7 @@ public class SimulatorView extends StateBasedViewPart {
 	
 	private String statusText;
 	private String oldStatusText;
-
-	public String getStatusText() {
+	private String getStatusText() {
 		if (statusText == null) statusText = "NULL";
 		return statusText;
 	}
@@ -150,9 +152,7 @@ public class SimulatorView extends StateBasedViewPart {
 	
 	private IProject project;
 	private Machine machine;
-	public Machine getMachine(){
-		return machine;
-	}
+	
 	List<Statemachine> stateMachines = new ArrayList<Statemachine>(); 
 	List<IFile> bmsFiles = new ArrayList<IFile>();
 
@@ -170,7 +170,7 @@ public class SimulatorView extends StateBasedViewPart {
 		bmsFiles.clear();
 
 		// start ProB animator
-		System.out.println("Starting ProB for " + machine);
+		System.out.println("Starting ProB for " + machine.getName());
 		try {
 			project.refreshLocal(IResource.DEPTH_ONE, null); // ensure files seen in workspace
 			LoadEventBModelCommand.load(getAnimator(), mchRoot);
@@ -270,59 +270,11 @@ public class SimulatorView extends StateBasedViewPart {
 	private Button btnReplay;
 	private Button btnRestart;
 	private Button btnStep;
+	private Button btnInd;
 	private Table methodsTable;
 	private Composite container;
-	private Composite parent;
-
 	private String countField = "5";
-
-	public Composite getParent() {
-		return parent;
-	}
-
-	public Composite getContainer() {
-		return container;
-	}
-
-	private Group buttonGroup;
-	private Group timeGroup;
-	private Table statusTable;
-//	private Group classGroup;
-//	private Group associationGroup;
-//	private FormData fd_classGroup;
-//	private FormData fd_associationGroup;
-	private FormData fd_timeGroup;
 	private Clock clock = Clock.getInstance();
-
-//	public Group getAssociationGroup() {
-//		return associationGroup;
-//	}
-
-	public Group getTimeGroup() {
-		return timeGroup;
-	}
-	
-	public void updateStatusTable() {
-		if (statusTable != null) statusTable.dispose();
-		statusTable = new Table(timeGroup, SWT.BORDER | SWT.FULL_SELECTION);
-		toolkit.adapt(statusTable);
-		toolkit.paintBordersFor(statusTable);
-		statusTable.setHeaderVisible(true);
-		statusTable.setLinesVisible(false);
-		TableColumn col = new TableColumn(statusTable, SWT.NULL);
-		col.setText(getStatusText());
-		col.pack();
-		timeGroup.layout();
-	}
-
-//	public Group getClassGroup() {
-//		return classGroup;
-//	}
-
-	public Table getMethodsTable() {
-		return methodsTable;
-	}
-	
 	private Operation manuallySelectedOp = null;
 	private int historyPosition=0;
 	
@@ -334,18 +286,20 @@ public class SimulatorView extends StateBasedViewPart {
 	 */
 	@Override
 	public Control createStatePartControl(Composite parent) {			
-		this.parent = parent;
+//		this.parent = parent;
 		getOracle().restart(getSite().getShell(), "UML-B", machine);
 		
 		if (oracle.isPlayback()) statusText = "Playback";
 		else statusText = "Recording";
 		
-		container = toolkit.createComposite(parent, SWT.V_SCROLL);
+		container = toolkit.createComposite(parent, SWT.V_SCROLL | SWT.H_SCROLL | SWT.NO_REDRAW_RESIZE );
 		toolkit.paintBordersFor(container);
 		container.setLayout(new FormLayout());
+		
+		Group buttonGroup = createButtonGroup();
+		
 		{
-			methodsTable = new Table(container, SWT.BORDER
-					| SWT.FULL_SELECTION);
+			methodsTable = new Table(container, SWT.BORDER	| SWT.FULL_SELECTION);
 			methodsTable.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseUp(MouseEvent e) {
@@ -361,7 +315,7 @@ public class SimulatorView extends StateBasedViewPart {
 					}
 					
 					TableItem selected = methodsTable.getItem(methodsTable.getSelectionIndex());
-					manuallySelectedOp = UpdateEnabledOpsList.findOperation(getAnimator(), selected.getText(0));
+					manuallySelectedOp = findOperation(getAnimator(), selected.getText(0));
 				}
 				
 				@Override
@@ -378,7 +332,7 @@ public class SimulatorView extends StateBasedViewPart {
 					}
 					
 					TableItem selected = methodsTable.getItem(methodsTable.getSelectionIndex());
-					manuallySelectedOp = UpdateEnabledOpsList.findOperation(getAnimator(), selected.getText(0));
+					manuallySelectedOp = findOperation(getAnimator(), selected.getText(0));
 					try {
 						bigStep();
 					} catch (ProBException e1) {
@@ -388,236 +342,209 @@ public class SimulatorView extends StateBasedViewPart {
 				}
 			});
 			fd_methodsTable = new FormData();
-			fd_methodsTable.width=2000;
+			//fd_methodsTable.width=500;
+			fd_methodsTable.left = new FormAttachment(buttonGroup, 10);
+			fd_methodsTable.right = new FormAttachment(100, -5);
+			fd_methodsTable.top = new FormAttachment(0, 5);
+			fd_methodsTable.bottom = new FormAttachment(100, -5);
 			methodsTable.setLayoutData(fd_methodsTable);
 
-			String[] title = {"         Enabled External Operations                 "};
-
-			int lastColumnIndex = title.length;
-			for (int loopIndex = 0; loopIndex < lastColumnIndex; loopIndex++) {
-				TableColumn col = new TableColumn(methodsTable, SWT.NULL);
-				col.setText(title[loopIndex]);
-			}
+			String[] title = {"Enabled External Operations"};
+			methodsTable.setToolTipText(title[0]);
 			
 			toolkit.adapt(methodsTable);
 			toolkit.paintBordersFor(methodsTable);
 			methodsTable.setHeaderVisible(true);
 			methodsTable.setLinesVisible(true);
 			
-			for(int i = 0; i < lastColumnIndex; i++){
-				methodsTable.getColumn(i).pack();
-			}
+			methodsTable.pack();
 
-			createNewGroups();
 		}
 		initializeToolBar();
 		initializeMenu();
 		setup(); 
+
 		return container;
 	}
-
+	
 	/**
-	 * creates new groups - note this is called to update state as well as initial setup
+	 * creates new button group - note this is called to update state as well as initial setup
+	 * @return 
 	 */
-	public void createNewGroups() {
-		{
-			buttonGroup = new Group(container, SWT.BORDER);
-			fd_methodsTable.left = new FormAttachment(buttonGroup, 29);
-			fd_methodsTable.top = new FormAttachment(0, 10);
-			fd_buttonGroup = new FormData();
-			fd_buttonGroup.top = new FormAttachment(0, 100);
-			fd_buttonGroup.right = new FormAttachment(100, -700);
-			buttonGroup.setLayoutData(fd_buttonGroup);
-			toolkit.adapt(buttonGroup);
-			toolkit.paintBordersFor(buttonGroup);
-			buttonGroup.setLayout(null);
-			{	//BIG STEP
-				btnTickN = new Button(buttonGroup, SWT.NONE);
-				btnTickN.setBounds(10, 10, 85, 25);
-				btnTickN.addMouseListener(new MouseAdapter() {
-					@Override
-					public void mouseUp(MouseEvent e) {
-						try {
-							bigStep();
-						} catch (ProBException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
-						}
+	private Group createButtonGroup() {
+		Group buttonGroup =  new Group(container, SWT.BORDER);
+		fd_buttonGroup = new FormData();
+		fd_buttonGroup.top = new FormAttachment(0, 5);
+		//fd_buttonGroup.right = new FormAttachment(100, -700);
+		buttonGroup.setLayoutData(fd_buttonGroup);
+		toolkit.adapt(buttonGroup);
+		toolkit.paintBordersFor(buttonGroup);
+		buttonGroup.setLayout(null);
+		{	//INDICATOR - not a button
+			btnInd = new Button(buttonGroup, SWT.NONE);
+			btnInd.setBounds(10, 10, 110, 25);
+			toolkit.adapt(btnInd, true, true);
+			btnInd.setText("Recording");
+			btnInd.setBackground(red);
+		}
+		{	//BIG STEP
+			btnTickN = new Button(buttonGroup, SWT.NONE);
+			btnTickN.setBounds(10, 40, 85, 25);
+			btnTickN.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseUp(MouseEvent e) {
+					try {
+						bigStep();
+					} catch (ProBException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
 					}
-				});
-				toolkit.adapt(btnTickN, true, true);
-				btnTickN.setText("Big Step");
-			}
-			{	//SML STEP
-				btnStep = new Button(buttonGroup, SWT.NONE);
-				btnStep.addMouseListener(new MouseAdapter() {
-					@Override
-					public void mouseUp(MouseEvent e) {
-						singleStep();
+				}
+			});
+			toolkit.adapt(btnTickN, true, true);
+			btnTickN.setText("Big Step");
+		}
+		{	//SML STEP
+			btnStep = new Button(buttonGroup, SWT.NONE);
+			btnStep.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseUp(MouseEvent e) {
+					singleStep();
+				}
+			});
+			btnStep.setBounds(10, 70, 85, 25);
+			toolkit.adapt(btnStep, true, true);
+			btnStep.setText("Sml Step");
+		}
+		{	//RUN FOR
+			btnContinue = new Button(buttonGroup, SWT.NONE);
+			btnContinue.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseUp(MouseEvent e) {
+					try {
+						runForTicks();
+					} catch (ProBException e1) {
+						e1.printStackTrace();
 					}
-				});
-				btnStep.setBounds(10, 41, 85, 25);
-				toolkit.adapt(btnStep, true, true);
-				btnStep.setText("Sml Step");
-			}
-			{	//RUN FOR
-				btnContinue = new Button(buttonGroup, SWT.NONE);
-				btnContinue.addMouseListener(new MouseAdapter() {
-					@Override
-					public void mouseUp(MouseEvent e) {
-						try {
-							runForTicks();
-						} catch (ProBException e1) {
-							e1.printStackTrace();
-						}
+				}
+			});
+			btnContinue.setBounds(10, 100, 80, 25);
+			toolkit.adapt(btnContinue, true, true);
+			btnContinue.setText("Run For");
+		}
+		{	//Tick Count
+			count = new Text(buttonGroup, SWT.BORDER);
+			count.addFocusListener(new FocusAdapter() {
+				@Override
+				public void focusLost(FocusEvent e) {
+					if (e.widget instanceof Text) {
+						String newText = ((Text) e.widget).getText();
+						count.setText(newText);
+						countField = newText;
+						count.pack();
 					}
-				});
-				btnContinue.setBounds(10, 72, 85, 25);
-				toolkit.adapt(btnContinue, true, true);
-				btnContinue.setText("Run For");
-			}
-			{	//Tick Count
-				count = new Text(buttonGroup, SWT.BORDER);
-				count.addFocusListener(new FocusAdapter() {
-					@Override
-					public void focusLost(FocusEvent e) {
-						if (e.widget instanceof Text) {
-							String newText = ((Text) e.widget).getText();
-							count.setText(newText);
-							countField = newText;
-							count.pack();
-						}
-					}
-				});
-				count.setBounds(90, 72, 30, 20);
-				count.setText(countField);
-				toolkit.adapt(count, true, true);
-			}
+				}
+			});
+			count.setBounds(80, 100, 30, 20);
+			count.setText(countField);
+			toolkit.adapt(count, true, true);
+		}
 
-			{	//RESTART
-				btnRestart = new Button(buttonGroup, SWT.NONE);
-				btnRestart.setBounds(92, 10, 70, 25);
-				btnRestart.addMouseListener(new MouseAdapter() {
-					@Override
-					public void mouseUp(MouseEvent e) {	
-							clock.reset();
-							historyPosition=0;
-							if (oracle.isPlayback()){
-								oracle.stopPlayback(false);
-								oracle.startPlayback(true);
-								statusText = "PlayBack";
-							}else{
-								oracle.stopRecording(false);
-								oracle.startRecording();	
-								statusText = "Recording";
-							}
-							updateStatusTable();
-							restartAnimator();
-					}
-				});
-				toolkit.adapt(btnRestart, true, true);
-				btnRestart.setText("Restart");
-			}
-			{	//SAVE
-				btnSave = new Button(buttonGroup, SWT.NONE);
-				btnSave.setBounds(160, 10, 70, 25);
-				btnSave.addMouseListener(new MouseAdapter() {
-					@Override
-					public void mouseUp(MouseEvent e) {
-						oracle.saveRecording();
-						if (!"Saved".equals(statusText)) oldStatusText = statusText;
-						statusText = "Saved";
-						updateStatusTable();
-					}
-				});
-				toolkit.adapt(btnSave, true, true);
-				btnSave.setText("Save");
-			}
-			{	//REPLAY
-				btnReplay = new Button(buttonGroup, SWT.NONE);
-				btnReplay.setBounds(160, 41, 70, 25);
-				btnReplay.addMouseListener(new MouseAdapter() {
-					@Override
-					public void mouseUp(MouseEvent e) {
+		{	//RESTART
+			btnRestart = new Button(buttonGroup, SWT.NONE);
+			btnRestart.setBounds(10, 130, 85, 25); 	//92, 10, 70, 25);
+			btnRestart.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseUp(MouseEvent e) {	
 						clock.reset();
 						historyPosition=0;
-						if (!oracle.isPlayback()){
-							oracle.stopRecording(false);
-							oracle.startPlayback(false);
-						}
-						statusText = "Playback";
-						updateStatusTable();
-						restartAnimator();
-					}
-				});
-				btnReplay.setText("Replay");
-				toolkit.adapt(btnReplay, true, true);
-
-			}
-			{	//STOP
-				btnStop = new Button(buttonGroup, SWT.NONE);
-				btnStop.setBounds(160, 72, 70, 25);
-				btnStop.addMouseListener(new MouseAdapter() {
-					@Override
-					public void mouseUp(MouseEvent e) {				
 						if (oracle.isPlayback()){
 							oracle.stopPlayback(false);
+							oracle.startPlayback(true);
+							statusText = "PlayBack";
+						}else{
+							oracle.stopRecording(false);
+							oracle.startRecording();	
 							statusText = "Recording";
 						}
-						updateStatusTable();
+						updateModeIndicator();
+						restartAnimator();
+				}
+			});
+			toolkit.adapt(btnRestart, true, true);
+			btnRestart.setText("Restart");
+		}
+		{	//SAVE
+			btnSave = new Button(buttonGroup, SWT.NONE);
+			btnSave.setBounds(10, 160, 85, 25); //160, 10, 70, 25);
+			btnSave.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseUp(MouseEvent e) {
+					oracle.saveRecording();
+					if (!"Saved".equals(statusText)) oldStatusText = statusText;
+					statusText = "Saved";
+					updateModeIndicator();
+				}
+			});
+			toolkit.adapt(btnSave, true, true);
+			btnSave.setText("Save");
+		}
+		{	//REPLAY
+			btnReplay = new Button(buttonGroup, SWT.NONE);
+			btnReplay.setBounds(10, 190, 85, 25); //160, 41, 70, 25);
+			btnReplay.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseUp(MouseEvent e) {
+					clock.reset();
+					historyPosition=0;
+					if (!oracle.isPlayback()){
+						oracle.stopRecording(false);
+						oracle.startPlayback(false);
 					}
-				});
+					statusText = "Playback";
+					updateModeIndicator();
+					restartAnimator();
+				}
+			});
+			btnReplay.setText("Replay");
+			toolkit.adapt(btnReplay, true, true);
 
-				toolkit.adapt(btnStop, true, true);
-				btnStop.setText("Stop");
-			}
+		}
+		{	//STOP
+			btnStop = new Button(buttonGroup, SWT.NONE);
+			btnStop.setBounds(10, 220, 85, 25); //160, 72, 70, 25);
+			btnStop.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseUp(MouseEvent e) {				
+					if (oracle.isPlayback()){
+						oracle.stopPlayback(false);
+						statusText = "Recording";
+					}
+					updateModeIndicator();
+				}
+			});
+
+			toolkit.adapt(btnStop, true, true);
+			btnStop.setText("Stop");
 		}
 
-		CBanner banner = new CBanner(container, SWT.NONE);
-		fd_methodsTable.bottom = new FormAttachment(100, -10);
-		FormData fd_banner = new FormData();
-		fd_banner.top = new FormAttachment(0, 290);
-		fd_banner.left = new FormAttachment(0, 430);
-		banner.setLayoutData(fd_banner);
-		toolkit.adapt(banner);
-		toolkit.paintBordersFor(banner);
-		{
-			timeGroup = new Group(container, SWT.BORDER);
-			timeGroup.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
-			fd_timeGroup = new FormData();
-			fd_timeGroup.right = new FormAttachment(buttonGroup, 0, SWT.RIGHT);
-			fd_timeGroup.top = new FormAttachment(methodsTable, 0, SWT.TOP);
-			fd_timeGroup.left = new FormAttachment(buttonGroup, 0, SWT.LEFT);
-			timeGroup.setLayoutData(fd_timeGroup);
-			toolkit.adapt(timeGroup);
-			toolkit.paintBordersFor(timeGroup);
-		}
-//		{
-//			classGroup = new Group(container, SWT.BORDER);
-//			classGroup.setText("Classes");
-//			classGroup.setLayout(new RowLayout(SWT.HORIZONTAL));
-//			fd_classGroup = new FormData();
-//			fd_classGroup.top = new FormAttachment(0, 10);
-//			fd_classGroup.left = new FormAttachment(0, 69);
-//			fd_classGroup.right = new FormAttachment(buttonGroup, -12);
-//			classGroup.setLayoutData(fd_classGroup);
-//			toolkit.adapt(classGroup);
-//			toolkit.paintBordersFor(classGroup);
-//		}
-//		{
-//			associationGroup = new Group(container, SWT.BORDER);
-//			associationGroup.setText("Associations");
-//			associationGroup.setLayout(new RowLayout(SWT.HORIZONTAL));
-//			fd_associationGroup = new FormData();
-//			fd_associationGroup.top = new FormAttachment(classGroup, 12);
-//			fd_associationGroup.left = new FormAttachment(0, 67);
-//			fd_associationGroup.right = new FormAttachment(buttonGroup, -12);
-//			associationGroup.setLayoutData(fd_associationGroup);
-//			toolkit.adapt(associationGroup);
-//			toolkit.paintBordersFor(associationGroup);
-//		}
+		updateModeIndicator();
+		return buttonGroup;
 	}
 
+	private void updateModeIndicator() {
+		if (!oracle.isPlayback()) {
+			btnInd.setText(getStatusText());
+			btnInd.setBackground(red);
+			btnInd.setForeground(red);
+		}else {
+			btnInd.setText(getStatusText());
+			btnInd.setBackground(blue);
+			btnInd.setForeground(blue);
+		}
+	}
+	
+	
 	////////////////////////////////////////////
 	
 	// implements the big step behaviour where we 
@@ -774,11 +701,34 @@ public class SimulatorView extends StateBasedViewPart {
  */
 	@Override
 	protected void stateChanged(final State activeState, final Operation operation) {
+		if (machine==null) 
+			return;
 		History history = getAnimator().getHistory();
 		if (historyPosition ==0 || history.getCurrentPosition()>historyPosition) {
 			Map<String, Variable> stateMap = getAnimator().getCurrentState().getValues();
-			UpdateStateLists.execute(this, clock, stateMap);
-			UpdateEnabledOpsList.execute(this);
+			createButtonGroup();
+			
+			{	//update the enabled ops table
+				if (methodsTable == null) return;
+				State currentState = animator.getCurrentState();
+				List<Operation> enabledOps = currentState.getEnabledOperations();
+				methodsTable.removeAll();
+				// for each enabled operation in the ProB model
+				int select = -1;
+				int j=0;
+				for(Operation op: enabledOps){
+					if (isExternal(op)) {
+						TableItem tableItem = new TableItem(methodsTable, SWT.NULL);
+						String[] rowString = {operationInStringFormat(op)}; 
+						tableItem.setText(rowString);
+						if (isNextOp(op)) {
+							select = j;
+						}
+						j++;
+					}
+				}
+				if (select>-1) methodsTable.select(select);
+			}
 			
 			OracleHandler oracle = getOracle();
 			if (oracle!=null) {
@@ -805,8 +755,8 @@ public class SimulatorView extends StateBasedViewPart {
 			}
 			historyPosition = history.getCurrentPosition();
 		}
-	}
-
+	}	
+	
 	/**
 	 * Initialize the toolbar.
 	 */
@@ -916,11 +866,11 @@ public class SimulatorView extends StateBasedViewPart {
 		return true;
 	}
 
-	public boolean isExternal (Operation op) {
+	private boolean isExternal (Operation op) {
 		return isExternal(op.getName());
 	}
 	
-	public boolean isExternal(String name) {
+	private boolean isExternal(String name) {
 		return isExternal(findEvent(name));
 	}
 	
@@ -930,7 +880,7 @@ public class SimulatorView extends StateBasedViewPart {
 	}
 	
 	
-	public boolean isInternal(Operation op) {
+	private boolean isInternal(Operation op) {
 		return isInternal(op.getName());
 	}
 	
@@ -993,6 +943,7 @@ public class SimulatorView extends StateBasedViewPart {
 	 * @return
 	 */
 	private Event findEvent(String name) { 
+		if (machine==null) return null;
 		if (!eventMap.containsKey(name)) {
 			Event found = null;
 			for (Event ev : machine.getEvents()) {
@@ -1019,11 +970,42 @@ public class SimulatorView extends StateBasedViewPart {
 		return variableMap.get(name);
 	}
 
-	public boolean isNextOp(Operation op) {
+	private boolean isNextOp(Operation op) {
 		return op==manuallySelectedOp || 
 				(oracle.isPlayback() && op==oracle.findNextOperation(getAnimator()));
 	}
 
-
+	/**
+	 * 
+	 * @param opSignature
+	 * @return
+	 */
+	private Operation findOperation(Animator animator, String opSignature) {
+		List<Operation> enabledOpsList = null;
+		try {
+			enabledOpsList = GetEnabledOperationsCommand.getOperations(
+					animator,
+					GetCurrentStateIdCommand.getID(animator));
+		} catch (ProBException e1) {
+			e1.printStackTrace();
+		}
+		if (enabledOpsList != null) {
+			for (Operation op : enabledOpsList) {
+				if (opSignature.equals(operationInStringFormat(op))){
+					return op;
+				}
+			}
+		}
+		return null;
+	}
+	
+	/**
+	 * 
+	 * @param op
+	 * @return
+	 */
+	private String operationInStringFormat(Operation op) {
+		return op.toString().replaceFirst("\\(", " (");
+	}
 
 }
