@@ -924,16 +924,28 @@ public class SimulatorView extends StateBasedViewPart {
 	}
 	
 
+	/** 
+	 * gets the priority of an event where a low number is high priority 
+	 * (-1 indicates null event)
+	 * external are always the lowest priority (highest integer returned) 
+	 * internal events may be prioritised by a comment 
+	 * 
+	 * @param ev
+	 * @return
+	 */
 	private Integer getPriority(Event ev) {
 		if (ev == null) return -1;
 		if (!eventPriorities.containsKey(ev)) {
 			String priString = ev.getComment();
 			Integer pri = Integer.MAX_VALUE;
-			if (priString!=null && priString.contains("<PRIORITY=")) {
-				priString = priString.substring(priString.indexOf("<PRIORITY=")+10);
-				int i = priString.indexOf(">"); 
-				if (i>0)  priString =  priString.substring(0,i);
-				pri = Integer.valueOf(priString);
+			if (isInternal(ev)) {
+				pri = pri-1;	//internal events default to slightly higher priority than external
+				if (priString!=null && priString.contains("<PRIORITY=")) {
+					priString = priString.substring(priString.indexOf("<PRIORITY=")+10);
+					int i = priString.indexOf(">"); 
+					if (i>0)  priString =  priString.substring(0,i);
+					pri = Integer.valueOf(priString);
+				}
 			}
 			eventPriorities.put(ev, pri);
 		}
