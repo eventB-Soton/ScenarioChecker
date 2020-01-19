@@ -627,8 +627,11 @@ public class SimulatorView extends StateBasedViewPart {
 			List<Operation> enabledOperations = getAnimator().getCurrentState().getEnabledOperations();
 			for (Operation op : enabledOperations){
 				if ("SETUP_CONTEXT".equals(op.getName())){
-					if (oracle.isPlayback() && "SETUP_CONTEXT".equals(oracle.findNextOperation(getAnimator()).getName())){
-						oracle.consumeNextStep();
+					if (oracle.isPlayback()) {
+						Operation nextop = oracle.findNextOperation(getAnimator());
+						if (nextop!=null && "SETUP_CONTEXT".equals(nextop.getName())){
+							oracle.consumeNextStep();
+						}
 					}
 					executeOperation(op,false);
 					ret=true;
