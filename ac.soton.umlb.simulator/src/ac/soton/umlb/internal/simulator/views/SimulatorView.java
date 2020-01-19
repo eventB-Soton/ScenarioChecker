@@ -557,8 +557,10 @@ public class SimulatorView extends StateBasedViewPart {
 		//execute at least one
 		progress = executeOperation(op, false);
 		//continue executing any internal operations
-		while (progress && (op = findNextOperation())!=null && isInternal(op)) {
+		List<Operation> loop = new ArrayList<Operation>(); //prevent infinite looping in case doesn't converge
+		while (progress && (op = findNextOperation())!=null && isInternal(op) && !loop.contains(op)) {
 			progress = executeOperation(op, false);
+			loop.add(op);
 		}
 		return progress;
 	}
