@@ -27,8 +27,8 @@
          point="org.eclipse.ui.views">
       <view
             category="ac.soton.umlb.viewCategory"
-            class="ac.soton.umlb.internal.simulator.views.SimulatorView"
-            id="ac.soton.umlb.simulator.SimulatorView"
+            class="ac.soton.eventb.internal.scenariochecker.views.SimulatorView"
+            id="ac.soton.eventb.scenariochecker.SimulatorView"
             name="%simViewName">
       </view>
    </extension>
@@ -79,15 +79,15 @@
       <command
             categoryId="ac.soton.eventb.emf.diagrams.iUMLB"
             description="%simulateCommandDescription"
-            id="ac.soton.umlb.simulator.simulateCommand"
+            id="ac.soton.eventb.scenariochecker.simulateCommand"
             name="%simulateCommand">
       </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
       <handler
-            class="ac.soton.umlb.internal.simulator.handlers.SimulateHandler"
-            commandId="ac.soton.umlb.simulator.simulateCommand">
+            class="ac.soton.eventb.internal.scenariochecker.handlers.SimulateHandler"
+            commandId="ac.soton.eventb.scenariochecker.simulateCommand">
       </handler>
    </extension>
    <extension
@@ -96,7 +96,7 @@
             allPopups="true"
             locationURI="popup:ac.soton.umlb.ui.simulationMenu">
          <command
-               commandId="ac.soton.umlb.simulator.simulateCommand"
+               commandId="ac.soton.eventb.scenariochecker.simulateCommand"
                label="%simulateCommandLabel"
                mnemonic="S"
                style="push"
@@ -111,9 +111,9 @@
    <extension
          point="org.eclipse.ui.perspectives">
       <perspective
-            class="ac.soton.umlb.internal.simulator.perspectives.SimPerspective"
+            class="ac.soton.eventb.internal.scenariochecker.perspectives.SimPerspective"
             icon = "icons/umlb.png"
-            id="ac.soton.umlb.simulator.simPerspective"
+            id="ac.soton.eventb.scenariochecker.simPerspective"
             name="%simPerspectiveName">
       </perspective>
    </extension>
@@ -121,10 +121,10 @@
    <extension
          point="org.eclipse.ui.perspectiveExtensions">
       <perspectiveExtension
-            targetID="ac.soton.umlb.simulator.simPerspective">
+            targetID="ac.soton.eventb.scenariochecker.simPerspective">
          <view
                closeable="true"
-               id="ac.soton.umlb.simulator.SimulatorView"
+               id="ac.soton.eventb.scenariochecker.SimulatorView"
                minimized="false"
                moveable="true"
                ratio="0.6f"
@@ -149,7 +149,7 @@
                moveable="true"
                ratio="0.6f"
                relationship="right"
-               relative="ac.soton.umlb.simulator.SimulatorView"
+               relative="ac.soton.eventb.scenariochecker.SimulatorView"
                visible="true">
          </view>
          <view
@@ -181,7 +181,7 @@
          </view>
          
          <viewShortcut
-               id="ac.soton.umlb.simulator.SimulatorView">
+               id="ac.soton.eventb.scenariochecker.SimulatorView">
          </viewShortcut>
          <viewShortcut
                id="fr.systerel.explorer.navigator.view">

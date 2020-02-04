@@ -8,7 +8,7 @@
  *  Contributors:
  *  University of Southampton - Initial implementation
  *******************************************************************************/
-package ac.soton.umlb.internal.simulator;
+package ac.soton.eventb.internal.scenariochecker;
 
 import java.awt.*;
 import java.awt.event.*;

@@ -1,4 +1,4 @@
-package ac.soton.umlb.internal.simulator;
+package ac.soton.eventb.internal.scenariochecker;
 
 /**
  * Simple centralised clock for keeping track of the simulator ticks

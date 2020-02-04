@@ -8,7 +8,7 @@
  *  Contributors:
  *  University of Southampton - Initial implementation
  *******************************************************************************/
-package ac.soton.umlb.internal.simulator.handlers;
+package ac.soton.eventb.internal.scenariochecker.handlers;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -22,8 +22,8 @@ import org.eclipse.ui.WorkbenchException;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.eventb.core.IMachineRoot;
 
-import ac.soton.umlb.internal.simulator.perspectives.SimPerspective;
-import ac.soton.umlb.internal.simulator.views.SimulatorView;
+import ac.soton.eventb.internal.scenariochecker.perspectives.SimPerspective;
+import ac.soton.eventb.internal.scenariochecker.views.SimulatorView;
 
 
 /**

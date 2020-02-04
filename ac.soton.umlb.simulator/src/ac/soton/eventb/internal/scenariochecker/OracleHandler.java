@@ -8,7 +8,7 @@
  *  Contributors:
  *  University of Southampton - Initial implementation
  *******************************************************************************/
-package ac.soton.umlb.internal.simulator;
+package ac.soton.eventb.internal.scenariochecker;
 
 import java.io.IOException;
 import java.util.Calendar;
@@ -56,8 +56,8 @@ import ac.soton.eventb.emf.oracle.OraclePackage;
 import ac.soton.eventb.emf.oracle.Run;
 import ac.soton.eventb.emf.oracle.Snapshot;
 import ac.soton.eventb.emf.oracle.Step;
-import ac.soton.umlb.internal.simulator.views.SimulatorView;
-import ac.soton.umlb.simulator.Activator;
+import ac.soton.eventb.internal.scenariochecker.views.SimulatorView;
+import ac.soton.eventb.scenariochecker.Activator;
 import de.prob.core.Animator;
 import de.prob.core.domainobjects.Operation;
 

@@ -8,7 +8,7 @@
  *  Contributors:
  *  University of Southampton - Initial implementation
  *******************************************************************************/
-package ac.soton.umlb.simulator;
+package ac.soton.eventb.scenariochecker;
 
 public class SimulatorException extends Exception {
 

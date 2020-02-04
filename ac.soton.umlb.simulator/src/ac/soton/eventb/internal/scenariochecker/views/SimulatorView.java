@@ -8,7 +8,7 @@
  *  Contributors:
  *  University of Southampton - Initial implementation
  *******************************************************************************/
-package ac.soton.umlb.internal.simulator.views;
+package ac.soton.eventb.internal.scenariochecker.views;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -62,13 +62,13 @@ import org.eventb.emf.persistence.EMFRodinDB;
 import org.rodinp.core.IRodinProject;
 import org.rodinp.core.RodinCore;
 
+import ac.soton.eventb.internal.scenariochecker.BMSStarter;
+import ac.soton.eventb.internal.scenariochecker.Clock;
+import ac.soton.eventb.internal.scenariochecker.OracleHandler;
+import ac.soton.eventb.internal.scenariochecker.perspectives.SimPerspective;
 import ac.soton.eventb.statemachines.Statemachine;
 import ac.soton.eventb.statemachines.animation.DiagramAnimator;
 import ac.soton.eventb.statemachines.diagram.part.StatemachinesDiagramEditor;
-import ac.soton.umlb.internal.simulator.BMSStarter;
-import ac.soton.umlb.internal.simulator.Clock;
-import ac.soton.umlb.internal.simulator.OracleHandler;
-import ac.soton.umlb.internal.simulator.perspectives.SimPerspective;
 import de.bmotionstudio.gef.editor.BMotionStudioEditor;
 import de.prob.core.Animator;
 import de.prob.core.LanguageDependendAnimationPart;
@@ -85,7 +85,7 @@ import de.prob.ui.StateBasedViewPart;
 
 public class SimulatorView extends StateBasedViewPart {
 	
-	public static final String ID = "ac.soton.umlb.internal.simulator.views.SimulatorView"; //$NON-NLS-1$
+	public static final String ID = "ac.soton.eventb.internal.scenariochecker.views.SimulatorView"; //$NON-NLS-1$
 	private static final String BMOTION_STUDIO_EXT = "bmso";
 	
 	Display display = Display.getCurrent();

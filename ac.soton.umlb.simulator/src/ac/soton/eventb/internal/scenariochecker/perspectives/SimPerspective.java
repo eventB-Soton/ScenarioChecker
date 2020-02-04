@@ -9,7 +9,7 @@
  *  University of Southampton - Initial implementation
  *******************************************************************************/
 
-package ac.soton.umlb.internal.simulator.perspectives;
+package ac.soton.eventb.internal.scenariochecker.perspectives;
 
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
@@ -29,7 +29,7 @@ import org.eclipse.ui.IPerspectiveFactory;
 public class SimPerspective implements IPerspectiveFactory {
 
 	// The Perspective ID.
-	public static final String PERSPECTIVE_ID = "ac.soton.umlb.simulator.simPerspective";
+	public static final String PERSPECTIVE_ID = "ac.soton.eventb.scenariochecker.simPerspective";
 
 	@Override
 	public void createInitialLayout(IPageLayout layout) {

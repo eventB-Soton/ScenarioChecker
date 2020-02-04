@@ -1,4 +1,4 @@
-package ac.soton.umlb.internal.simulator;
+package ac.soton.eventb.internal.scenariochecker;
 
 import java.io.IOException;
 import java.util.HashMap;
