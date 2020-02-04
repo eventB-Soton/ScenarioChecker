@@ -62,9 +62,6 @@ import org.eventb.emf.persistence.EMFRodinDB;
 import org.rodinp.core.IRodinProject;
 import org.rodinp.core.RodinCore;
 
-import ac.soton.eventb.classdiagrams.Class;
-import ac.soton.eventb.classdiagrams.ClassMethod;
-import ac.soton.eventb.classdiagrams.Classdiagram;
 import ac.soton.eventb.statemachines.Statemachine;
 import ac.soton.eventb.statemachines.animation.DiagramAnimator;
 import ac.soton.eventb.statemachines.diagram.part.StatemachinesDiagramEditor;
@@ -579,12 +576,12 @@ public class SimulatorView extends StateBasedViewPart {
 		final int endTime = clock.getValueInt()+Integer.valueOf(count.getText());
 		boolean progress = true;
 		while (clock.getValueInt() < endTime && progress) {
-			if (!oracle.isPlayback() && nonDeterministicChoiceInClass()){
-				adviseUser("Run terminated after reaching non-deterministic choice");
-				return false;
-			}else{
+//			if (!oracle.isPlayback() && nonDeterministicChoice()) { //InClass()){
+//				adviseUser("Run terminated after reaching non-deterministic choice");
+//				return false;
+//			}else{
 				progress = bigStep();
-			}
+//			}
 		}
 		if (!progress) {
 			adviseUser("Run terminated due to lack of progress.");
@@ -654,48 +651,48 @@ public class SimulatorView extends StateBasedViewPart {
 		return ret;
 	}
 	
-	private boolean nonDeterministicChoiceInClass() {
-		int foundComponentOpEnabled;
-		// if there is a choice of operations then stop the animation
-		List<Operation> enabledOps = getAnimator().getCurrentState().getEnabledOperations();
-		List<String> enabledOpNames = new ArrayList<String>();
-		for (Operation op : enabledOps) {
-			enabledOpNames.add(op.getName());
-		}
-		EList<AbstractExtension> exts = machine.getExtensions();
-		// go through each extension and find classdiagrams and map to their eventNames.
-		for (AbstractExtension ext : exts) {
-			if (ext instanceof Classdiagram) {
-				Classdiagram classdiagram = (Classdiagram) ext;
-				EList<Class> classes = classdiagram.getClasses();
-				// iterate through classes
-				for (Class class_ : classes) {
-					List<String> evtNames = new ArrayList<String>();					
-					foundComponentOpEnabled = 0;
-					EList<ClassMethod> classMethods = class_.getMethods();
-					for (ClassMethod m : classMethods) {
-						//if (!(m instanceof External)) {
-							EList<Event> elaborates = m.getElaborates();
-							for (Event evt : elaborates) {
-								evtNames.add(evt.getName());
-							}
-						//}
-					}
-					// we now have a list of enabled event names for this class
-					for (String evtName : evtNames) {
-						if (enabledOpNames.contains(evtName)) {
-							foundComponentOpEnabled++;
-							// if we have more than one enabled method then advise user and return
-							if(foundComponentOpEnabled>1){
-								return true;
-							}
-						}
-					}
-				}
-			}
-		}
-		return false;
-	}
+//	private boolean nonDeterministicChoiceInClass() {
+//		int foundComponentOpEnabled;
+//		// if there is a choice of operations then stop the animation
+//		List<Operation> enabledOps = getAnimator().getCurrentState().getEnabledOperations();
+//		List<String> enabledOpNames = new ArrayList<String>();
+//		for (Operation op : enabledOps) {
+//			enabledOpNames.add(op.getName());
+//		}
+//		EList<AbstractExtension> exts = machine.getExtensions();
+//		// go through each extension and find classdiagrams and map to their eventNames.
+//		for (AbstractExtension ext : exts) {
+//			if (ext instanceof Classdiagram) {
+//				Classdiagram classdiagram = (Classdiagram) ext;
+//				EList<Class> classes = classdiagram.getClasses();
+//				// iterate through classes
+//				for (Class class_ : classes) {
+//					List<String> evtNames = new ArrayList<String>();					
+//					foundComponentOpEnabled = 0;
+//					EList<ClassMethod> classMethods = class_.getMethods();
+//					for (ClassMethod m : classMethods) {
+//						//if (!(m instanceof External)) {
+//							EList<Event> elaborates = m.getElaborates();
+//							for (Event evt : elaborates) {
+//								evtNames.add(evt.getName());
+//							}
+//						//}
+//					}
+//					// we now have a list of enabled event names for this class
+//					for (String evtName : evtNames) {
+//						if (enabledOpNames.contains(evtName)) {
+//							foundComponentOpEnabled++;
+//							// if we have more than one enabled method then advise user and return
+//							if(foundComponentOpEnabled>1){
+//								return true;
+//							}
+//						}
+//					}
+//				}
+//			}
+//		}
+//		return false;
+//	}
 
 /**
  * called by ProB when the state has changed
