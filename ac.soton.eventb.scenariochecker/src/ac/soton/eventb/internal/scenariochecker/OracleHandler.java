@@ -48,6 +48,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eventb.emf.core.CorePackage;
 import org.eventb.emf.core.EventBNamed;
 import org.eventb.emf.core.EventBObject;
+import org.eventb.emf.core.machine.Machine;
 
 import ac.soton.eventb.emf.oracle.Entry;
 import ac.soton.eventb.emf.oracle.Oracle;
@@ -56,7 +57,6 @@ import ac.soton.eventb.emf.oracle.OraclePackage;
 import ac.soton.eventb.emf.oracle.Run;
 import ac.soton.eventb.emf.oracle.Snapshot;
 import ac.soton.eventb.emf.oracle.Step;
-import ac.soton.eventb.internal.scenariochecker.views.SimulatorView;
 import ac.soton.eventb.scenariochecker.Activator;
 import de.prob.core.Animator;
 import de.prob.core.domainobjects.Operation;
@@ -93,7 +93,7 @@ public class OracleHandler {
 	 */
 	
 	public void initialise(EventBObject eventBObject){
-		modelName = ((EventBNamed)eventBObject.getContaining(CorePackage.Literals.EVENT_BNAMED_COMMENTED_COMPONENT_ELEMENT)).getName();
+		machine = (Machine) ((EventBNamed)eventBObject.getContaining(CorePackage.Literals.EVENT_BNAMED_COMMENTED_COMPONENT_ELEMENT));
 		try {
 			folder = getOracleFolder(eventBObject);
 		} catch (CoreException e) {
@@ -109,7 +109,7 @@ public class OracleHandler {
 			if (debug)System.out.println("Oracle initialisation FAILED due to no machine");
 			return false;
 		}else{
-			modelName = ((EventBNamed)eventBObject.getContaining(CorePackage.Literals.EVENT_BNAMED_COMMENTED_COMPONENT_ELEMENT)).getName();
+			machine = (Machine) ((EventBNamed)eventBObject.getContaining(CorePackage.Literals.EVENT_BNAMED_COMMENTED_COMPONENT_ELEMENT));
 			try {
 				folder = getOracleFolder(eventBObject);
 			} catch (CoreException e) {
@@ -137,7 +137,7 @@ public class OracleHandler {
 	 * @return
 	 */
 	public void startRecording(){
-		//SimulatorView.getSimulator().restartAnimator();
+		//SimulationManager.getSimulator().restartAnimator();
 		
 	}
 	
@@ -155,7 +155,7 @@ public class OracleHandler {
 	}
 
 	public void startSnapshot(String clockValue) {
-		startSnapshot(modelName == null? "<unknown>" : modelName, clockValue);
+		startSnapshot(machine == null? "<unknown>" : machine.getName(), clockValue);
 	}
 		
 	public void startSnapshot(String machineName, String clockValue) {
@@ -297,7 +297,7 @@ public class OracleHandler {
 	public void startPlayback(boolean repeat){
 		playback = true;
 		this.repeat = repeat;
-		//SimulatorView.getSimulator().restartAnimator();
+		//SimulationManager.getSimulator().restartAnimator();
 	}
 	
 	private void doStartPlayback(){
@@ -346,12 +346,11 @@ public class OracleHandler {
 	 * 
 	 * 
 	 * 
-	 * @param animator
 	 * @return operation
 	 */
-	public Operation findNextOperation(Animator animator) {
+	public Operation findNextOperation() {
 		
-		List<Operation> ops = animator.getCurrentState().getEnabledOperations();
+		List<Operation> ops = Animator.getAnimator().getCurrentState().getEnabledOperations();
 		if (!hasNextStep() && isPlayback()){
 			stopPlayback(false);
 			MessageBox mbox = new MessageBox(shell, SWT.ICON_INFORMATION | SWT.OK);
@@ -410,7 +409,7 @@ public class OracleHandler {
 			do{
 				stepPointer = stepPointer+1;
 			}while (stepPointer < oracleEntries.size() && (!(oracleEntries.get(stepPointer) instanceof Step) ||
-					SimulatorView.getSimulatorView().isInternal(((Step)oracleEntries.get(stepPointer)).getName()))) ;
+					Utils.isInternal(Utils.findEvent(((Step)oracleEntries.get(stepPointer)).getName(), machine)))) ;
 			if (stepPointer < oracleEntries.size()){
 				nextStep = (Step)oracleEntries.get(stepPointer);
 				return true;
@@ -434,8 +433,8 @@ public class OracleHandler {
 	/////////////internal//////////
 	////////////////////////////////
 	private Shell shell = null;
-
-	private String modelName = null;
+	private Machine machine = null;
+	//private String modelName = null;
 	private IFolder folder = null;
 	private TransactionalEditingDomain editingDomain;
 	private String oracleName = null;
@@ -561,7 +560,7 @@ public class OracleHandler {
 
 	private Resource getResource(String name, String timestamp, boolean gold) throws CoreException{
 		IPath filePath = folder.getFullPath();
-		filePath = filePath.append("/"+modelName);
+		filePath = filePath.append("/"+machine.getName());
 		filePath = filePath.addFileExtension(name);
 		filePath = filePath.addFileExtension(timestamp);
 		if (gold) filePath = filePath.addFileExtension(goldOracleExtension);
