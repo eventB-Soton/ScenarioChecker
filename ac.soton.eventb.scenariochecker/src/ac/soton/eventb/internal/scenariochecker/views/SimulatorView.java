@@ -1,5 +1,5 @@
 /*******************************************************************************
- *  Copyright (c) 2019-2019 University of Southampton.
+ *  Copyright (c) 2019-2020 University of Southampton.
  *  All rights reserved. This program and the accompanying materials
  *  are made available under the terms of the Eclipse Public License v1.0
  *  which accompanies this distribution, and is available at
@@ -11,20 +11,11 @@
 package ac.soton.eventb.internal.scenariochecker.views;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.emf.common.util.EList;
-import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.workspace.util.WorkspaceSynchronizer;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.swt.SWT;
@@ -45,37 +36,20 @@ import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IEditorReference;
-import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.WorkbenchException;
 import org.eclipse.ui.forms.widgets.FormToolkit;
-import org.eventb.core.IEventBRoot;
 import org.eventb.core.IMachineRoot;
-import org.eventb.emf.core.AbstractExtension;
-import org.eventb.emf.core.EventBElement;
 import org.eventb.emf.core.machine.Event;
 import org.eventb.emf.core.machine.Machine;
 import org.eventb.emf.persistence.EMFRodinDB;
-import org.rodinp.core.IRodinProject;
-import org.rodinp.core.RodinCore;
 
-import ac.soton.eventb.internal.scenariochecker.BMSStarter;
 import ac.soton.eventb.internal.scenariochecker.Clock;
 import ac.soton.eventb.internal.scenariochecker.OracleHandler;
-import ac.soton.eventb.internal.scenariochecker.perspectives.SimPerspective;
-import ac.soton.eventb.statemachines.Statemachine;
-import ac.soton.eventb.statemachines.animation.DiagramAnimator;
-import ac.soton.eventb.statemachines.diagram.part.StatemachinesDiagramEditor;
-import de.bmotionstudio.gef.editor.BMotionStudioEditor;
+import ac.soton.eventb.internal.scenariochecker.Utils;
+import ac.soton.eventb.probsupport.AnimationManager;
 import de.prob.core.Animator;
-import de.prob.core.LanguageDependendAnimationPart;
 import de.prob.core.command.ExecuteOperationCommand;
 import de.prob.core.command.GetCurrentStateIdCommand;
 import de.prob.core.command.GetEnabledOperationsCommand;
-import de.prob.core.command.LoadEventBModelCommand;
 import de.prob.core.domainobjects.History;
 import de.prob.core.domainobjects.Operation;
 import de.prob.core.domainobjects.State;
@@ -86,7 +60,6 @@ import de.prob.ui.StateBasedViewPart;
 public class SimulatorView extends StateBasedViewPart {
 	
 	public static final String ID = "ac.soton.eventb.internal.scenariochecker.views.SimulatorView"; //$NON-NLS-1$
-	private static final String BMOTION_STUDIO_EXT = "bmso";
 	
 	Display display = Display.getCurrent();
 	Color red = display.getSystemColor(SWT.COLOR_RED);
@@ -103,34 +76,6 @@ public class SimulatorView extends StateBasedViewPart {
 		}
 		return simulatorView;
 	}
-
-	private Animator animator;
-	private Animator getAnimator() {
-		if (animator==null) {
-			animator = Animator.getAnimator();
-		}
-		return animator;
-	}
-	
-	public void restartAnimator(){
-		try {
-			project.refreshLocal(IResource.DEPTH_ONE, null);
-			//restart animator
-			LanguageDependendAnimationPart ldp = getAnimator().getLanguageDependendPart();
-			if (ldp!= null)
-					ldp.reload(getAnimator());
-			
-			BMSStarter.restartBMS(bmsFiles, getAnimator());
-			umlbPerspective();
-			
-		} catch (CoreException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		} catch (ProBException e2) {
-			// TODO Auto-generated catch block
-			e2.printStackTrace();
-		}
-	}
 	
 	private String statusText;
 	private String oldStatusText;
@@ -138,124 +83,39 @@ public class SimulatorView extends StateBasedViewPart {
 		if (statusText == null) statusText = "NULL";
 		return statusText;
 	}
-
-	private OracleHandler oracle = null;
-	public OracleHandler getOracle(){
-		if (oracle == null) {
-			oracle = OracleHandler.getOracle();
-		}
-		return oracle;
-	}
 	
-	private IProject project;
 	private Machine machine;
-	
-	List<Statemachine> stateMachines = new ArrayList<Statemachine>(); 
-	List<IFile> bmsFiles = new ArrayList<IFile>();
+	private IMachineRoot mchRoot;
 
 	public void initialise(IMachineRoot mchRoot) {
-		project = mchRoot.getRodinProject().getProject();
-		String machineName = mchRoot.getComponentName();
+		this.mchRoot = mchRoot;
 		EMFRodinDB emfRodinDB = new EMFRodinDB();
 		machine = (Machine) emfRodinDB.loadEventBComponent(mchRoot);
 		historyPosition=0;
 		clock.reset();
-		eventPriorities.clear();
-		eventInternal.clear();
-		eventMap.clear();
-		stateMachines.clear();
-		bmsFiles.clear();
-
-		// start ProB animator
-		System.out.println("Starting ProB for " + machine.getName());
-		try {
-			project.refreshLocal(IResource.DEPTH_ONE, null); // ensure files seen in workspace
-			LoadEventBModelCommand.load(getAnimator(), mchRoot);
-		} catch (ProBException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (CoreException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		
-		// Find all the state-machines and bmsFiles of the machine
-		// (these must come from the editors as each editor has a different local copy)
-		for (IWorkbenchPage page : PlatformUI.getWorkbench().getActiveWorkbenchWindow().getPages()) {   //   activeWorkbenchWindow.getPages()) {
-			for (IEditorReference editorRef : page.getEditorReferences()) {
-				IEditorPart editor = editorRef.getEditor(true);
-				if (editor instanceof StatemachinesDiagramEditor) {
-					Statemachine statemachine = (Statemachine) ((StatemachinesDiagramEditor) editor).getDiagram().getElement();
-					if (mchRoot.equals(getEventBRoot(statemachine))) {
-						if (editor.isDirty()) {
-							editor.doSave(new NullProgressMonitor());
-						}
-						stateMachines.add(statemachine);
-
-						// let the editor know that we are animating so that it
-						// doesn't try to save animation artifacts
-						((StatemachinesDiagramEditor) editor).startAnimating();
-					}
-				}
-				
-	    		//also look for BMotionStudio editors on the same machine
-	    		if (editor instanceof BMotionStudioEditor) {
-	    			BMotionStudioEditor bmsEditor = (BMotionStudioEditor) editor;
-	    			Object bmspf = bmsEditor.getVisualization().getProjectFile();
-	    			if (bmspf instanceof IFile && BMOTION_STUDIO_EXT.equals(((IFile)bmspf).getFileExtension())){
-		    			String bmsMachineName = bmsEditor.getVisualization().getMachineName();
-		    			IProject bmsproject = ((IFile)bmspf).getProject();
-	    				if (bmsMachineName.startsWith(machineName) && project.equals(bmsproject)){
-	    					if (!bmsFiles.contains(bmspf)) bmsFiles.add(((IFile)bmspf));
-	    				}
-	    			}
-		    	}
-
-			}
-		}
-
-		DiagramAnimator diagramAnimator = DiagramAnimator.getAnimator();
-		try {
-			diagramAnimator.start(machine, stateMachines, mchRoot, bmsFiles);
-		} catch (ProBException e) {
-			e.printStackTrace();
-		}
-		
-		restartAnimator();
-
 		//initialise oracle in record mode
-		getOracle().initialise(machine);
+		OracleHandler.getOracle().initialise(machine);
+		
+		//umlbPerspective();
 	}
 	
-	
-	
-	/**
-	 * Switch to UML-B perspective
-	 * 
-	 */
-	private void umlbPerspective() {
-		// Switch to umlb simulation perspective.
-		final IWorkbench workbench = PlatformUI.getWorkbench();
-		try {
-			workbench.showPerspective(SimPerspective.PERSPECTIVE_ID, workbench.getActiveWorkbenchWindow());
-		} catch (WorkbenchException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
+// DISABLED FOR NOW AS SEEMS TO CLASH WITH BMS PERSPECTIVE
+//	/**
+//	 * Switch to UML-B perspective
+//	 * 
+//	 */
+//	private void umlbPerspective() {
+//		// Switch to umlb simulation perspective.
+//		final IWorkbench workbench = PlatformUI.getWorkbench();
+//		try {
+//			workbench.showPerspective(SimPerspective.PERSPECTIVE_ID, workbench.getActiveWorkbenchWindow());
+//		} catch (WorkbenchException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//	}
 
-	private static IEventBRoot getEventBRoot(EventBElement element) {
-		Resource resource = element.eResource();
-		if (resource != null && resource.isLoaded()) {
-			IFile file = WorkspaceSynchronizer.getFile(resource);
-			IRodinProject rodinProject = RodinCore.getRodinDB()
-					.getRodinProject(file.getProject().getName());
-			IEventBRoot root = (IEventBRoot) rodinProject.getRodinFile(
-					file.getName()).getRoot();
-			return root;
-		}
-		return null;
-	}
 	
 	///////////////////////////////////
 	private final FormToolkit toolkit = new FormToolkit(Display.getCurrent());
@@ -283,10 +143,9 @@ public class SimulatorView extends StateBasedViewPart {
 	 */
 	@Override
 	public Control createStatePartControl(Composite parent) {			
-//		this.parent = parent;
-		getOracle().restart(getSite().getShell(), "UML-B", machine);
+		OracleHandler.getOracle().restart(getSite().getShell(), "UML-B", machine);
 		
-		if (oracle.isPlayback()) statusText = "Playback";
+		if (OracleHandler.getOracle().isPlayback()) statusText = "Playback";
 		else statusText = "Recording";
 		
 		container = toolkit.createComposite(parent, SWT.V_SCROLL | SWT.H_SCROLL | SWT.NO_REDRAW_RESIZE );
@@ -303,7 +162,7 @@ public class SimulatorView extends StateBasedViewPart {
 					// Select operation for later execution
 					
 					// Manual selection of events is disabled during playback
-					if (oracle!=null && oracle.isPlayback()){
+					if (OracleHandler.getOracle()!=null && OracleHandler.getOracle().isPlayback()){
 						MessageBox mbox = new MessageBox(getSite().getShell(), SWT.ICON_ERROR | SWT.OK);
 						mbox.setText("Error - Cannot Execute Event");
 						mbox.setMessage("Cannot select events manually while playback is in progress.");
@@ -312,7 +171,7 @@ public class SimulatorView extends StateBasedViewPart {
 					}
 					
 					TableItem selected = methodsTable.getItem(methodsTable.getSelectionIndex());
-					manuallySelectedOp = findOperation(getAnimator(), selected.getText(0));
+					manuallySelectedOp = Utils.findOperation(selected.getText(0));
 				}
 				
 				@Override
@@ -320,7 +179,7 @@ public class SimulatorView extends StateBasedViewPart {
 					// Execute the selected operation (as a big step)
 					
 					// Manual selection of events is disabled during playback
-					if (oracle!=null && oracle.isPlayback()){
+					if (OracleHandler.getOracle()!=null && OracleHandler.getOracle().isPlayback()){
 						MessageBox mbox = new MessageBox(getSite().getShell(), SWT.ICON_ERROR | SWT.OK);
 						mbox.setText("Error - Cannot Execute Event");
 						mbox.setMessage("Cannot select events manually while playback is in progress.");
@@ -329,7 +188,7 @@ public class SimulatorView extends StateBasedViewPart {
 					}
 					
 					TableItem selected = methodsTable.getItem(methodsTable.getSelectionIndex());
-					manuallySelectedOp = findOperation(getAnimator(), selected.getText(0));
+					manuallySelectedOp = Utils.findOperation(selected.getText(0));
 					try {
 						bigStep();
 					} catch (ProBException e1) {
@@ -338,7 +197,7 @@ public class SimulatorView extends StateBasedViewPart {
 					}
 				}
 			});
-			fd_methodsTable = new FormData();
+			FormData fd_methodsTable = new FormData();
 			//fd_methodsTable.width=500;
 			fd_methodsTable.left = new FormAttachment(buttonGroup, 10);
 			fd_methodsTable.right = new FormAttachment(100, -5);
@@ -370,7 +229,7 @@ public class SimulatorView extends StateBasedViewPart {
 	 */
 	private Group createButtonGroup() {
 		Group buttonGroup =  new Group(container, SWT.BORDER);
-		fd_buttonGroup = new FormData();
+		FormData fd_buttonGroup = new FormData();
 		fd_buttonGroup.top = new FormAttachment(0, 5);
 		//fd_buttonGroup.right = new FormAttachment(100, -700);
 		buttonGroup.setLayoutData(fd_buttonGroup);
@@ -455,17 +314,17 @@ public class SimulatorView extends StateBasedViewPart {
 				public void mouseUp(MouseEvent e) {	
 						clock.reset();
 						historyPosition=0;
-						if (oracle.isPlayback()){
-							oracle.stopPlayback(false);
-							oracle.startPlayback(true);
+						if (OracleHandler.getOracle().isPlayback()){
+							OracleHandler.getOracle().stopPlayback(false);
+							OracleHandler.getOracle().startPlayback(true);
 							statusText = "PlayBack";
 						}else{
-							oracle.stopRecording(false);
-							oracle.startRecording();	
+							OracleHandler.getOracle().stopRecording(false);
+							OracleHandler.getOracle().startRecording();	
 							statusText = "Recording";
 						}
 						updateModeIndicator();
-						restartAnimator();
+						AnimationManager.restartAnimation(mchRoot);
 				}
 			});
 			toolkit.adapt(btnRestart, true, true);
@@ -477,7 +336,7 @@ public class SimulatorView extends StateBasedViewPart {
 			btnSave.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseUp(MouseEvent e) {
-					oracle.saveRecording();
+					OracleHandler.getOracle().saveRecording();
 					if (!"Saved".equals(statusText)) oldStatusText = statusText;
 					statusText = "Saved";
 					updateModeIndicator();
@@ -494,13 +353,13 @@ public class SimulatorView extends StateBasedViewPart {
 				public void mouseUp(MouseEvent e) {
 					clock.reset();
 					historyPosition=0;
-					if (!oracle.isPlayback()){
-						oracle.stopRecording(false);
-						oracle.startPlayback(false);
+					if (!OracleHandler.getOracle().isPlayback()){
+						OracleHandler.getOracle().stopRecording(false);
+						OracleHandler.getOracle().startPlayback(false);
 					}
 					statusText = "Playback";
 					updateModeIndicator();
-					restartAnimator();
+					AnimationManager.restartAnimation(mchRoot);
 				}
 			});
 			btnReplay.setText("Replay");
@@ -513,8 +372,8 @@ public class SimulatorView extends StateBasedViewPart {
 			btnStop.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseUp(MouseEvent e) {				
-					if (oracle.isPlayback()){
-						oracle.stopPlayback(false);
+					if (OracleHandler.getOracle().isPlayback()){
+						OracleHandler.getOracle().stopPlayback(false);
 						statusText = "Recording";
 					}
 					updateModeIndicator();
@@ -530,7 +389,7 @@ public class SimulatorView extends StateBasedViewPart {
 	}
 
 	private void updateModeIndicator() {
-		if (!oracle.isPlayback()) {
+		if (!OracleHandler.getOracle().isPlayback()) {
 			btnInd.setText(getStatusText());
 			btnInd.setBackground(red);
 			btnInd.setForeground(red);
@@ -555,7 +414,7 @@ public class SimulatorView extends StateBasedViewPart {
 		progress = executeOperation(op, false);
 		//continue executing any internal operations
 		List<Operation> loop = new ArrayList<Operation>(); //prevent infinite looping in case doesn't converge
-		while (progress && (op = findNextOperation())!=null && isInternal(op) && !loop.contains(op)) {
+		while (progress && (op = findNextOperation())!=null && Utils.isInternal(Utils.findEvent(op.getName(), machine)) && !loop.contains(op)) {
 			progress = executeOperation(op, false);
 			loop.add(op);
 		}
@@ -569,14 +428,14 @@ public class SimulatorView extends StateBasedViewPart {
 	}
 	
 	// implements the run behaviour where we take the selected number of big steps
-	// (when not in playback mode we stop when a non-deterministic choice is available)
+	// (when not in playback mode we stop when a non-deterministic choice is available)  <<<<<<<<<< DISABLED FOR NOW - WHICH IS BETTER?
 	private boolean runForTicks() throws ProBException {
 		if (inSetup()) return false;	
 		//Animator animator = Animator.getAnimator();
 		final int endTime = clock.getValueInt()+Integer.valueOf(count.getText());
 		boolean progress = true;
 		while (clock.getValueInt() < endTime && progress) {
-//			if (!oracle.isPlayback() && nonDeterministicChoice()) { //InClass()){
+//			if (!OracleHandler.getOracle().isPlayback() && nonDeterministicChoice()) { //InClass()){
 //				adviseUser("Run terminated after reaching non-deterministic choice");
 //				return false;
 //			}else{
@@ -584,7 +443,7 @@ public class SimulatorView extends StateBasedViewPart {
 //			}
 		}
 		if (!progress) {
-			adviseUser("Run terminated due to lack of progress.");
+			messageUser("Run terminated due to lack of progress.");
 		}
 		return progress;
 	}
@@ -592,7 +451,7 @@ public class SimulatorView extends StateBasedViewPart {
 	/*
 	 * display message to the user
 	 */
-	private void adviseUser(String message) {
+	private void messageUser(String message) {
 		MessageBox mbox = new MessageBox(getSite().getShell(), SWT.ICON_INFORMATION | SWT.OK);
 		mbox.setText("Continue Terminated Message");
 		mbox.setMessage(message);
@@ -603,10 +462,10 @@ public class SimulatorView extends StateBasedViewPart {
 	 * check whether the context needs to be set up
 	 */
 	private boolean inSetup(){
-		List<Operation> enabledOperations = getAnimator().getCurrentState().getEnabledOperations();
+		List<Operation> enabledOperations = Animator.getAnimator().getCurrentState().getEnabledOperations();
 		for (Operation op : enabledOperations){
 			if ("SETUP_CONTEXT".equals(op.getName()) ){
-				adviseUser("Use Step button to execute SETUP_CONTEXT");
+				messageUser("Use Step button to execute SETUP_CONTEXT");
 				return true;
 			}
 		}
@@ -618,16 +477,16 @@ public class SimulatorView extends StateBasedViewPart {
 	 */
 	private boolean setup(){
 		boolean ret = false;
-		if (getAnimator().getCurrentState()==null) {
+		if (Animator.getAnimator().getCurrentState()==null) {
 			ret= false;
 		}else {
-			List<Operation> enabledOperations = getAnimator().getCurrentState().getEnabledOperations();
+			List<Operation> enabledOperations = Animator.getAnimator().getCurrentState().getEnabledOperations();
 			for (Operation op : enabledOperations){
 				if ("SETUP_CONTEXT".equals(op.getName())){
-					if (oracle.isPlayback()) {
-						Operation nextop = oracle.findNextOperation(getAnimator());
+					if (OracleHandler.getOracle().isPlayback()) {
+						Operation nextop = OracleHandler.getOracle().findNextOperation();
 						if (nextop!=null && "SETUP_CONTEXT".equals(nextop.getName())){
-							oracle.consumeNextStep();
+							OracleHandler.getOracle().consumeNextStep();
 						}
 					}
 					executeOperation(op,false);
@@ -650,49 +509,6 @@ public class SimulatorView extends StateBasedViewPart {
 		}
 		return ret;
 	}
-	
-//	private boolean nonDeterministicChoiceInClass() {
-//		int foundComponentOpEnabled;
-//		// if there is a choice of operations then stop the animation
-//		List<Operation> enabledOps = getAnimator().getCurrentState().getEnabledOperations();
-//		List<String> enabledOpNames = new ArrayList<String>();
-//		for (Operation op : enabledOps) {
-//			enabledOpNames.add(op.getName());
-//		}
-//		EList<AbstractExtension> exts = machine.getExtensions();
-//		// go through each extension and find classdiagrams and map to their eventNames.
-//		for (AbstractExtension ext : exts) {
-//			if (ext instanceof Classdiagram) {
-//				Classdiagram classdiagram = (Classdiagram) ext;
-//				EList<Class> classes = classdiagram.getClasses();
-//				// iterate through classes
-//				for (Class class_ : classes) {
-//					List<String> evtNames = new ArrayList<String>();					
-//					foundComponentOpEnabled = 0;
-//					EList<ClassMethod> classMethods = class_.getMethods();
-//					for (ClassMethod m : classMethods) {
-//						//if (!(m instanceof External)) {
-//							EList<Event> elaborates = m.getElaborates();
-//							for (Event evt : elaborates) {
-//								evtNames.add(evt.getName());
-//							}
-//						//}
-//					}
-//					// we now have a list of enabled event names for this class
-//					for (String evtName : evtNames) {
-//						if (enabledOpNames.contains(evtName)) {
-//							foundComponentOpEnabled++;
-//							// if we have more than one enabled method then advise user and return
-//							if(foundComponentOpEnabled>1){
-//								return true;
-//							}
-//						}
-//					}
-//				}
-//			}
-//		}
-//		return false;
-//	}
 
 /**
  * called by ProB when the state has changed
@@ -705,25 +521,25 @@ public class SimulatorView extends StateBasedViewPart {
 	protected void stateChanged(final State activeState, final Operation operation) {
 		if (machine==null) 
 			return;
-		History history = getAnimator().getHistory();
+		History history = Animator.getAnimator().getHistory();
 		if (historyPosition ==0 || history.getCurrentPosition()>historyPosition) {
-			Map<String, Variable> stateMap = getAnimator().getCurrentState().getValues();
+			Map<String, Variable> stateMap = Animator.getAnimator().getCurrentState().getValues();
 			createButtonGroup();
 			
 			{	//update the enabled ops table
 				if (methodsTable == null) return;
-				State currentState = animator.getCurrentState();
+				State currentState = Animator.getAnimator().getCurrentState();
 				List<Operation> enabledOps = currentState.getEnabledOperations();
 				methodsTable.removeAll();
 				// for each enabled operation in the ProB model
 				int select = -1;
 				int j=0;
 				for(Operation op: enabledOps){
-					if (isExternal(op)) {
+					if (Utils.isExternal(Utils.findEvent(op.getName(), machine))) {
 						TableItem tableItem = new TableItem(methodsTable, SWT.NULL);
-						String[] rowString = {operationInStringFormat(op)}; 
+						String[] rowString = {Utils.operationInStringFormat(op)}; 
 						tableItem.setText(rowString);
-						if (isNextOp(op)) {
+						if (op==manuallySelectedOp || Utils.isNextOp(op)) {
 							select = j;
 						}
 						j++;
@@ -732,8 +548,7 @@ public class SimulatorView extends StateBasedViewPart {
 				if (select>-1) methodsTable.select(select);
 			}
 			
-			OracleHandler oracle = getOracle();
-			if (oracle!=null) {
+			if (OracleHandler.getOracle()!=null) {
 				for (int i=historyPosition; i<history.getCurrentPosition(); i++) {
 					//n.b. history is indexed backwards from the current state.. i.e 0 get current, -1 gets previous etc.
 					//(the last operation is in the previous position; current pos never has an operation, it is just the post-state)
@@ -741,17 +556,17 @@ public class SimulatorView extends StateBasedViewPart {
 					Operation op = history.getHistoryItem(pos).getOperation();
 					
 					//we only record external events
-					if (op!=null && (isExternal(op) || op.getName().equals("SETUP_CONTEXT"))) {
-						oracle.addStepToTrace(machine.getName(), op, clock.getValue());	
-						oracle.startSnapshot(clock.getValue());
+					if (op!=null && (Utils.isExternal(Utils.findEvent(op.getName(), machine)) || op.getName().equals("SETUP_CONTEXT"))) {
+						OracleHandler.getOracle().addStepToTrace(machine.getName(), op, clock.getValue());	
+						OracleHandler.getOracle().startSnapshot(clock.getValue());
 						//the post state of an operation is in the next history item. 
 						stateMap = history.getHistoryItem(pos+1).getState().getValues();
 						for (Entry<String, Variable> entry : stateMap.entrySet()) {
-							if (!isPrivate(entry.getKey())){
-								oracle.addValueToSnapshot(entry.getKey(), entry.getValue().getValue(), clock.getValue());
+							if (!Utils.isPrivate(entry.getKey(), machine)){
+								OracleHandler.getOracle().addValueToSnapshot(entry.getKey(), entry.getValue().getValue(), clock.getValue());
 							}
 						}
-						oracle.stopSnapshot(clock.getValue());
+						OracleHandler.getOracle().stopSnapshot(clock.getValue());
 					}
 				}
 			}
@@ -774,40 +589,30 @@ public class SimulatorView extends StateBasedViewPart {
 		@SuppressWarnings("unused")
 		IMenuManager manager = getViewSite().getActionBars().getMenuManager();
 	}
-
-	
-	private static final Random random = new Random();
-	private FormData fd_methodsTable;
-	private FormData fd_buttonGroup;
-	private Map<Event, Integer> eventPriorities = new HashMap<Event,Integer>();
-	private Map<Event, Boolean> eventInternal = new HashMap<Event,Boolean>();
-	private Map<String, Event> eventMap = new HashMap<String, Event>();
-	private Map<String, org.eventb.emf.core.machine.Variable> variableMap = new HashMap<String, org.eventb.emf.core.machine.Variable>();
-	private Map<org.eventb.emf.core.machine.Variable, Boolean> privateVariables = new HashMap<org.eventb.emf.core.machine.Variable,Boolean>();	
-	
 	
 	/**
 	 * finds the next operation to be executed.
 	 * when not in playback mode, it is manually (or randomly) selected from those that are enabled according to priority (internal first)
-	 * when in playback mode, external events are given by the next operation in the oracle being replayed,
+	 * when in playback mode, external events are given by the next operation in the OracleHandler.getOracle() being replayed,
 	 * 
 	 * @param animator
 	 * @return
 	 */
 	private Operation findNextOperation() {	
 		Operation nextOp = null;
-		State currentState = getAnimator().getCurrentState();	
+		State currentState = Animator.getAnimator().getCurrentState();	
 		List<Operation> ops = prioritise(currentState.getEnabledOperations());
 		nextOp = 	ops.isEmpty()? null: 
 					ops.contains(manuallySelectedOp) ? manuallySelectedOp :
 					pickFrom(ops);
 
-		if (oracle.isPlayback() && isExternal(nextOp)){
-			nextOp = oracle.findNextOperation(getAnimator());
+		if (OracleHandler.getOracle().isPlayback() && Utils.isExternal(Utils.findEvent(nextOp.getName(), machine))){
+			nextOp = OracleHandler.getOracle().findNextOperation();
 		}
 		return nextOp;
 	}
 
+	private static final Random random = new Random();
 	private Operation pickFrom(List<Operation> ops) {
 		Operation op = ops.get(random.nextInt(ops.size()));
 		return op;
@@ -826,8 +631,8 @@ public class SimulatorView extends StateBasedViewPart {
 		
 		for (Operation op : enabledOperations) {
 			Integer priority;
-			Event ev = findEvent(op.getName());
-			priority = ev==null? -1 : getPriority(ev);
+			Event ev = Utils.findEvent(op.getName(), machine);
+			priority = ev==null? -1 : Utils.getPriority(ev);
 			if (priority>current) continue; 	//ignore lesser (i.e. higher int) eventPriorities
 			if (priority<current) {				//found a better eventPriorities
 				filtered.clear();
@@ -852,12 +657,12 @@ public class SimulatorView extends StateBasedViewPart {
 	private boolean executeOperation(Operation operation, boolean silent){
 		if (operation==null) return false;
 		try {
-			if (oracle.isPlayback() && isExternal(operation)) {
-				oracle.consumeNextStep();
+			if (OracleHandler.getOracle().isPlayback() && Utils.isExternal(Utils.findEvent(operation.getName(), machine))) {
+				OracleHandler.getOracle().consumeNextStep();
 			}
-			ExecuteOperationCommand.executeOperation(getAnimator(), operation, silent);
+			ExecuteOperationCommand.executeOperation(Animator.getAnimator(), operation, silent);
 			//waitingForOperation = operation;
-			if (isExternal(operation)) clock.inc();
+			if (Utils.isExternal(Utils.findEvent(operation.getName(), machine))) clock.inc();
 		} catch (ProBException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -867,159 +672,6 @@ public class SimulatorView extends StateBasedViewPart {
 		if ("Saved".equals(statusText)) statusText = oldStatusText;
 		return true;
 	}
-
-	private boolean isExternal (Operation op) {
-		return isExternal(op.getName());
-	}
 	
-	private boolean isExternal(String name) {
-		return isExternal(findEvent(name));
-	}
-	
-	private boolean isExternal(Event ev) {
-		if (ev == null) return false;
-		return !isInternal(ev);
-	}
-	
-	
-	private boolean isInternal(Operation op) {
-		return isInternal(op.getName());
-	}
-	
-	public boolean isInternal(String name) {
-		return isInternal(findEvent(name));
-	}
-	
-	/**
-	 * return true if the given event is internal
-	 * 
-	 * @param event
-	 * @return
-	 */
-	private boolean isInternal(Event ev) {
-		if (ev == null) return false;
-		if (!eventInternal.containsKey(ev)) {
-			String comment = ev.getComment();
-			eventInternal.put(ev,comment!=null && comment.contains("<INTERNAL>"));
-		}
-		return eventInternal.get(ev);
-	}
-	
-	/**
-	 * return true if the given variable is private 
-	 * @param name
-	 * @return
-	 */
-	private boolean isPrivate(String name) {
-		org.eventb.emf.core.machine.Variable var = findVariable(name);
-		if (var == null) return false;
-		if (!privateVariables.containsKey(var)) {
-			String comment = var.getComment();
-			privateVariables.put(var,comment!=null && comment.contains("<PRIVATE>"));
-		}
-		return privateVariables.get(var);
-	}
-	
-
-	/** 
-	 * gets the priority of an event where a low number is high priority 
-	 * (-1 indicates null event)
-	 * external are always the lowest priority (highest integer returned) 
-	 * internal events may be prioritised by a comment 
-	 * 
-	 * @param ev
-	 * @return
-	 */
-	private Integer getPriority(Event ev) {
-		if (ev == null) return -1;
-		if (!eventPriorities.containsKey(ev)) {
-			String priString = ev.getComment();
-			Integer pri = Integer.MAX_VALUE;
-			if (isInternal(ev)) {
-				pri = pri-1;	//internal events default to slightly higher priority than external
-				if (priString!=null && priString.contains("<PRIORITY=")) {
-					priString = priString.substring(priString.indexOf("<PRIORITY=")+10);
-					int i = priString.indexOf(">"); 
-					if (i>0)  priString =  priString.substring(0,i);
-					pri = Integer.valueOf(priString);
-				}
-			}
-			eventPriorities.put(ev, pri);
-		}
-		return eventPriorities.get(ev);
-	}
-	
-	
-	/**
-	 * find an event in the machine with the given name
-	 * 
-	 * @param event name
-	 * @return
-	 */
-	private Event findEvent(String name) { 
-		if (machine==null) return null;
-		if (!eventMap.containsKey(name)) {
-			Event found = null;
-			for (Event ev : machine.getEvents()) {
-				if (name.equals(ev.getName())) {
-					found = ev;
-				}
-			}
-			eventMap.put(name, found);
-		}
-		return eventMap.get(name);
-	}
-	
-	
-	private org.eventb.emf.core.machine.Variable findVariable(String name) {
-		if (!variableMap.containsKey(name)) {
-			org.eventb.emf.core.machine.Variable found = null;
-			for (org.eventb.emf.core.machine.Variable var : machine.getVariables()) {
-				if (name.equals(var.getName())) {
-					found = var;
-				}
-			}
-			variableMap.put(name, found);
-		}
-		return variableMap.get(name);
-	}
-
-	private boolean isNextOp(Operation op) {
-		return op==manuallySelectedOp || 
-				(oracle.isPlayback() && op==oracle.findNextOperation(getAnimator()));
-	}
-
-	/**
-	 * 
-	 * @param opSignature
-	 * @return
-	 */
-	private Operation findOperation(Animator animator, String opSignature) {
-		List<Operation> enabledOpsList = null;
-		try {
-			enabledOpsList = GetEnabledOperationsCommand.getOperations(
-					animator,
-					GetCurrentStateIdCommand.getID(animator));
-		} catch (ProBException e1) {
-			e1.printStackTrace();
-		}
-		if (enabledOpsList != null) {
-			for (Operation op : enabledOpsList) {
-				if (opSignature.equals(operationInStringFormat(op))){
-					return op;
-				}
-			}
-		}
-		return null;
-	}
-	
-	/**
-	 * 
-	 * @param op
-	 * @return
-	 */
-	private String operationInStringFormat(Operation op) {
-		return op.toString().replaceFirst("\\(", " (");
-	}
 
 }
