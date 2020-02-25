@@ -29,10 +29,12 @@
             category="ac.soton.umlb.viewCategory"
             class="ac.soton.eventb.internal.scenariochecker.views.SimulatorView"
             id="ac.soton.eventb.scenariochecker.SimulatorView"
-            name="%simViewName">
+            name="%simViewName"
+            restorable="true">
       </view>
    </extension>
-      <extension
+   
+   <extension
          point="org.eclipse.ui.menus">
       <menuContribution
             allPopups="false"
@@ -208,6 +210,15 @@
                id="de.prob.ui.log">
          </viewShortcut>
       </perspectiveExtension>
+   </extension>
+   
+   <extension
+         point="ac.soton.eventb.probsupport.animationParticipant">
+      <animationParticipant
+            class="ac.soton.eventb.internal.scenariochecker.participants.ScenarioCheckerParticipant"
+            id="ac.soton.eventb.scenariochecker.ScenarioCheckerParticipant"
+            name="ScenarioCheckerParticipant">
+      </animationParticipant>
    </extension>
 
 </plugin>
