@@ -23,7 +23,7 @@ import org.eclipse.ui.handlers.HandlerUtil;
 import org.eventb.core.IMachineRoot;
 
 import ac.soton.eventb.internal.scenariochecker.perspectives.SimPerspective;
-import ac.soton.eventb.internal.scenariochecker.views.SimulatorView;
+import ac.soton.eventb.scenariochecker.SimulationManager;
 
 
 /**
@@ -64,8 +64,7 @@ public class SimulateHandler extends AbstractHandler implements IHandler {
 			e.printStackTrace();
 		}
 		
-		SimulatorView.getSimulatorView().initialise(mchRoot);
-
+		SimulationManager.getDefault().initialise(mchRoot);
 		return null;
 	}
 
