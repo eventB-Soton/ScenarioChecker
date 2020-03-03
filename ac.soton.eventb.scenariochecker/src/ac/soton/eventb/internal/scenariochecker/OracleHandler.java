@@ -45,6 +45,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.PlatformUI;
 import org.eventb.emf.core.CorePackage;
 import org.eventb.emf.core.EventBNamed;
 import org.eventb.emf.core.EventBObject;
@@ -93,6 +94,7 @@ public class OracleHandler {
 	 */
 	
 	public void initialise(EventBObject eventBObject){
+		shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
 		machine = (Machine) ((EventBNamed)eventBObject.getContaining(CorePackage.Literals.EVENT_BNAMED_COMMENTED_COMPONENT_ELEMENT));
 		try {
 			folder = getOracleFolder(eventBObject);
@@ -104,7 +106,7 @@ public class OracleHandler {
 		playback = false;
 	}
 	
-	public boolean restart(Shell shell, String name, EventBObject eventBObject){
+	public boolean restart(String name, EventBObject eventBObject){
 		if (eventBObject==null){
 			if (debug)System.out.println("Oracle initialisation FAILED due to no machine");
 			return false;
@@ -117,7 +119,6 @@ public class OracleHandler {
 				e.printStackTrace();
 				if (debug) System.out.println("Oracle initialisation FAILED");
 			}
-			this.shell = shell;
 			oracleName = name;
 			for (Resource resource : editingDomain.getResourceSet().getResources()){
 				resource.unload();
