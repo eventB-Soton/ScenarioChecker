@@ -24,7 +24,6 @@ import org.eventb.core.IMachineRoot;
 
 import ac.soton.eventb.internal.scenariochecker.perspectives.ScenarioCheckerPerspective;
 import ac.soton.eventb.probsupport.AnimationManager;
-import ac.soton.eventb.scenariochecker.ScenarioCheckerManager;
 
 
 /**
