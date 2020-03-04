@@ -8,6 +8,7 @@
  *  Contributors:
  *  University of Southampton - Initial implementation
  *******************************************************************************/
+
 package ac.soton.eventb.scenariochecker;
 
 import java.util.ArrayList;
