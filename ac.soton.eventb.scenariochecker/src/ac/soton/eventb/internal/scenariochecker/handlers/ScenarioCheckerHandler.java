@@ -64,7 +64,18 @@ public class ScenarioCheckerHandler extends AbstractHandler implements IHandler 
 			e.printStackTrace();
 		}
 		
-		SimulationManager.getDefault().initialise(mchRoot);
+		
+		// Start the Scenario Checker
+		//ScenarioCheckerManager.getDefault().initialise(mchRoot);
+		
+		
+		// If a machine is selected, start the animations for it
+		// This starts all animation participants that have open views/editors..
+		// ... including the scenario checker that we just opened the perspective for.
+		if (mchRoot != null) {
+			AnimationManager.startAnimation(mchRoot);
+		}
+ 
 		return null;
 	}
 
