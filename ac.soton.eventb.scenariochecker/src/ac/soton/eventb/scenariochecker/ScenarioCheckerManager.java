@@ -34,14 +34,14 @@ import de.prob.core.domainobjects.State;
 import de.prob.core.domainobjects.Variable;
 import de.prob.exceptions.ProBException;
 
-public class SimulationManager  {
+public class ScenarioCheckerManager  {
 	
-	//the Singleton SimulationManager instance
-	private static SimulationManager instance = null;
+	//the Singleton ScenarioCheckerManager instance
+	private static ScenarioCheckerManager instance = null;
 
-	public static SimulationManager getDefault() {
+	public static ScenarioCheckerManager getDefault() {
 		if (instance==null){
-			instance = new  SimulationManager();
+			instance = new  ScenarioCheckerManager();
 		}
 		return instance;
 	}
@@ -53,12 +53,12 @@ public class SimulationManager  {
 	private int historyPosition=0;
 	
 	//classes that provide a control panel UI view for the simulation can register here
-	private static List<ISimulationControlPanel> simulationControlPanels = new ArrayList<ISimulationControlPanel>();
-	public void addSimulationControlPanel(ISimulationControlPanel operationSelector) {
-		simulationControlPanels.add(operationSelector);
+	private static List<IScenarioCheckerControlPanel> scenarioCheckerControlPanels = new ArrayList<IScenarioCheckerControlPanel>();
+	public void addSimulationControlPanel(IScenarioCheckerControlPanel operationSelector) {
+		scenarioCheckerControlPanels.add(operationSelector);
 	}
-	public void removeSimulationControlPanel(ISimulationControlPanel simulationControlPanel) {
-		simulationControlPanels.remove(simulationControlPanel);
+	public void removeSimulationControlPanel(IScenarioCheckerControlPanel scenarioCheckerControlPanel) {
+		scenarioCheckerControlPanels.remove(scenarioCheckerControlPanel);
 	}
 	
 
@@ -73,8 +73,8 @@ public class SimulationManager  {
 		OracleHandler.getOracle().initialise(machine);
 		OracleHandler.getOracle().restart("UML-B", machine);
 		//start the control panels
-		for (ISimulationControlPanel simulationControlPanel : simulationControlPanels) {
-			simulationControlPanel.start();
+		for (IScenarioCheckerControlPanel scenarioCheckerControlPanel : scenarioCheckerControlPanels) {
+			scenarioCheckerControlPanel.start();
 		}
 		//execute setup operation automatically
 		if (inSetup()) {
@@ -90,8 +90,8 @@ public class SimulationManager  {
 	public void stop(IMachineRoot mchRoot) {
 		if (mchRoot.getCorrespondingResource()!= this.mchRoot.getCorrespondingResource()) return;
 		//stop the control panels
-		for (ISimulationControlPanel simulationControlPanel : simulationControlPanels) {
-			simulationControlPanel.stop();
+		for (IScenarioCheckerControlPanel scenarioCheckerControlPanel : scenarioCheckerControlPanels) {
+			scenarioCheckerControlPanel.stop();
 		}
 		// clear state
 		this.mchRoot = null;
@@ -108,7 +108,7 @@ public class SimulationManager  {
 	 * @return
 	 */
 	public boolean isOpen() {
-		for (ISimulationControlPanel scp : simulationControlPanels) {
+		for (IScenarioCheckerControlPanel scp : scenarioCheckerControlPanels) {
 			if (scp.isReady()) return true;
 		}
 		return false;
@@ -119,7 +119,7 @@ public class SimulationManager  {
 	
 	/**
 	 * control panel selection changed.
-	 * This is called by the simulationControlPanels when the user has selected an operation.
+	 * This is called by the scenarioCheckerControlPanels when the user has selected an operation.
 	 * If 'fire' is true, the new selection will be executed as a big step now
 	 * 
 	 * @param opName
@@ -207,13 +207,13 @@ public class SimulationManager  {
 		if (OracleHandler.getOracle().isPlayback()){
 			OracleHandler.getOracle().stopPlayback(false);
 			OracleHandler.getOracle().startPlayback(true);
-			for (ISimulationControlPanel controlPanel : simulationControlPanels) {
+			for (IScenarioCheckerControlPanel controlPanel : scenarioCheckerControlPanels) {
 				controlPanel.updateModeIndicator(Mode.PLAYBACK);
 			}
 		}else{
 			OracleHandler.getOracle().stopRecording(false);
 			OracleHandler.getOracle().startRecording();	
-			for (ISimulationControlPanel controlPanel : simulationControlPanels) {
+			for (IScenarioCheckerControlPanel controlPanel : scenarioCheckerControlPanels) {
 				controlPanel.updateModeIndicator(Mode.RECORDING);
 			}
 		}
@@ -222,7 +222,7 @@ public class SimulationManager  {
 
 	public void savePressed() {
 		OracleHandler.getOracle().saveRecording();
-		for (ISimulationControlPanel controlPanel : simulationControlPanels) {
+		for (IScenarioCheckerControlPanel controlPanel : scenarioCheckerControlPanels) {
 			controlPanel.updateModeIndicator(Mode.SAVED);
 		}
 	}
@@ -234,7 +234,7 @@ public class SimulationManager  {
 			OracleHandler.getOracle().stopRecording(false);
 			OracleHandler.getOracle().startPlayback(false);
 		}
-		for (ISimulationControlPanel controlPanel : simulationControlPanels) {
+		for (IScenarioCheckerControlPanel controlPanel : scenarioCheckerControlPanels) {
 			controlPanel.updateModeIndicator(Mode.PLAYBACK);
 		}
 		AnimationManager.restartAnimation(mchRoot);
@@ -244,7 +244,7 @@ public class SimulationManager  {
 		if (OracleHandler.getOracle().isPlayback()){
 			OracleHandler.getOracle().stopPlayback(false);
 		}
-		for (ISimulationControlPanel controlPanel : simulationControlPanels) {
+		for (IScenarioCheckerControlPanel controlPanel : scenarioCheckerControlPanels) {
 			controlPanel.updateModeIndicator(Mode.RECORDING);
 		}
 	}
@@ -286,8 +286,8 @@ public class SimulationManager  {
 							j++;
 						}
 					}
-					for (ISimulationControlPanel simulationControlPanel : simulationControlPanels) {
-						simulationControlPanel.updateEnabledOperations(opnames,select);
+					for (IScenarioCheckerControlPanel scenarioCheckerControlPanel : scenarioCheckerControlPanels) {
+						scenarioCheckerControlPanel.updateEnabledOperations(opnames,select);
 					}
 
 				}

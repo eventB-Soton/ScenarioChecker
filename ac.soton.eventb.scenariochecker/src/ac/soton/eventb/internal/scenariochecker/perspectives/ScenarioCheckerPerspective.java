@@ -16,20 +16,20 @@ import org.eclipse.ui.IPerspectiveFactory;
 
 /**
  * <p>
- * The perspective for umlb Simulation perspective. This is the default
+ * The perspective for Scenario Checker. This is the default
  * implementation. All views and actions are added via Eclipse extension
  * mechanism.
  * </p>
  * 
- * @author htson
+ * @author cfsnook
  * @version 0.1
  * @see IPerspectiveFactory
  * @since 3.0
  */
-public class SimPerspective implements IPerspectiveFactory {
+public class ScenarioCheckerPerspective implements IPerspectiveFactory {
 
 	// The Perspective ID.
-	public static final String PERSPECTIVE_ID = "ac.soton.eventb.scenariochecker.simPerspective";
+	public static final String PERSPECTIVE_ID = "ac.soton.eventb.scenariochecker.scenarioCheckerPerspective";
 
 	@Override
 	public void createInitialLayout(IPageLayout layout) {

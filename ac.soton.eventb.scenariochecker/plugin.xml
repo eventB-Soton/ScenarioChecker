@@ -27,8 +27,8 @@
          point="org.eclipse.ui.views">
       <view
             category="ac.soton.umlb.viewCategory"
-            class="ac.soton.eventb.internal.scenariochecker.views.SimulatorView"
-            id="ac.soton.eventb.scenariochecker.SimulatorView"
+            class="ac.soton.eventb.internal.scenariochecker.views.ScenarioCheckerControlPanelView"
+            id="ac.soton.eventb.scenariochecker.ScenarioCheckerControlPanelView"
             name="%simViewName"
             restorable="true">
       </view>
@@ -88,7 +88,7 @@
    <extension
          point="org.eclipse.ui.handlers">
       <handler
-            class="ac.soton.eventb.internal.scenariochecker.handlers.SimulateHandler"
+            class="ac.soton.eventb.internal.scenariochecker.handlers.ScenarioCheckerHandler"
             commandId="ac.soton.eventb.scenariochecker.simulateCommand">
       </handler>
    </extension>
@@ -108,14 +108,13 @@
    </extension>
 <!-- end of new menu handler -->
 
-
-
+<!-- scenario checker perspective -->
    <extension
          point="org.eclipse.ui.perspectives">
       <perspective
-            class="ac.soton.eventb.internal.scenariochecker.perspectives.SimPerspective"
+            class="ac.soton.eventb.internal.scenariochecker.perspectives.ScenarioCheckerPerspective"
             icon = "icons/umlb.png"
-            id="ac.soton.eventb.scenariochecker.simPerspective"
+            id="ac.soton.eventb.scenariochecker.scenarioCheckerPerspective"
             name="%simPerspectiveName">
       </perspective>
    </extension>
@@ -123,10 +122,10 @@
    <extension
          point="org.eclipse.ui.perspectiveExtensions">
       <perspectiveExtension
-            targetID="ac.soton.eventb.scenariochecker.simPerspective">
+            targetID="ac.soton.eventb.scenariochecker.scenarioCheckerPerspective">
          <view
                closeable="true"
-               id="ac.soton.eventb.scenariochecker.SimulatorView"
+               id="ac.soton.eventb.scenariochecker.ScenarioCheckerControlPanelView"
                minimized="false"
                moveable="true"
                ratio="0.6f"
@@ -151,7 +150,7 @@
                moveable="true"
                ratio="0.6f"
                relationship="right"
-               relative="ac.soton.eventb.scenariochecker.SimulatorView"
+               relative="ac.soton.eventb.scenariochecker.ScenarioCheckerControlPanelView"
                visible="true">
          </view>
          <view
@@ -183,7 +182,7 @@
          </view>
          
          <viewShortcut
-               id="ac.soton.eventb.scenariochecker.SimulatorView">
+               id="ac.soton.eventb.scenariochecker.ScenarioCheckerControlPanelView">
          </viewShortcut>
          <viewShortcut
                id="fr.systerel.explorer.navigator.view">
@@ -211,7 +210,9 @@
          </viewShortcut>
       </perspectiveExtension>
    </extension>
-   
+<!-- end of scenario checker perspective -->
+
+<!-- participant in animations  - scenario checker -->   
    <extension
          point="ac.soton.eventb.probsupport.animationParticipant">
       <animationParticipant
@@ -220,12 +221,15 @@
             name="ScenarioCheckerParticipant">
       </animationParticipant>
    </extension>
-   
+<!-- end of participant in animations  - scenario checker -->
+
+<!-- listen to ProB animations  - scenario checker -->   
    <extension
          point="de.prob.core.animation">
       <listener
             class="ac.soton.eventb.scenariochecker.AnimationListener">
       </listener>
    </extension>
+<!-- end of listen to ProB animations  - scenario checker --> 
 
 </plugin>

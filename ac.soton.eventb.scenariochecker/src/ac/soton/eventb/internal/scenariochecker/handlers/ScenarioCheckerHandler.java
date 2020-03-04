@@ -22,8 +22,9 @@ import org.eclipse.ui.WorkbenchException;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.eventb.core.IMachineRoot;
 
-import ac.soton.eventb.internal.scenariochecker.perspectives.SimPerspective;
-import ac.soton.eventb.scenariochecker.SimulationManager;
+import ac.soton.eventb.internal.scenariochecker.perspectives.ScenarioCheckerPerspective;
+import ac.soton.eventb.probsupport.AnimationManager;
+import ac.soton.eventb.scenariochecker.ScenarioCheckerManager;
 
 
 /**
@@ -31,8 +32,7 @@ import ac.soton.eventb.scenariochecker.SimulationManager;
  *
  */
 
-public class SimulateHandler extends AbstractHandler implements IHandler {
-//	private static final String BMOTION_STUDIO_EXT = "bmso";
+public class ScenarioCheckerHandler extends AbstractHandler implements IHandler {
 
 	
 	@Override
@@ -55,10 +55,10 @@ public class SimulateHandler extends AbstractHandler implements IHandler {
 		// Return if the current selection is not a machine root.
 		if (mchRoot == null) return null;
 
-		// Switch to umlb simulation perspective.
+		// Switch to Scenario Checker perspective.
 		IWorkbench workbench = PlatformUI.getWorkbench();
 		try {
-			workbench.showPerspective(SimPerspective.PERSPECTIVE_ID, HandlerUtil.getActiveWorkbenchWindow(event));   //activeWorkbenchWindow);
+			workbench.showPerspective(ScenarioCheckerPerspective.PERSPECTIVE_ID, HandlerUtil.getActiveWorkbenchWindow(event));   //activeWorkbenchWindow);
 		} catch (WorkbenchException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

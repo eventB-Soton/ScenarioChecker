@@ -16,13 +16,13 @@ import de.prob.core.domainobjects.State;
 
 /**
  * a listener that ProB can instantiate.
- * It just defers to the singleton SimulationManager
+ * It just defers to the singleton ScenarioCheckerManager
  * @author cfs
  *
  */
 public class AnimationListener implements IAnimationListener {
 	@Override
 	public void currentStateChanged(State activeState, Operation operation) {
-		SimulationManager.getDefault().currentStateChanged(activeState, operation);
+		ScenarioCheckerManager.getDefault().currentStateChanged(activeState, operation);
 	}
 }

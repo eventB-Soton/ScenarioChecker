@@ -13,7 +13,7 @@ package ac.soton.eventb.internal.scenariochecker.participants;
 import org.eventb.core.IMachineRoot;
 
 import ac.soton.eventb.probsupport.IAnimationParticipant;
-import ac.soton.eventb.scenariochecker.SimulationManager;
+import ac.soton.eventb.scenariochecker.ScenarioCheckerManager;
 
 public class ScenarioCheckerParticipant implements IAnimationParticipant {
 	
@@ -22,8 +22,8 @@ public class ScenarioCheckerParticipant implements IAnimationParticipant {
 	 */
 	@Override
 	public void startAnimating(IMachineRoot mchRoot) {
-		if (SimulationManager.getDefault().isOpen()) {
-			SimulationManager.getDefault().initialise(mchRoot);
+		if (ScenarioCheckerManager.getDefault().isOpen()) {
+			ScenarioCheckerManager.getDefault().initialise(mchRoot);
 		}
 	}
 	
@@ -32,7 +32,7 @@ public class ScenarioCheckerParticipant implements IAnimationParticipant {
 	 */
 	@Override
 	public void stopAnimating(IMachineRoot mchRoot) {
-		SimulationManager.getDefault().stop(mchRoot);
+		ScenarioCheckerManager.getDefault().stop(mchRoot);
 	}
 
 }

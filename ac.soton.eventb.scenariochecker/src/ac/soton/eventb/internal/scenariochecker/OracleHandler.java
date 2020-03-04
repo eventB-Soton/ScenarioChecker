@@ -138,7 +138,7 @@ public class OracleHandler {
 	 * @return
 	 */
 	public void startRecording(){
-		//SimulationManager.getSimulator().restartAnimator();
+		//ScenarioCheckerManager.getSimulator().restartAnimator();
 		
 	}
 	
@@ -298,7 +298,7 @@ public class OracleHandler {
 	public void startPlayback(boolean repeat){
 		playback = true;
 		this.repeat = repeat;
-		//SimulationManager.getSimulator().restartAnimator();
+		//ScenarioCheckerManager.getSimulator().restartAnimator();
 	}
 	
 	private void doStartPlayback(){

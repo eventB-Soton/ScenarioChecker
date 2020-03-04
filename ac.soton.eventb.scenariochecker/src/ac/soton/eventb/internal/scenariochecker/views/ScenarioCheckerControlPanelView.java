@@ -33,13 +33,13 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.part.ViewPart;
 
-import ac.soton.eventb.scenariochecker.ISimulationControlPanel;
+import ac.soton.eventb.scenariochecker.IScenarioCheckerControlPanel;
 import ac.soton.eventb.scenariochecker.Mode;
-import ac.soton.eventb.scenariochecker.SimulationManager;
+import ac.soton.eventb.scenariochecker.ScenarioCheckerManager;
 
-public class SimulatorView extends ViewPart implements ISimulationControlPanel{
+public class ScenarioCheckerControlPanelView extends ViewPart implements IScenarioCheckerControlPanel{
 	
-	public static final String ID = "ac.soton.eventb.internal.scenariochecker.views.SimulatorView"; //$NON-NLS-1$
+	public static final String ID = "ac.soton.eventb.internal.scenariochecker.views.ScenarioCheckerControlPanelView"; //$NON-NLS-1$
 	
 	private static final Color red = Display.getCurrent().getSystemColor(SWT.COLOR_RED);
 	private static final Color green = Display.getCurrent().getSystemColor(SWT.COLOR_GREEN);
@@ -48,10 +48,10 @@ public class SimulatorView extends ViewPart implements ISimulationControlPanel{
 	/**
 	 * Creates a Scenario Checker control panel view and registers it with the Simulation Manager
 	 */
-	public SimulatorView() {
+	public ScenarioCheckerControlPanelView() {
 		super();
 		//register with the manager as a Simulation Control Panel
-		SimulationManager.getDefault().addSimulationControlPanel(this);
+		ScenarioCheckerManager.getDefault().addSimulationControlPanel(this);
 	}
 	
 	private final FormToolkit toolkit = new FormToolkit(Display.getCurrent());
@@ -106,7 +106,7 @@ public class SimulatorView extends ViewPart implements ISimulationControlPanel{
 				bigStepButton.addMouseListener(new MouseAdapter() {
 					@Override
 					public void mouseUp(MouseEvent e) {
-						SimulationManager.getDefault().bigStep();
+						ScenarioCheckerManager.getDefault().bigStep();
 						updateModeIndicator(lastMode);
 					}
 				});
@@ -118,7 +118,7 @@ public class SimulatorView extends ViewPart implements ISimulationControlPanel{
 				smallStepButton.addMouseListener(new MouseAdapter() {
 					@Override
 					public void mouseUp(MouseEvent e) {
-						SimulationManager.getDefault().singleStep();
+						ScenarioCheckerManager.getDefault().singleStep();
 						updateModeIndicator(lastMode);
 					}
 				});
@@ -131,7 +131,7 @@ public class SimulatorView extends ViewPart implements ISimulationControlPanel{
 				severalStepsButton.addMouseListener(new MouseAdapter() {
 					@Override
 					public void mouseUp(MouseEvent e) {
-						SimulationManager.getDefault().runForTicks(Integer.valueOf(stepCount.getText()));
+						ScenarioCheckerManager.getDefault().runForTicks(Integer.valueOf(stepCount.getText()));
 						updateModeIndicator(lastMode);
 					}
 				});
@@ -163,7 +163,7 @@ public class SimulatorView extends ViewPart implements ISimulationControlPanel{
 				restartButton.addMouseListener(new MouseAdapter() {
 					@Override
 					public void mouseUp(MouseEvent e) {	
-						SimulationManager.getDefault().restartPressed();
+						ScenarioCheckerManager.getDefault().restartPressed();
 					}
 				});
 				toolkit.adapt(restartButton, true, true);
@@ -175,7 +175,7 @@ public class SimulatorView extends ViewPart implements ISimulationControlPanel{
 				saveButton.addMouseListener(new MouseAdapter() {
 					@Override
 					public void mouseUp(MouseEvent e) {
-						SimulationManager.getDefault().savePressed();
+						ScenarioCheckerManager.getDefault().savePressed();
 					}
 				});
 				toolkit.adapt(saveButton, true, true);
@@ -187,7 +187,7 @@ public class SimulatorView extends ViewPart implements ISimulationControlPanel{
 				replayButton.addMouseListener(new MouseAdapter() {
 					@Override
 					public void mouseUp(MouseEvent e) {
-						SimulationManager.getDefault().replayPressed();
+						ScenarioCheckerManager.getDefault().replayPressed();
 					}
 				});
 				replayButton.setText("Replay");
@@ -200,7 +200,7 @@ public class SimulatorView extends ViewPart implements ISimulationControlPanel{
 				stopButton.addMouseListener(new MouseAdapter() {
 					@Override
 					public void mouseUp(MouseEvent e) {
-						SimulationManager.getDefault().stopPressed();					
+						ScenarioCheckerManager.getDefault().stopPressed();					
 					}
 				});
 
@@ -219,11 +219,11 @@ public class SimulatorView extends ViewPart implements ISimulationControlPanel{
 					int count = operationsTable.getItemCount();
 					if (index<0 || index>=count) return;
 					TableItem selected = operationsTable.getItem(index);
-					if (SimulationManager.getDefault().isPlayback()) {
+					if (ScenarioCheckerManager.getDefault().isPlayback()) {
 						messageUser("Error", "Cannot select events manually while playback is in progress.", SWT.ICON_ERROR | SWT.OK);
 					}else {
 						//tell the manager about the new selection
-						SimulationManager.getDefault().selectionChanged(selected.getText(0), false);
+						ScenarioCheckerManager.getDefault().selectionChanged(selected.getText(0), false);
 					}
 					updateModeIndicator(lastMode);
 				}
@@ -232,11 +232,11 @@ public class SimulatorView extends ViewPart implements ISimulationControlPanel{
 				public void mouseDoubleClick(MouseEvent e) {
 					// Execute the selected operation (as a big step)		
 					TableItem selected = operationsTable.getItem(operationsTable.getSelectionIndex());
-					if (SimulationManager.getDefault().isPlayback()) {
+					if (ScenarioCheckerManager.getDefault().isPlayback()) {
 						messageUser("Error", "Cannot select events manually while playback is in progress.", SWT.ICON_ERROR | SWT.OK);
 					}else {
 						//tell the manager about the new selection and to fire it
-						SimulationManager.getDefault().selectionChanged(selected.getText(0), true);
+						ScenarioCheckerManager.getDefault().selectionChanged(selected.getText(0), true);
 					}
 					updateModeIndicator(lastMode);
 				}
@@ -289,14 +289,14 @@ public class SimulatorView extends ViewPart implements ISimulationControlPanel{
 	 */
 	@Override
 	public void dispose() {
-		SimulationManager.getDefault().removeSimulationControlPanel(this);
+		ScenarioCheckerManager.getDefault().removeSimulationControlPanel(this);
 		super.dispose();
 	}
 
-	///////////// Control panel interface ISimulationControlPanel - API for Simulation Manager //////////////
+	///////////// Control panel interface IScenarioCheckerControlPanel - API for Simulation Manager //////////////
 	
 	/* (non-Javadoc)
-	 * @see ac.soton.eventb.scenariochecker.ISimulationControlPanel#updateEnabledOperations(java.util.List, int)
+	 * @see ac.soton.eventb.scenariochecker.IScenarioCheckerControlPanel#updateEnabledOperations(java.util.List, int)
 	 */
 	@Override
 	public void updateEnabledOperations (List<String> opNames, int selected) {
@@ -314,7 +314,7 @@ public class SimulatorView extends ViewPart implements ISimulationControlPanel{
 	}
 	
 	/* (non-Javadoc)
-	 * @see ac.soton.eventb.scenariochecker.ISimulationControlPanel#updateModeIndicator(ac.soton.eventb.scenariochecker.Mode)
+	 * @see ac.soton.eventb.scenariochecker.IScenarioCheckerControlPanel#updateModeIndicator(ac.soton.eventb.scenariochecker.Mode)
 	 */
 	@Override
 	public void updateModeIndicator(Mode mode) {
@@ -337,7 +337,7 @@ public class SimulatorView extends ViewPart implements ISimulationControlPanel{
 	
 	
 	/* (non-Javadoc)
-	 * @see ac.soton.eventb.scenariochecker.ISimulationControlPanel#isReady()
+	 * @see ac.soton.eventb.scenariochecker.IScenarioCheckerControlPanel#isReady()
 	 */
 	@Override
 	public boolean isReady() {
@@ -346,7 +346,7 @@ public class SimulatorView extends ViewPart implements ISimulationControlPanel{
 	}
 	
 	/* (non-Javadoc)
-	 * @see ac.soton.eventb.scenariochecker.ISimulationControlPanel#stop()
+	 * @see ac.soton.eventb.scenariochecker.IScenarioCheckerControlPanel#stop()
 	 */
 	@Override
 	public void stop() {
@@ -362,7 +362,7 @@ public class SimulatorView extends ViewPart implements ISimulationControlPanel{
 	}
 	
 	/* (non-Javadoc)
-	 * @see ac.soton.eventb.scenariochecker.ISimulationControlPanel#start()
+	 * @see ac.soton.eventb.scenariochecker.IScenarioCheckerControlPanel#start()
 	 */
 	@Override
 	public void start() {

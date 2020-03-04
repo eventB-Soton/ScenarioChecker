@@ -12,7 +12,7 @@ package ac.soton.eventb.scenariochecker;
 
 import java.util.List;
 
-public interface ISimulationControlPanel {
+public interface IScenarioCheckerControlPanel {
 
 	void updateModeIndicator(Mode mode);
 	
