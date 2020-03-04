@@ -8,8 +8,9 @@
  *  Contributors:
  *  University of Southampton - Initial implementation
  *******************************************************************************/
-package ac.soton.eventb.scenariochecker;
+package ac.soton.eventb.internal.scenariochecker;
 
+import ac.soton.eventb.scenariochecker.ScenarioCheckerManager;
 import de.prob.core.IAnimationListener;
 import de.prob.core.domainobjects.Operation;
 import de.prob.core.domainobjects.State;

@@ -227,7 +227,7 @@
    <extension
          point="de.prob.core.animation">
       <listener
-            class="ac.soton.eventb.scenariochecker.AnimationListener">
+            class="ac.soton.eventb.internal.scenariochecker.AnimationListener">
       </listener>
    </extension>
 <!-- end of listen to ProB animations  - scenario checker --> 
