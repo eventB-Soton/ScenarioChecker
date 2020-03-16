@@ -11,62 +11,44 @@
 
 package ac.soton.eventb.internal.scenariochecker;
 
-import java.util.List;
-
+import org.eventb.core.IMachineRoot;
 import org.eventb.emf.core.machine.Event;
 import org.eventb.emf.core.machine.Machine;
 
-import de.prob.core.Animator;
-import de.prob.core.command.GetCurrentStateIdCommand;
-import de.prob.core.command.GetEnabledOperationsCommand;
-import de.prob.core.domainobjects.Operation;
-import de.prob.exceptions.ProBException;
+import ac.soton.eventb.probsupport.AnimationManager;
+import ac.soton.eventb.probsupport.data.Operation_;
 
 public class Utils {
 
 	////////////////////////////// utils /////////////
 	
-	/**
-	 * 
-	 * @param op
-	 * @return
-	 */
-	public static boolean isNextOp(Operation op) {
-		return (OracleHandler.getOracle().isPlayback() && op==OracleHandler.getOracle().findNextOperation());
-	}
+//	/**
+//	 * 
+//	 * @param op
+//	 * @return
+//	 */
+//	public static boolean isNextOp(String opName, IMachineRoot mchRoot) {
+//		return (OracleHandler.getOracle().isPlayback() && 
+//				opName.equals(OracleHandler.getOracle().findNextOperation()));
+//	}
+
+
 
 	/**
 	 * 
 	 * @param opSignature
 	 * @return
 	 */
-	public static Operation findOperation(String opSignature) {
-		List<Operation> enabledOpsList = null;
-		try {
-			enabledOpsList = GetEnabledOperationsCommand.getOperations(
-					Animator.getAnimator(),
-					GetCurrentStateIdCommand.getID(Animator.getAnimator()));
-		} catch (ProBException e1) {
-			e1.printStackTrace();
-		}
-		if (enabledOpsList != null) {
-			for (Operation op : enabledOpsList) {
-				if (opSignature.equals(operationInStringFormat(op))){
-					return op;
-				}
+	public static Operation_ findOperation(IMachineRoot mchRoot, String opSignature) {
+		for (Operation_ op : AnimationManager.getEnabledOperations(mchRoot)) {
+			if (opSignature.equals(op.inStringFormat())){
+				return op;
 			}
 		}
 		return null;
 	}
 	
-	/**
-	 * 
-	 * @param op
-	 * @return
-	 */
-	public static String operationInStringFormat(Operation op) {
-		return op.toString().replaceFirst("\\(", " (");
-	}
+
 	
 	public static boolean isExternal(Event ev) {
 		if (ev == null) return false;

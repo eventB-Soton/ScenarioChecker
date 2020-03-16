@@ -15,6 +15,10 @@ import org.eventb.core.IMachineRoot;
 import ac.soton.eventb.probsupport.IAnimationParticipant;
 import ac.soton.eventb.scenariochecker.ScenarioCheckerManager;
 
+/**
+ * @author cfs
+ *
+ */
 public class ScenarioCheckerParticipant implements IAnimationParticipant {
 	
 	/* (non-Javadoc)
@@ -35,4 +39,12 @@ public class ScenarioCheckerParticipant implements IAnimationParticipant {
 		ScenarioCheckerManager.getDefault().stop(mchRoot);
 	}
 
+	/* (non-Javadoc)
+	 * @see ac.soton.eventb.probsupport.IAnimationParticipant#updateAnimation(org.eventb.core.IMachineRoot)
+	 */
+	@Override
+	public void updateAnimation(IMachineRoot mchRoot) {
+		ScenarioCheckerManager.getDefault().currentStateChanged(mchRoot);
+	}
+	
 }

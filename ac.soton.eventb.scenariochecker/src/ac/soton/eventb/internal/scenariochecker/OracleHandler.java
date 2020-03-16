@@ -11,9 +11,9 @@
 package ac.soton.eventb.internal.scenariochecker;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -49,6 +49,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eventb.emf.core.CorePackage;
 import org.eventb.emf.core.EventBNamed;
 import org.eventb.emf.core.EventBObject;
+import org.eventb.emf.core.machine.Event;
 import org.eventb.emf.core.machine.Machine;
 
 import ac.soton.eventb.emf.oracle.Entry;
@@ -58,10 +59,8 @@ import ac.soton.eventb.emf.oracle.OraclePackage;
 import ac.soton.eventb.emf.oracle.Run;
 import ac.soton.eventb.emf.oracle.Snapshot;
 import ac.soton.eventb.emf.oracle.Step;
+import ac.soton.eventb.probsupport.data.Operation_;
 import ac.soton.eventb.scenariochecker.Activator;
-import de.prob.core.Animator;
-import de.prob.core.domainobjects.Operation;
-
 
 
 public class OracleHandler {
@@ -255,11 +254,11 @@ public class OracleHandler {
 		return (Snapshot) oracleEntries.get(snapShotPointer-1);
 	}
 
-	public Step addStepToTrace(String machineName, Operation operation, String clockValue){
-		if (debug) System.out.println("Oracle addStepToTrace: "+operation.getName());
+	public Step addStepToTrace(String machineName, Operation_ operation_, String clockValue){
+		if (debug) System.out.println("Oracle addStepToTrace: "+operation_.getName());
 		Step step = OracleFactory.eINSTANCE.createStep();
-		step.setName(operation.getName());
-		step.getArgs().addAll(operation.getArguments());
+		step.setName(operation_.getName());
+		step.getArgs().addAll(operation_.getArguments());
 		step.setMachine(machineName);
 		step.setClock(clockValue);
 		currentRecordRun.getEntries().add(step);
@@ -302,7 +301,6 @@ public class OracleHandler {
 	}
 	
 	private void doStartPlayback(){
-		assert(playback == false);
 		playback = true;
 		if (debug) System.out.println("Oracle startPlayback");
 		if (currentPlaybackRun == null || repeat==false){
@@ -326,7 +324,7 @@ public class OracleHandler {
 //	 * @deprecated - use findNextOperation and look up its index yourself.
 //	 */
 //	public int selectNextOperation(Animator animator) {
-//		List<Operation> ops = animator.getCurrentState().getEnabledOperations();
+//		List<Operation_> ops = animator.getCurrentState().getEnabledOperations();
 //		return ops.indexOf(findNextOperation(animator));
 //	}
 	
@@ -349,9 +347,7 @@ public class OracleHandler {
 	 * 
 	 * @return operation
 	 */
-	public Operation findNextOperation() {
-		
-		List<Operation> ops = Animator.getAnimator().getCurrentState().getEnabledOperations();
+	public Operation_ findNextOperation() {
 		if (!hasNextStep() && isPlayback()){
 			stopPlayback(false);
 			MessageBox mbox = new MessageBox(shell, SWT.ICON_INFORMATION | SWT.OK);
@@ -362,41 +358,46 @@ public class OracleHandler {
 		}
 		
 		if (nextStep!=null){
-			for (Operation op : ops) {
-				if (op.getName().equals(nextStep.getName())) {
-					boolean thisOne;
-					if (nextStep.getArgs().size() == op.getArguments().size()){
-						thisOne = true;
-						Iterator<String> it = nextStep.getArgs().iterator();
-						for (String arg : op.getArguments()){
-							if (!(it.hasNext() && arg.equals(it.next()))){
-								thisOne = false;
-								break;
-							}
-						}						
-					}else{
-						thisOne = false;
-					}
-					if (thisOne) {
-						if (debug) System.out.println("Oracle selected next operation = "+op.getName());
-						return op;
-					}
-				}
-			}
+			List<String> args = new ArrayList<String>();
+			args.addAll(nextStep.getArgs());
+			if (debug) System.out.println("Oracle selected next operation = "+nextStep.getName());
+			return (new Operation_(nextStep.getName(),args));
+			
+//			for (Operation_ op : ops) {
+//				if (op.getName().equals(nextStep.getName())) {
+//					boolean thisOne;
+//					if (nextStep.getArgs().size() == op.getArguments().size()){
+//						thisOne = true;
+//						Iterator<String> it = nextStep.getArgs().iterator();
+//						for (String arg : op.getArguments()){
+//							if (!(it.hasNext() && arg.equals(it.next()))){
+//								thisOne = false;
+//								break;
+//							}
+//						}						
+//					}else{
+//						thisOne = false;
+//					}
+//					if (thisOne) {
+//						if (debug) System.out.println("Oracle selected next operation = "+op.getName());
+//						return op;
+//					}
+//				}
+//			}
 		}
-		MessageBox mbox = new MessageBox(shell, SWT.ICON_ERROR | SWT.OK);
-		mbox.setText("Playback Discrepancy");
-		String message = "?";
-		if (nextStep ==null){
-			message = "Original operation is null";
-		}else{
-			message = "Original operation is not enabled in playback. \n Operation = "+nextStep.getName();
-			if (nextStep.getArgs().size()>0){
-				message = message+"\n"+"Arguments = "+nextStep.getArgs() ;
-			}
-		}
-		mbox.setMessage(message);
-		mbox.open();
+//		MessageBox mbox = new MessageBox(shell, SWT.ICON_ERROR | SWT.OK);
+//		mbox.setText("Playback Discrepancy");
+//		String message = "?";
+//		if (nextStep ==null){
+//			message = "Original operation is null";
+//		}else{
+//			message = "Original operation is not enabled in playback. \n Operation_ = "+nextStep.getName();
+//			if (nextStep.getArgs().size()>0){
+//				message = message+"\n"+"Arguments = "+nextStep.getArgs() ;
+//			}
+//		}
+//		mbox.setMessage(message);
+//		mbox.open();
 
 		if (debug) System.out.println("Oracle select next operation FAILED");
 		return null; 
@@ -407,10 +408,13 @@ public class OracleHandler {
 		if (nextStep == null) {
 			EList<Entry> oracleEntries = currentPlaybackRun.getEntries();
 			int oldStepPointer = stepPointer;
+			Event event;
 			do{
 				stepPointer = stepPointer+1;
 			}while (stepPointer < oracleEntries.size() && (!(oracleEntries.get(stepPointer) instanceof Step) ||
-					Utils.isInternal(Utils.findEvent(((Step)oracleEntries.get(stepPointer)).getName(), machine)))) ;
+					//TODO: do we need this.. i don't think we store internal events any more
+					(event = Utils.findEvent(((Step)oracleEntries.get(stepPointer)).getName(), machine))!=null &&
+					Utils.isInternal(event))) ;
 			if (stepPointer < oracleEntries.size()){
 				nextStep = (Step)oracleEntries.get(stepPointer);
 				return true;

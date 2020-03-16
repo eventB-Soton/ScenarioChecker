@@ -13,7 +13,6 @@ package ac.soton.eventb.scenariochecker;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 
@@ -26,13 +25,9 @@ import ac.soton.eventb.internal.scenariochecker.Clock;
 import ac.soton.eventb.internal.scenariochecker.OracleHandler;
 import ac.soton.eventb.internal.scenariochecker.Utils;
 import ac.soton.eventb.probsupport.AnimationManager;
-import de.prob.core.Animator;
-import de.prob.core.command.ExecuteOperationCommand;
-import de.prob.core.domainobjects.History;
-import de.prob.core.domainobjects.Operation;
-import de.prob.core.domainobjects.State;
-import de.prob.core.domainobjects.Variable;
-import de.prob.exceptions.ProBException;
+import ac.soton.eventb.probsupport.data.History_;
+import ac.soton.eventb.probsupport.data.Operation_;
+import ac.soton.eventb.probsupport.data.State_;
 
 public class ScenarioCheckerManager  {
 	
@@ -48,9 +43,11 @@ public class ScenarioCheckerManager  {
 	
 	private IMachineRoot mchRoot;
 	private Machine machine;
+	//TODO: We could delete clock - it is not used for much now that we only save externals
 	private Clock clock = Clock.getInstance();	
-	private Operation manuallySelectedOp = null;
-	private int historyPosition=0;
+	private Operation_ manuallySelectedOp = null;
+	private List<Operation_> enabledOperations = null;
+	//private int historyPosition=0;
 	
 	//classes that provide a control panel UI view for the simulation can register here
 	private static List<IScenarioCheckerControlPanel> scenarioCheckerControlPanels = new ArrayList<IScenarioCheckerControlPanel>();
@@ -61,13 +58,11 @@ public class ScenarioCheckerManager  {
 		scenarioCheckerControlPanels.remove(scenarioCheckerControlPanel);
 	}
 	
-
-
 	public void initialise(IMachineRoot mchRoot) {
 		this.mchRoot = mchRoot;
 		EMFRodinDB emfRodinDB = new EMFRodinDB();
 		machine = (Machine) emfRodinDB.loadEventBComponent(mchRoot);
-		historyPosition=0;
+		//historyPosition=0;
 		clock.reset();
 		//initialise oracle in record mode
 		OracleHandler.getOracle().initialise(machine);
@@ -88,6 +83,7 @@ public class ScenarioCheckerManager  {
 	 * @param mchRoot
 	 */
 	public void stop(IMachineRoot mchRoot) {
+		if (this.mchRoot==null) return;
 		if (mchRoot.getCorrespondingResource()!= this.mchRoot.getCorrespondingResource()) return;
 		//stop the control panels
 		for (IScenarioCheckerControlPanel scenarioCheckerControlPanel : scenarioCheckerControlPanels) {
@@ -98,7 +94,7 @@ public class ScenarioCheckerManager  {
 		machine = null;
 		clock.reset();
 		manuallySelectedOp = null;
-		historyPosition = 0;
+		//historyPosition = 0;
 
 	}
 	
@@ -125,29 +121,35 @@ public class ScenarioCheckerManager  {
 	 * @param opName
 	 * @param fireNow
 	 */
-	public void selectionChanged(String opName, boolean fireNow) {
-		manuallySelectedOp = Utils.findOperation(opName);
-		if (fireNow) {
-			bigStep();
+	public void selectionChanged(String operationSignature, boolean fireNow) {
+		for (Operation_ operation : AnimationManager.getEnabledOperations(mchRoot)) {
+			if (operationSignature.equals(operation.inStringFormat())){
+				manuallySelectedOp = operation; 
+				if (fireNow) {
+					bigStep();
+				}
+				break;
+			}
 		}
 	}
-	
 	
 	public boolean isPlayback() {
 		return OracleHandler.getOracle().isPlayback();
 	}
 	
-	// implements the big step behaviour where we 
-	// fire the next operation and then run to completion of all internal operations
+	/**
+	 * 	implements the big step behaviour where we fire the next operation and then run to completion of all internal operations
+	 */
+
 	public boolean bigStep() {	
 		if (inSetup()) return false;	
-		Operation op = findNextOperation();
+		Operation_ op = findNextOperation();
 		//Animator animator = Animator.getAnimator();
 		boolean progress = true;
 		//execute at least one
 		progress = executeOperation(op, false);
 		//continue executing any internal operations
-		List<Operation> loop = new ArrayList<Operation>(); //prevent infinite looping in case doesn't converge
+		List<Operation_> loop = new ArrayList<Operation_>(); //prevent infinite looping in case doesn't converge
 		while (progress && (op = findNextOperation())!=null && Utils.isInternal(Utils.findEvent(op.getName(), machine)) && !loop.contains(op)) {
 			progress = executeOperation(op, false);
 			loop.add(op);
@@ -157,7 +159,7 @@ public class ScenarioCheckerManager  {
 	
 	// implements the small step behaviour where we fire one enabled external or internal operation
 	public void singleStep(){
-		Operation op = findNextOperation();
+		Operation_ op = findNextOperation();
 		executeOperation(op, false);
 	}
 	
@@ -176,26 +178,21 @@ public class ScenarioCheckerManager  {
 		return "ok";
 	}
 	
-	/*
+	/**
 	 * run the context set-up operation if enabled
-	 */
+	 **/
 	public boolean setup(){
 		boolean ret = false;
-		if (Animator.getAnimator().getCurrentState()==null) {
-			ret= false;
-		}else {
-			List<Operation> enabledOperations = Animator.getAnimator().getCurrentState().getEnabledOperations();
-			for (Operation op : enabledOperations){
-				if ("SETUP_CONTEXT".equals(op.getName())){
-					if (OracleHandler.getOracle().isPlayback()) {
-						Operation nextop = OracleHandler.getOracle().findNextOperation();
-						if (nextop!=null && "SETUP_CONTEXT".equals(nextop.getName())){
-							OracleHandler.getOracle().consumeNextStep();
-						}
+		for (Operation_ op : AnimationManager.getEnabledOperations(mchRoot)){
+			if ("SETUP_CONTEXT".equals(op.getName())){
+				if (OracleHandler.getOracle().isPlayback()) {
+					Operation_ nextop = OracleHandler.getOracle().findNextOperation();
+					if (nextop!=null && "SETUP_CONTEXT".equals(nextop.getName())){
+						OracleHandler.getOracle().consumeNextStep();
 					}
-					executeOperation(op,false);
-					ret=true;
 				}
+				executeOperation(op,false);
+				ret=true;
 			}
 		}
 		return ret;
@@ -203,7 +200,8 @@ public class ScenarioCheckerManager  {
 
 	public void restartPressed() {
 		clock.reset();
-		historyPosition=0;
+		//historyPosition=0;
+		AnimationManager.restartAnimation(mchRoot);
 		if (OracleHandler.getOracle().isPlayback()){
 			OracleHandler.getOracle().stopPlayback(false);
 			OracleHandler.getOracle().startPlayback(true);
@@ -217,11 +215,11 @@ public class ScenarioCheckerManager  {
 				controlPanel.updateModeIndicator(Mode.RECORDING);
 			}
 		}
-		AnimationManager.restartAnimation(mchRoot);
+		OracleHandler.getOracle().restart("UML-B", machine);
 	}
 
 	public void savePressed() {
-		OracleHandler.getOracle().saveRecording();
+		saveToOracle();
 		for (IScenarioCheckerControlPanel controlPanel : scenarioCheckerControlPanels) {
 			controlPanel.updateModeIndicator(Mode.SAVED);
 		}
@@ -229,7 +227,8 @@ public class ScenarioCheckerManager  {
 
 	public void replayPressed() {
 		clock.reset();
-		historyPosition=0;
+		//historyPosition=0;
+		AnimationManager.restartAnimation(mchRoot);
 		if (!OracleHandler.getOracle().isPlayback()){
 			OracleHandler.getOracle().stopRecording(false);
 			OracleHandler.getOracle().startPlayback(false);
@@ -237,7 +236,7 @@ public class ScenarioCheckerManager  {
 		for (IScenarioCheckerControlPanel controlPanel : scenarioCheckerControlPanels) {
 			controlPanel.updateModeIndicator(Mode.PLAYBACK);
 		}
-		AnimationManager.restartAnimation(mchRoot);
+		OracleHandler.getOracle().restart("UML-B", machine);
 	}
 
 	public void stopPressed() {
@@ -257,66 +256,80 @@ public class ScenarioCheckerManager  {
 	 * The oracle is only updated for external operations.
 	 * 
 	 */
-		public void currentStateChanged(State activeState, Operation operation) {
-			if (machine==null)  return;
-			History history = Animator.getAnimator().getHistory();
-			if (historyPosition ==0 || history.getCurrentPosition()>historyPosition) {
-				Map<String, Variable> stateMap = Animator.getAnimator().getCurrentState().getValues();
-				//createButtonGroup();
-				
-				{	//update the enabled ops table
-					//if (methodsTable == null) return;
-					State currentState = Animator.getAnimator().getCurrentState();
-					List<Operation> enabledOps = currentState.getEnabledOperations();
-					List<String> opnames = new ArrayList<String>();
-					// for each enabled operation in the ProB model
-					int select = -1;
-					int j=0;
-					for(Operation op: enabledOps){
-						if (Utils.isExternal(Utils.findEvent(op.getName(), machine))) {
-							opnames.add(Utils.operationInStringFormat(op));
-							
-//							TableItem tableItem = new TableItem(methodsTable, SWT.NULL);
-//							String[] rowString = {Utils.operationInStringFormat(op)}; 
-//							tableItem.setText(rowString);
-							
-							if (op==manuallySelectedOp || Utils.isNextOp(op)) {
-								select = j;
-							}
-							j++;
-						}
-					}
-					for (IScenarioCheckerControlPanel scenarioCheckerControlPanel : scenarioCheckerControlPanels) {
-						scenarioCheckerControlPanel.updateEnabledOperations(opnames,select);
-					}
-
+	
+	public void currentStateChanged(IMachineRoot mchRoot) {
+		//update the enabled ops table
+		enabledOperations = AnimationManager.getEnabledOperations(mchRoot);
+		List<String> operationSignatures = new ArrayList<String>();
+		int select = 0;
+		for(Operation_ op: enabledOperations){
+			if (Utils.isExternal(Utils.findEvent(op.getName(), machine))) {
+				operationSignatures.add(op.inStringFormat());
+				if (op==manuallySelectedOp || 
+						(OracleHandler.getOracle().isPlayback() && 
+						op == OracleHandler.getOracle().findNextOperation())); {
+					select = enabledOperations.indexOf(op);
 				}
-				
-				if (OracleHandler.getOracle()!=null) {
-					for (int i=historyPosition; i<history.getCurrentPosition(); i++) {
-						//n.b. history is indexed backwards from the current state.. i.e 0 get current, -1 gets previous etc.
-						//(the last operation is in the previous position; current pos never has an operation, it is just the post-state)
-						int pos = i-history.getCurrentPosition();
-						Operation op = history.getHistoryItem(pos).getOperation();
-						
-						//we only record external events
-						if (op!=null && (Utils.isExternal(Utils.findEvent(op.getName(), machine)) || op.getName().equals("SETUP_CONTEXT"))) {
-							OracleHandler.getOracle().addStepToTrace(machine.getName(), op, clock.getValue());	
-							OracleHandler.getOracle().startSnapshot(clock.getValue());
-							//the post state of an operation is in the next history item. 
-							stateMap = history.getHistoryItem(pos+1).getState().getValues();
-							for (Entry<String, Variable> entry : stateMap.entrySet()) {
-								if (!Utils.isPrivate(entry.getKey(), machine)){
-									OracleHandler.getOracle().addValueToSnapshot(entry.getKey(), entry.getValue().getValue(), clock.getValue());
-								}
-							}
-							OracleHandler.getOracle().stopSnapshot(clock.getValue());
-						}
-					}
-				}
-				historyPosition = history.getCurrentPosition();
 			}
-		}	
+		}
+		for (IScenarioCheckerControlPanel scenarioCheckerControlPanel : scenarioCheckerControlPanels) {
+			scenarioCheckerControlPanel.updateEnabledOperations(operationSignatures, select);
+		}
+	}
+	
+	
+//		public void currentStateChanged(State activeState, Operation operation) {
+//			if (machine==null)  return;
+//			History history = Animator.getAnimator().getHistory();
+//			if (historyPosition ==0 || history.getCurrentPosition()>historyPosition) {
+//				Map<String, String> stateMap = AnimationManager.getStateMap(mchRoot); 
+//				
+//
+//				{	//update the enabled ops table
+//					enabledOperations = AnimationManager.getEnabledOperations(mchRoot);
+//					List<String> operationSignatures = new ArrayList<String>();
+//					int select = 0;
+//					for(Operation_ op: enabledOperations){
+//						if (Utils.isExternal(Utils.findEvent(op.getName(), machine))) {
+//							operationSignatures.add(op.inStringFormat());
+//							if (op==manuallySelectedOp || 
+//									(OracleHandler.getOracle().isPlayback() && 
+//									op == OracleHandler.getOracle().findNextOperation())); {
+//								select = enabledOperations.indexOf(op);
+//							}
+//						}
+//					}
+//					for (IScenarioCheckerControlPanel scenarioCheckerControlPanel : scenarioCheckerControlPanels) {
+//						scenarioCheckerControlPanel.updateEnabledOperations(operationSignatures, select);
+//					}
+//				}
+//				
+//				if (OracleHandler.getOracle()!=null) {
+//					for (int i=historyPosition; i<history.getCurrentPosition(); i++) {
+//						//n.b. history is indexed backwards from the current state.. i.e 0 get current, -1 gets previous etc.
+//						//(the last operation is in the previous position; current pos never has an operation, it is just the post-state)
+//						int pos = i-history.getCurrentPosition();
+//						Operation_ op = history.getHistoryItem(pos).getOperation();
+//						
+//						//we only record external events
+//						if (op!=null && (Utils.isExternal(Utils.findEvent(op.getName(), machine)) || op.getName().equals("SETUP_CONTEXT"))) {
+//							OracleHandler.getOracle().addStepToTrace(machine.getName(), op, clock.getValue());	
+//							OracleHandler.getOracle().startSnapshot(clock.getValue());
+//							//the post state of an operation is in the next history item. 
+//							stateMap = history.getHistoryItem(pos+1).getState().getValues();
+//							for (Entry<String, Variable> entry : stateMap.entrySet()) {
+//								if (!Utils.isPrivate(entry.getKey(), machine)){
+//									OracleHandler.getOracle().addValueToSnapshot(entry.getKey(), entry.getValue().getValue(), clock.getValue());
+//								}
+//							}
+//							OracleHandler.getOracle().stopSnapshot(clock.getValue());
+//						}
+//					}
+//				}
+//				
+//				historyPosition = history.getCurrentPosition();
+//			}
+//		}	
 	
 		
 		
@@ -324,12 +337,61 @@ public class ScenarioCheckerManager  {
 		
 	///////////////// private utilities to help with execution ///////////////////////////
 	
+	private void saveToOracle() {
+		if (OracleHandler.getOracle()!=null) {
+			History_ history = AnimationManager.getHistory(mchRoot);
+			for (History_.HistoryItem_ hi : history.getAllItems() ) { 
+				Operation_ op = hi.operation;
+				//we only record external events
+				if (op!=null && (Utils.isExternal(Utils.findEvent(op.getName(), machine)) || op.getName().equals("SETUP_CONTEXT"))) {
+					OracleHandler.getOracle().addStepToTrace(machine.getName(), op, clock.getValue());	
+					OracleHandler.getOracle().startSnapshot(clock.getValue());
+					State_ state = hi.state;
+					for (Entry<String, String> entry : state.getAllValues().entrySet()) {
+						if (!Utils.isPrivate(entry.getKey(), machine)){
+							OracleHandler.getOracle().addValueToSnapshot(entry.getKey(), entry.getValue(), clock.getValue());
+						}
+					}
+					OracleHandler.getOracle().stopSnapshot(clock.getValue());
+				}
+			}
+			OracleHandler.getOracle().saveRecording();
+		}
+	}	
+				
+				
+				
+				
+//				//int i=0; i<history.getCurrentPosition(); i++) {
+//				//n.b. history is indexed backwards from the current state.. i.e 0 get current, -1 gets previous etc.
+//				//(the last operation is in the previous position; current pos never has an operation, it is just the post-state)
+//				int pos = i-history.getCurrentPosition();
+//				Operation_ op = history.getHistoryItem(pos).getOperation();
+//				
+//				//we only record external events
+//				if (op!=null && (Utils.isExternal(Utils.findEvent(op.getName(), machine)) || op.getName().equals("SETUP_CONTEXT"))) {
+//					OracleHandler.getOracle().addStepToTrace(machine.getName(), op, clock.getValue());	
+//					OracleHandler.getOracle().startSnapshot(clock.getValue());
+//					//the post state of an operation is in the next history item. 
+//					stateMap = history.getHistoryItem(pos+1).getState().getValues();
+//					for (Entry<String, Variable> entry : stateMap.entrySet()) {
+//						if (!Utils.isPrivate(entry.getKey(), machine)){
+//							OracleHandler.getOracle().addValueToSnapshot(entry.getKey(), entry.getValue().getValue(), clock.getValue());
+//						}
+//					}
+//					OracleHandler.getOracle().stopSnapshot(clock.getValue());
+//				}
+//			}
+//			OracleHandler.getOracle().saveRecording();
+//		}
+
+	
 		/*
 		 * check whether the context needs to be set up
 		 */
 		private boolean inSetup(){
-			List<Operation> enabledOperations = Animator.getAnimator().getCurrentState().getEnabledOperations();
-			for (Operation op : enabledOperations){
+			List<Operation_> enabledOperations = AnimationManager.getEnabledOperations(mchRoot);
+			for (Operation_ op : enabledOperations){
 				if ("SETUP_CONTEXT".equals(op.getName()) ){
 					return true;
 				}
@@ -346,23 +408,37 @@ public class ScenarioCheckerManager  {
 	 * @param animator
 	 * @return
 	 */
-	private Operation findNextOperation() {	
-		Operation nextOp = null;
-		State currentState = Animator.getAnimator().getCurrentState();	
-		List<Operation> ops = prioritise(currentState.getEnabledOperations());
-		nextOp = 	ops.isEmpty()? null: 
-					ops.contains(manuallySelectedOp) ? manuallySelectedOp :
-					pickFrom(ops);
-
+	private Operation_ findNextOperation() {	
+		Operation_ nextOp = null;
+		nextOp = 	manuallySelectedOp!=null && 
+				isEnabled(manuallySelectedOp) ? manuallySelectedOp :
+					pickFrom(prioritise(AnimationManager.getEnabledOperations(mchRoot)));
 		if (OracleHandler.getOracle().isPlayback() && Utils.isExternal(Utils.findEvent(nextOp.getName(), machine))){
-			nextOp = OracleHandler.getOracle().findNextOperation();
+			Operation_ playbackOp = OracleHandler.getOracle().findNextOperation();
+			if (playbackOp!=null) nextOp = playbackOp;
+			//it may come out of playback here.. in which case update control panel
+			if (!OracleHandler.getOracle().isPlayback()) {
+				for (IScenarioCheckerControlPanel controlPanel : scenarioCheckerControlPanels) {
+					controlPanel.updateModeIndicator(Mode.RECORDING);
+				}
+			}
 		}
 		return nextOp;
 	}
 
+	private boolean isEnabled(Operation_ op) {
+		List<Operation_> enabled = AnimationManager.getEnabledOperations(mchRoot);
+		for (Operation_ eop : enabled) {
+			if (eop!=null && op.inStringFormat().equals(eop.inStringFormat())) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	private static final Random random = new Random();
-	private Operation pickFrom(List<Operation> ops) {
-		Operation op = ops.get(random.nextInt(ops.size()));
+	private Operation_ pickFrom(List<Operation_> ops) {
+		Operation_ op = ops.get(random.nextInt(ops.size()));
 		return op;
 	}
 	
@@ -373,11 +449,11 @@ public class ScenarioCheckerManager  {
 	 * @param enabledOperations
 	 * @return
 	 */
-	private List<Operation> prioritise(List<Operation> enabledOperations) {
-		List<Operation> filtered = new ArrayList<Operation>();
+	private List<Operation_> prioritise(List<Operation_> enabledOperations) {
+		List<Operation_> filtered = new ArrayList<Operation_>();
 		Integer current = Integer.MAX_VALUE;
 		
-		for (Operation op : enabledOperations) {
+		for (Operation_ op : enabledOperations) {
 			Integer priority;
 			Event ev = Utils.findEvent(op.getName(), machine);
 			priority = ev==null? -1 : Utils.getPriority(ev);
@@ -402,20 +478,16 @@ public class ScenarioCheckerManager  {
 	 * @param silent
 	 * @return
 	 */
-	private boolean executeOperation(Operation operation, boolean silent){
+	private boolean executeOperation(Operation_ operation, boolean silent){
 		if (operation==null) return false;
-		try {
-			if (OracleHandler.getOracle().isPlayback() && Utils.isExternal(Utils.findEvent(operation.getName(), machine))) {
-				OracleHandler.getOracle().consumeNextStep();
-			}
-			ExecuteOperationCommand.executeOperation(Animator.getAnimator(), operation, silent);
-			//waitingForOperation = operation;
-			if (Utils.isExternal(Utils.findEvent(operation.getName(), machine))) clock.inc();
-		} catch (ProBException e) {
-			e.printStackTrace();
-			//waitingForOperation=null;
-			return false;
+		if (OracleHandler.getOracle().isPlayback() && Utils.isExternal(Utils.findEvent(operation.getName(), machine))) {
+			OracleHandler.getOracle().consumeNextStep();
 		}
+		System.out.println("executing operation : "+operation.getName()+" "+operation.getArguments() );
+		AnimationManager.executeOperation(mchRoot, operation, silent);
+		//waitingForOperation = operation;
+		Event ev =Utils.findEvent(operation.getName(), machine);
+		if (ev!=null && Utils.isExternal(ev)) clock.inc();
 		return true;
 	}
 
