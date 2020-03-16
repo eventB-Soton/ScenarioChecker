@@ -299,11 +299,11 @@ public class ScenarioCheckerControlPanelView extends ViewPart implements IScenar
 	 * @see ac.soton.eventb.scenariochecker.IScenarioCheckerControlPanel#updateEnabledOperations(java.util.List, int)
 	 */
 	@Override
-	public void updateEnabledOperations (List<String> opNames, int selected) {
+	public void updateEnabledOperations (List<String> enabledOperations, int selected) {
 		operationsTable.removeAll();
-		for (String opName : opNames) {
+		for (String opString : enabledOperations) {
 			TableItem tableItem = new TableItem(operationsTable, SWT.NULL);
-			String[] rowString = {opName}; 
+			String[] rowString = {opString}; 
 			tableItem.setText(rowString);
 		}
 		if (selected>-1) {

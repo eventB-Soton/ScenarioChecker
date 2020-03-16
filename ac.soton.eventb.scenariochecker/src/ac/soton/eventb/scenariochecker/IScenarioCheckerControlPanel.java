@@ -16,12 +16,13 @@ public interface IScenarioCheckerControlPanel {
 
 	void updateModeIndicator(Mode mode);
 	
-	void updateEnabledOperations(List<String> names, int initialSelection);
+	void updateEnabledOperations(List<String> enabledOperations, int selected);
 
 	boolean isReady();
 
 	void stop();
 
 	void start();
+
 	
 }
