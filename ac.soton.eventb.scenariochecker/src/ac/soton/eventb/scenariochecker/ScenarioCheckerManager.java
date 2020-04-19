@@ -16,6 +16,9 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Random;
 
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.common.util.EMap;
 import org.eventb.core.IMachineRoot;
 import org.eventb.emf.core.machine.Event;
 import org.eventb.emf.core.machine.Machine;
@@ -298,17 +301,30 @@ public class ScenarioCheckerManager  {
 		//update the enabled ops table
 		enabledOperations = AnimationManager.getEnabledOperations(mchRoot);
 		List<String> operationSignatures = new ArrayList<String>();
-		int select = 0;
+		Operation_ selectedOp = null;
+		
+//		int select = 0;
 		for(Operation_ op: enabledOperations){
 			if (Utils.isExternal(Utils.findEvent(op.getName(), machine))) {
 				operationSignatures.add(op.inStringFormat());
-				if (op==manuallySelectedOp || 
-						(OracleHandler.getOracle().isPlayback() && 
-						op == OracleHandler.getOracle().findNextOperation())); {
-					select = enabledOperations.indexOf(op);
-				}
+//				if (op.equals(selectedOp)) {
+//					select = enabledOperations.indexOf(op);
+//				}
 			}
 		}
+		//
+		if (OracleHandler.getOracle().isPlayback()) {
+			selectedOp = OracleHandler.getOracle().findNextOperation();
+			if (!OracleHandler.getOracle().isPlayback()) {		
+				for (IScenarioCheckerControlPanel scenarioCheckerControlPanel : scenarioCheckerControlPanels) {
+					scenarioCheckerControlPanel.updateModeIndicator(Mode.RECORDING);
+				}	
+			}
+		}
+		if (selectedOp==null) {	
+			selectedOp = manuallySelectedOp;
+		}
+		int select = selectedOp==null? -1 : operationSignatures.indexOf(selectedOp.inStringFormat());
 		for (IScenarioCheckerControlPanel scenarioCheckerControlPanel : scenarioCheckerControlPanels) {
 			scenarioCheckerControlPanel.updateEnabledOperations(operationSignatures, select);
 		}
