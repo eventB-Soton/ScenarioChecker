@@ -43,7 +43,6 @@ import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.FileDialog;
-import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 import org.eventb.emf.core.CorePackage;
@@ -221,11 +220,7 @@ public class OracleHandler {
 	 */
 	public Operation_ findNextOperation() {
 		if (!hasNextStep() && isPlayback()){
-			stopPlayback(false);
-			MessageBox mbox = new MessageBox(shell, SWT.ICON_INFORMATION | SWT.OK);
-			mbox.setText("Playback Finished");
-			mbox.setMessage("Playback has completed the trace");
-			mbox.open();
+			stopPlayback();
 			return null;
 		}
 		
