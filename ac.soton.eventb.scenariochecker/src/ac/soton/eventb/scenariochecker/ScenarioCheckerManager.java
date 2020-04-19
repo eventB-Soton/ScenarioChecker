@@ -420,7 +420,12 @@ public class ScenarioCheckerManager  {
 					pickFrom(prioritise(AnimationManager.getEnabledOperations(mchRoot)));
 		if (OracleHandler.getOracle().isPlayback() && Utils.isExternal(Utils.findEvent(nextOp.getName(), machine))){
 			Operation_ playbackOp = OracleHandler.getOracle().findNextOperation();
-			if (playbackOp!=null) nextOp = playbackOp;
+			if ("INITIALISATION".equals(nextOp.getName()) &&
+					"SETUP_CONTEXT".equals(playbackOp.getName())) {
+				OracleHandler.getOracle().consumeNextStep();
+				playbackOp = OracleHandler.getOracle().findNextOperation();
+			}
+			nextOp = playbackOp;
 			//it may come out of playback here.. in which case update control panel
 			if (!OracleHandler.getOracle().isPlayback()) {
 				for (IScenarioCheckerControlPanel controlPanel : scenarioCheckerControlPanels) {
@@ -491,7 +496,8 @@ public class ScenarioCheckerManager  {
 	 */
 	private boolean executeOperation(Operation_ operation, boolean silent){
 		if (operation==null) return false;
-		if (OracleHandler.getOracle().isPlayback() && Utils.isExternal(Utils.findEvent(operation.getName(), machine))) {
+		boolean playback = OracleHandler.getOracle().isPlayback();
+		if (playback && Utils.isExternal(Utils.findEvent(operation.getName(), machine))) {
 			OracleHandler.getOracle().consumeNextStep();
 		}
 		System.out.println("executing operation : "+operation.getName()+" "+operation.getArguments() );
