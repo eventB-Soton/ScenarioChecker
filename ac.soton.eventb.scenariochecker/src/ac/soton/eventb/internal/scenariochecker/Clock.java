@@ -18,10 +18,9 @@ package ac.soton.eventb.internal.scenariochecker;
  * 
  * 
  * 
- * @author cfs
+ * @author cfsnook
  *
  */
-
 public class Clock {
 	
 	//singleton
@@ -34,32 +33,17 @@ public class Clock {
 		return instance;
 	}
 	
-	
 	private Integer clock = -1;
-	//Variable currTimeVar = null;
 	
 	public String getValue() {
-		//currTimeVar = stateMap.get("current_time");
-//		if (currTimeVar==null) { 
-			return clock.toString();
-//		}else {
-//			return currTimeVar.getValue();
-//		}
+		return clock.toString();
 	}
 	
 	public int getValueInt() {
-		//currTimeVar = stateMap.get("current_time");
-//		if (currTimeVar==null) { 
-			return clock;
-//		}else {
-//			return currTimeVar.getValue();
-//		}
+		return clock;
 	}
-
 	
 	public void inc() {
-		//currTimeVar = stateMap.get("current_time");
-		//TODO: we would like to increment the clock only when a non-internal event is enabled.
 		clock++;
 	}
 	
