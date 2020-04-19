@@ -160,38 +160,6 @@ public class OracleHandler {
 		snapShotPointer++;
 		return (Snapshot) oracleEntries.get(snapShotPointer-1);
 	}
-
-	public Step addStepToTrace(String machineName, Operation_ operation_, String clockValue){
-		if (debug) System.out.println("Oracle addStepToTrace: "+operation_.getName());
-		Step step = OracleFactory.eINSTANCE.createStep();
-		step.setName(operation_.getName());
-		step.getArgs().addAll(operation_.getArguments());
-		step.setMachine(machineName);
-		step.setClock(clockValue);
-		currentRecordRun.getEntries().add(step);
-		snapShotPointer = currentRecordRun.getEntries().size();	//this keeps the snapshot pointer in synch with the steps
-		return step;
-	}
-	
-	public boolean saveRecording(){
-		if (debug) System.out.println("Oracle saveRecording ");
-		if (currentSnapshot!=null) stopSnapshot(currentSnapshot.getClock());
-		try {
-			save(currentRecordRun);
-		} catch (CoreException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return false;
-		}
-		return true;
-	}
-	
-	public boolean stopRecording(boolean save){
-		if (debug) System.out.println("Oracle stopRecording (save = "+save+")");
-		if (save) saveRecording();
-		return true;
-	}
-
 	
 	/**
 	 * PLAYBACK
@@ -231,7 +199,7 @@ public class OracleHandler {
 		stepPointer = -1;
 		snapShotPointer = -1;
 		nextStep = null;
-		doStartRecording();
+//		doStartRecording();
 		return ;
 	}
 	
