@@ -35,6 +35,10 @@ import ac.soton.eventb.probsupport.data.State_;
 
 public class ScenarioCheckerManager  {
 	
+	private static final String recordingName = "Scenario";
+	private static final String SETUP = "SETUP_CONTEXT";
+	private static final String INITIALISATION = "INITIALISATION";
+	
 	//the Singleton ScenarioCheckerManager instance
 	private static ScenarioCheckerManager instance = null;
 
@@ -70,7 +74,7 @@ public class ScenarioCheckerManager  {
 		clock.reset();
 		//initialise oracle in record mode
 		OracleHandler.getOracle().initialise(machine);
-		OracleHandler.getOracle().restart("UML-B", machine);
+		OracleHandler.getOracle().restart(recordingName, machine);
 		//start the control panels
 		for (IScenarioCheckerControlPanel scenarioCheckerControlPanel : scenarioCheckerControlPanels) {
 			scenarioCheckerControlPanel.start();
@@ -188,10 +192,10 @@ public class ScenarioCheckerManager  {
 	public boolean setup(){
 		boolean ret = false;
 		for (Operation_ op : AnimationManager.getEnabledOperations(mchRoot)){
-			if ("SETUP_CONTEXT".equals(op.getName())){
+			if (SETUP.equals(op.getName())){
 				if (OracleHandler.getOracle().isPlayback()) {
 					Operation_ nextop = OracleHandler.getOracle().findNextOperation();
-					if (nextop!=null && "SETUP_CONTEXT".equals(nextop.getName())){
+					if (nextop!=null && SETUP.equals(nextop.getName())){
 						OracleHandler.getOracle().consumeNextStep();
 					}
 				}
@@ -217,7 +221,7 @@ public class ScenarioCheckerManager  {
 				controlPanel.updateModeIndicator(Mode.RECORDING);
 			}
 		}
-		OracleHandler.getOracle().restart("UML-B", machine);
+		OracleHandler.getOracle().restart(recordingName, machine);
 	}
 
 	public void savePressed() {
@@ -237,8 +241,9 @@ public class ScenarioCheckerManager  {
 		}
 		for (IScenarioCheckerControlPanel controlPanel : scenarioCheckerControlPanels) {
 			controlPanel.updateModeIndicator(Mode.PLAYBACK);
+			}
 		}
-		OracleHandler.getOracle().restart("UML-B", machine);
+		OracleHandler.getOracle().restart(recordingName, machine);
 	}
 
 	public void stopPressed() {
