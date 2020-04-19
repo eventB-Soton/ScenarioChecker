@@ -255,9 +255,8 @@ public class ScenarioCheckerManager  {
 		if (!OracleHandler.getOracle().isPlayback()){
 //			OracleHandler.getOracle().stopRecording(false);
 			OracleHandler.getOracle().startPlayback(false);
-		}
-		for (IScenarioCheckerControlPanel controlPanel : scenarioCheckerControlPanels) {
-			controlPanel.updateModeIndicator(Mode.PLAYBACK);
+			for (IScenarioCheckerControlPanel controlPanel : scenarioCheckerControlPanels) {
+				controlPanel.updateModeIndicator(Mode.PLAYBACK);
 			}
 		}
 		OracleHandler.getOracle().restart(recordingName, machine);
