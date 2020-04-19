@@ -123,102 +123,18 @@ public class OracleHandler {
 				resource.unload();
 			}		
 			if (playback==true) doStartPlayback();
-			else  doStartRecording();
+//			else  doStartRecording();
 			return true;
 		}
 	}
 	
-	/**
-	 * RECORDING
-	 */
+	/////////////////// should be part of playback? /////////////
 	
 	/**
-	 * 
+	 * @param goldSnapshot
+	 * @param newSnapshot
 	 * @return
 	 */
-	public void startRecording(){
-		//ScenarioCheckerManager.getSimulator().restartAnimator();
-		
-	}
-	
-	public void doStartRecording(){
-		if (debug) System.out.println("Oracle start recording");
-		currentRecordRun = makeRun();
-		currentSnapshot = null;
-		return;
-	}
-
-	private Run makeRun() {
-		Run run = OracleFactory.eINSTANCE.createRun();		
-		run.setName(oracleName);
-		return run;
-	}
-
-	public void startSnapshot(String clockValue) {
-		startSnapshot(machine == null? "<unknown>" : machine.getName(), clockValue);
-	}
-		
-	public void startSnapshot(String machineName, String clockValue) {
-		assert (currentSnapshot == null);
-		if (debug) System.out.println("Oracle startSnapshot");
-		currentSnapshot = OracleFactory.eINSTANCE.createSnapshot();
-		currentSnapshot.setClock(clockValue);
-		currentSnapshot.setMachine(machineName);
-	}
-
-	public void addValueToSnapshot(String name, String value, String timeStamp){
-		addValueToSnapshot(name, value, timeStamp, false);
-	}
-	
-	public void addValueToSnapshot(String name, String value, String timeStamp, boolean verbose) {
-		assert(currentSnapshot != null);
-		assert(currentSnapshot.getClock().equals(timeStamp));
-		if (verbose || hasChanged(name,value)){
-			currentSnapshot.getValues().put(name, value);
-			if (debug) System.out.println("Oracle addtoSnapshot: "+name+" -> "+value);
-		}
-	}
-
-	private boolean hasChanged(String name, String value) {
-		if (currentRecordRun == null) return true;
-		EList<Entry> entries = currentRecordRun.getEntries();		
-		for (int i = entries.size()-1; i>=0 ; i = i-1){
-			if (entries.get(i) instanceof Snapshot){
-				EMap<String, String> snapshotValues = ((Snapshot) entries.get(i)).getValues();
-				if (snapshotValues.containsKey(name)){
-					if (value.equals(snapshotValues.get(name))){
-						return false;
-					}else{
-						return true;
-					}	
-				}
-			}
-		}
-		return true;
-	}
-
-	public void stopSnapshot(String value) {
-		assert(currentSnapshot != null);
-		assert(currentSnapshot.getClock().equals(value));
-		assert(currentRecordRun!= null);
-		if (debug) System.out.println("Oracle stopSnapshot");
-		if (!currentSnapshot.getValues().isEmpty()) {
-			if (playback == true){
-				Snapshot goldSnapshot = getNextGoldSnapshot();
-				if (goldSnapshot!=null)
-					currentSnapshot.setResult(compareSnapshots(goldSnapshot, currentSnapshot));
-				else{
-					currentSnapshot.setResult(false);
-				}
-			}else{
-				currentSnapshot.setResult(true);	//for gold run all snapshots are result = true
-			}
-			currentRecordRun.getEntries().add(currentSnapshot);
-		}
-		currentSnapshot = null;
-		
-	}
-	
 	private boolean compareSnapshots(Snapshot goldSnapshot, Snapshot newSnapshot) {
 		EMap<String, String> newValues = newSnapshot.getValues();
 		for (Map.Entry<String, String> goldValue : goldSnapshot.getValues()){
@@ -426,10 +342,9 @@ public class OracleHandler {
 		return true;
 	}
 	
-	public boolean stopPlayback(boolean save){
+	/**
 		assert(playback==true);
-		if (debug) System.out.println("Oracle stopPlayback (save = "+save+")");
-		if (save) saveRecording();
+		if (debug) System.out.println("Oracle stopPlayback" ); //(save = "+save+")");
 		playback = false;
 		return true;
 	}
@@ -443,13 +358,7 @@ public class OracleHandler {
 	private IFolder folder = null;
 	private TransactionalEditingDomain editingDomain;
 	private String oracleName = null;
-	
-	//RECORDING
-	// the run being recorded - this should not be added to the oracle runs until save
-	private Run currentRecordRun = null;
-	// the snapshot being recorded - add to the currentRecordRun when the snapshot is stopped
-	private Snapshot currentSnapshot = null;
-	
+		
 	//PLAYBACK
 	//flag indicating that same gold should be played back again
 	private boolean repeat = false;
@@ -534,7 +443,7 @@ public class OracleHandler {
 		return null;
 	}
 	
-	private void save(Run run) throws CoreException{	
+	/**
 		final Resource resource = getResource(oracleName, getTimeStamp(), !playback);
 		final SaveRunCommand saveRunCommand = new SaveRunCommand(editingDomain, resource, shell, run);
 		if (saveRunCommand.canExecute()) {	

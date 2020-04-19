@@ -21,6 +21,10 @@ import org.eventb.emf.core.machine.Event;
 import org.eventb.emf.core.machine.Machine;
 import org.eventb.emf.persistence.EMFRodinDB;
 
+import ac.soton.eventb.emf.oracle.OracleFactory;
+import ac.soton.eventb.emf.oracle.Run;
+import ac.soton.eventb.emf.oracle.Snapshot;
+import ac.soton.eventb.emf.oracle.Step;
 import ac.soton.eventb.internal.scenariochecker.Clock;
 import ac.soton.eventb.internal.scenariochecker.OracleHandler;
 import ac.soton.eventb.internal.scenariochecker.Utils;
@@ -209,8 +213,6 @@ public class ScenarioCheckerManager  {
 				controlPanel.updateModeIndicator(Mode.PLAYBACK);
 			}
 		}else{
-			OracleHandler.getOracle().stopRecording(false);
-			OracleHandler.getOracle().startRecording();	
 			for (IScenarioCheckerControlPanel controlPanel : scenarioCheckerControlPanels) {
 				controlPanel.updateModeIndicator(Mode.RECORDING);
 			}
@@ -230,7 +232,7 @@ public class ScenarioCheckerManager  {
 		//historyPosition=0;
 		AnimationManager.restartAnimation(mchRoot);
 		if (!OracleHandler.getOracle().isPlayback()){
-			OracleHandler.getOracle().stopRecording(false);
+//			OracleHandler.getOracle().stopRecording(false);
 			OracleHandler.getOracle().startPlayback(false);
 		}
 		for (IScenarioCheckerControlPanel controlPanel : scenarioCheckerControlPanels) {
@@ -337,56 +339,55 @@ public class ScenarioCheckerManager  {
 		
 	///////////////// private utilities to help with execution ///////////////////////////
 	
+	/**
+	 * saves the history as a scenario
+	 * (the history is obtained from the animation manager)
+	 * 
+	 */
 	private void saveToOracle() {
 		if (OracleHandler.getOracle()!=null) {
 			History_ history = AnimationManager.getHistory(mchRoot);
+			Run recording = OracleFactory.eINSTANCE.createRun();
+			recording.setName(recordingName);
 			for (History_.HistoryItem_ hi : history.getAllItems() ) { 
 				Operation_ op = hi.operation;
 				//we only record external events
-				if (op!=null && (Utils.isExternal(Utils.findEvent(op.getName(), machine)) || op.getName().equals("SETUP_CONTEXT"))) {
-					OracleHandler.getOracle().addStepToTrace(machine.getName(), op, clock.getValue());	
-					OracleHandler.getOracle().startSnapshot(clock.getValue());
+				if (op!=null && (Utils.isExternal(Utils.findEvent(op.getName(), machine)) || SETUP.equals(op.getName()))) {
+					Step step = OracleFactory.eINSTANCE.createStep();
+					step.setName(op.getName());
+					step.getArgs().addAll(op.getArguments());
+					step.setMachine(machine.getName());
+					step.setClock(clock.getValue());
+					recording.getEntries().add(step);	
+					Snapshot currentSnapshot = OracleFactory.eINSTANCE.createSnapshot();
+					currentSnapshot.setClock(clock.getValue());
+					currentSnapshot.setMachine(machine.getName());
 					State_ state = hi.state;
 					for (Entry<String, String> entry : state.getAllValues().entrySet()) {
 						if (!Utils.isPrivate(entry.getKey(), machine)){
-							OracleHandler.getOracle().addValueToSnapshot(entry.getKey(), entry.getValue(), clock.getValue());
+							if (hasChanged(entry.getKey(),entry.getValue(), recording)){
+								currentSnapshot.getValues().put(entry.getKey(), entry.getValue());
+							}
 						}
 					}
-					OracleHandler.getOracle().stopSnapshot(clock.getValue());
+					if (!currentSnapshot.getValues().isEmpty()) {
+						//FIXME: In playback, we should check that the snapshot matches gold version - for now = true
+						boolean result = true;
+						currentSnapshot.setResult(result);	//for gold run all snapshots are result = true
+						recording.getEntries().add(currentSnapshot);
+					}
 				}
 			}
-			OracleHandler.getOracle().saveRecording();
+			try {
+				OracleHandler.getOracle().save(recording);
+			} catch (CoreException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
-	}	
-				
-				
-				
-				
-//				//int i=0; i<history.getCurrentPosition(); i++) {
-//				//n.b. history is indexed backwards from the current state.. i.e 0 get current, -1 gets previous etc.
-//				//(the last operation is in the previous position; current pos never has an operation, it is just the post-state)
-//				int pos = i-history.getCurrentPosition();
-//				Operation_ op = history.getHistoryItem(pos).getOperation();
-//				
-//				//we only record external events
-//				if (op!=null && (Utils.isExternal(Utils.findEvent(op.getName(), machine)) || op.getName().equals("SETUP_CONTEXT"))) {
-//					OracleHandler.getOracle().addStepToTrace(machine.getName(), op, clock.getValue());	
-//					OracleHandler.getOracle().startSnapshot(clock.getValue());
-//					//the post state of an operation is in the next history item. 
-//					stateMap = history.getHistoryItem(pos+1).getState().getValues();
-//					for (Entry<String, Variable> entry : stateMap.entrySet()) {
-//						if (!Utils.isPrivate(entry.getKey(), machine)){
-//							OracleHandler.getOracle().addValueToSnapshot(entry.getKey(), entry.getValue().getValue(), clock.getValue());
-//						}
-//					}
-//					OracleHandler.getOracle().stopSnapshot(clock.getValue());
-//				}
-//			}
-//			OracleHandler.getOracle().saveRecording();
-//		}
-
+	}
 	
-		/*
+		/**
 		 * check whether the context needs to be set up
 		 */
 		private boolean inSetup(){
@@ -490,7 +491,31 @@ public class ScenarioCheckerManager  {
 		if (ev!=null && Utils.isExternal(ev)) clock.inc();
 		return true;
 	}
-
-
+	
+	/**
+	 * Checks whether the value of the named identifier has changed since the last time it was recorded in the recording.
+	 * 
+	 * @param name
+	 * @param value
+	 * @param run 
+	 * @return
+	 */
+	private boolean hasChanged(String name, String value, Run run) {
+		if (run == null) return true;
+		EList<ac.soton.eventb.emf.oracle.Entry> entries = run.getEntries();		
+		for (int i = entries.size()-1; i>=0 ; i = i-1){
+			if (entries.get(i) instanceof Snapshot){
+				EMap<String, String> snapshotValues = ((Snapshot) entries.get(i)).getValues();
+				if (snapshotValues.containsKey(name)){
+					if (value.equals(snapshotValues.get(name))){
+						return false;
+					}else{
+						return true;
+					}	
+				}
+			}
+		}
+		return true;
+	}
 
 }
