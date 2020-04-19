@@ -66,11 +66,12 @@ public class ScenarioCheckerManager  {
 		scenarioCheckerControlPanels.remove(scenarioCheckerControlPanel);
 	}
 	
+	
+	
 	public void initialise(IMachineRoot mchRoot) {
 		this.mchRoot = mchRoot;
 		EMFRodinDB emfRodinDB = new EMFRodinDB();
 		machine = (Machine) emfRodinDB.loadEventBComponent(mchRoot);
-		//historyPosition=0;
 		clock.reset();
 		//initialise oracle in record mode
 		OracleHandler.getOracle().initialise(machine);
@@ -92,18 +93,18 @@ public class ScenarioCheckerManager  {
 	 */
 	public void stop(IMachineRoot mchRoot) {
 		if (this.mchRoot==null) return;
-		if (mchRoot.getCorrespondingResource()!= this.mchRoot.getCorrespondingResource()) return;
+		if (mchRoot.getCorrespondingResource() != this.mchRoot.getCorrespondingResource()) return;
 		//stop the control panels
 		for (IScenarioCheckerControlPanel scenarioCheckerControlPanel : scenarioCheckerControlPanels) {
 			scenarioCheckerControlPanel.stop();
 		}
+		
 		// clear state
 		this.mchRoot = null;
 		machine = null;
 		clock.reset();
 		manuallySelectedOp = null;
-		//historyPosition = 0;
-
+		dirty=false;
 	}
 	
 	/**
@@ -158,20 +159,28 @@ public class ScenarioCheckerManager  {
 		progress = executeOperation(op, false);
 		//continue executing any internal operations
 		List<Operation_> loop = new ArrayList<Operation_>(); //prevent infinite looping in case doesn't converge
-		while (progress && (op = findNextOperation())!=null && Utils.isInternal(Utils.findEvent(op.getName(), machine)) && !loop.contains(op)) {
+		while (progress && (op = findNextOperation())!=null &&
+				Utils.isInternal(Utils.findEvent(op.getName(), machine)) &&
+				!loop.contains(op)) {
 			progress = executeOperation(op, false);
 			loop.add(op);
 		}
 		return progress;
 	}
 	
-	// implements the small step behaviour where we fire one enabled external or internal operation
+	/**
+	 *  implements the small step behaviour where we fire one enabled external or internal operation
+	 */
 	public void singleStep(){
 		Operation_ op = findNextOperation();
 		executeOperation(op, false);
 	}
 	
-	// implements the run behaviour where we take the selected number of big steps
+	/**
+	 *  implements the run behaviour where we take the selected number of big steps
+	 * @param ticks
+	 * @return
+	 */
 	// (when not in playback mode we stop when a non-deterministic choice is available)  <<<<<<<<<< DISABLED FOR NOW - WHICH IS BETTER?
 	public String runForTicks(Integer ticks) {
 		if (inSetup()) return "In Setup";	
@@ -206,6 +215,9 @@ public class ScenarioCheckerManager  {
 		return ret;
 	}
 
+	/**
+	 * restarts the current scenario
+	 */
 	public void restartPressed() {
 		clock.reset();
 		//historyPosition=0;
@@ -223,14 +235,20 @@ public class ScenarioCheckerManager  {
 		}
 		OracleHandler.getOracle().restart(recordingName, machine);
 	}
-
+	
+	/**
+	 * saves the current scenario
+	 */
 	public void savePressed() {
 		saveToOracle();
 		for (IScenarioCheckerControlPanel controlPanel : scenarioCheckerControlPanels) {
 			controlPanel.updateModeIndicator(Mode.SAVED);
 		}
 	}
-
+	
+	/**
+	 * starts playing back the selected scenario
+	 */
 	public void replayPressed() {
 		clock.reset();
 		//historyPosition=0;
@@ -246,6 +264,10 @@ public class ScenarioCheckerManager  {
 		OracleHandler.getOracle().restart(recordingName, machine);
 	}
 
+	/**
+	 * stops the current playback and switches to recording mode
+	 * (without restarting - so a new scenario can continue from the played back one)
+	 */
 	public void stopPressed() {
 		if (OracleHandler.getOracle().isPlayback()){
 			OracleHandler.getOracle().stopPlayback(false);
@@ -282,67 +304,20 @@ public class ScenarioCheckerManager  {
 		for (IScenarioCheckerControlPanel scenarioCheckerControlPanel : scenarioCheckerControlPanels) {
 			scenarioCheckerControlPanel.updateEnabledOperations(operationSignatures, select);
 		}
-	}
-	
-	
-//		public void currentStateChanged(State activeState, Operation operation) {
-//			if (machine==null)  return;
-//			History history = Animator.getAnimator().getHistory();
-//			if (historyPosition ==0 || history.getCurrentPosition()>historyPosition) {
-//				Map<String, String> stateMap = AnimationManager.getStateMap(mchRoot); 
-//				
-//
-//				{	//update the enabled ops table
-//					enabledOperations = AnimationManager.getEnabledOperations(mchRoot);
-//					List<String> operationSignatures = new ArrayList<String>();
-//					int select = 0;
-//					for(Operation_ op: enabledOperations){
-//						if (Utils.isExternal(Utils.findEvent(op.getName(), machine))) {
-//							operationSignatures.add(op.inStringFormat());
-//							if (op==manuallySelectedOp || 
-//									(OracleHandler.getOracle().isPlayback() && 
-//									op == OracleHandler.getOracle().findNextOperation())); {
-//								select = enabledOperations.indexOf(op);
-//							}
-//						}
-//					}
-//					for (IScenarioCheckerControlPanel scenarioCheckerControlPanel : scenarioCheckerControlPanels) {
-//						scenarioCheckerControlPanel.updateEnabledOperations(operationSignatures, select);
-//					}
-//				}
-//				
-//				if (OracleHandler.getOracle()!=null) {
-//					for (int i=historyPosition; i<history.getCurrentPosition(); i++) {
-//						//n.b. history is indexed backwards from the current state.. i.e 0 get current, -1 gets previous etc.
-//						//(the last operation is in the previous position; current pos never has an operation, it is just the post-state)
-//						int pos = i-history.getCurrentPosition();
-//						Operation_ op = history.getHistoryItem(pos).getOperation();
-//						
-//						//we only record external events
-//						if (op!=null && (Utils.isExternal(Utils.findEvent(op.getName(), machine)) || op.getName().equals("SETUP_CONTEXT"))) {
-//							OracleHandler.getOracle().addStepToTrace(machine.getName(), op, clock.getValue());	
-//							OracleHandler.getOracle().startSnapshot(clock.getValue());
-//							//the post state of an operation is in the next history item. 
-//							stateMap = history.getHistoryItem(pos+1).getState().getValues();
-//							for (Entry<String, Variable> entry : stateMap.entrySet()) {
-//								if (!Utils.isPrivate(entry.getKey(), machine)){
-//									OracleHandler.getOracle().addValueToSnapshot(entry.getKey(), entry.getValue().getValue(), clock.getValue());
-//								}
-//							}
-//							OracleHandler.getOracle().stopSnapshot(clock.getValue());
-//						}
-//					}
-//				}
-//				
-//				historyPosition = history.getCurrentPosition();
-//			}
-//		}	
-	
-		
-		
-		
+	}		
 		
 	///////////////// private utilities to help with execution ///////////////////////////
+
+	/**
+	 * sets the dirty flag and tells the control panels to show as dirty
+	 * @param dirty
+	 */
+	private void setDirty(boolean dirty) {
+		for (IScenarioCheckerControlPanel controlPanel : scenarioCheckerControlPanels) {
+			controlPanel.updateDirtyStatus(dirty);;
+		}
+		this.dirty=dirty;
+	}
 	
 	/**
 	 * saves the history as a scenario
@@ -432,6 +407,11 @@ public class ScenarioCheckerManager  {
 		return nextOp;
 	}
 
+	/**
+	 * checks whether a particular operation is currently enabled
+	 * @param op
+	 * @return
+	 */
 	private boolean isEnabled(Operation_ op) {
 		List<Operation_> enabled = AnimationManager.getEnabledOperations(mchRoot);
 		for (Operation_ eop : enabled) {
@@ -442,6 +422,9 @@ public class ScenarioCheckerManager  {
 		return false;
 	}
 
+	/**
+	 * selects an operation from the given list at random
+	 */
 	private static final Random random = new Random();
 	private Operation_ pickFrom(List<Operation_> ops) {
 		Operation_ op = ops.get(random.nextInt(ops.size()));
@@ -450,7 +433,6 @@ public class ScenarioCheckerManager  {
 	
 	/**
 	 * filter the given list of operations so that it contains the subset with the highest eventPriorities
-	 * 
 	 * 
 	 * @param enabledOperations
 	 * @return
@@ -475,7 +457,6 @@ public class ScenarioCheckerManager  {
 
 	/**
 	 * execute the given operation while maintaining the clock
-	 * 
 	 * If the operation execution succeeds, and the operation is not internal,
 	 * the clock is incremented
 	 * 
@@ -491,7 +472,6 @@ public class ScenarioCheckerManager  {
 		}
 		System.out.println("executing operation : "+operation.getName()+" "+operation.getArguments() );
 		AnimationManager.executeOperation(mchRoot, operation, silent);
-		//waitingForOperation = operation;
 		Event ev =Utils.findEvent(operation.getName(), machine);
 		if (ev!=null && Utils.isExternal(ev)) clock.inc();
 		return true;

@@ -63,13 +63,17 @@ import ac.soton.eventb.probsupport.data.Operation_;
 import ac.soton.eventb.scenariochecker.Activator;
 
 
+/**
+ * Manages reading and writing to the oracle files
+ * 
+ * @author cfsnook
+ *
+ */
 public class OracleHandler {
 	
 	private final static String oracleExtension = "oracle";
 	private final static String goldOracleExtension = "gold_"+oracleExtension;
 	private boolean debug = true;
-
-
 	
 	/**
 	 * Singleton
@@ -139,22 +143,6 @@ public class OracleHandler {
 		EMap<String, String> newValues = newSnapshot.getValues();
 		for (Map.Entry<String, String> goldValue : goldSnapshot.getValues()){
 			if (!(newValues.containsKey(goldValue.getKey()) && newValues.get(goldValue.getKey()).equals(goldValue.getValue()))){
-				
-				//TODO: This used to stop and warn the user when a discrepancy was found
-				// Now we record the discrepancy but carry on.
-//				//User message
-//				MessageBox mbox = new MessageBox(shell, SWT.ICON_ERROR | SWT.OK);
-//				mbox.setText("Playback Discrepancy");				
-//				if (newValues.containsKey(goldValue.getKey())){
-//					mbox.setMessage("Different value in playback for variable "+goldValue.getKey()+"\n"+
-//							"Original Value = "+goldValue.getValue() +"\n"+
-//							"Playback Value ="+newValues.get(goldValue.getKey()));
-//				}else{
-//					mbox.setMessage("No new value in playback for variable "+goldValue.getKey()+"\n"+
-//							"(Original Value = "+goldValue.getValue() +")");
-//				}
-//				mbox.open();
-
 				return false;
 			}
 		}
@@ -162,6 +150,9 @@ public class OracleHandler {
 	}
 
 
+	/**
+	 * @return
+	 */
 	private Snapshot getNextGoldSnapshot() {
 		if (currentPlaybackRun == null){return null;}
 		EList<Entry> oracleEntries = currentPlaybackRun.getEntries();
@@ -206,16 +197,28 @@ public class OracleHandler {
 	 * PLAYBACK
 	 */
 	
+	/**
+	 * Checks whether currently in playback mode 
+	 * @return
+	 */
 	public boolean isPlayback(){
 		return playback;
 	}
 	
+	/**
+	 * Switch to playback mode
+	 * If repeat is true, use the existin oracle file, otherwise a new one will be loaded
+	 * 
+	 * @param repeat
+	 */
 	public void startPlayback(boolean repeat){
 		playback = true;
 		this.repeat = repeat;
-		//ScenarioCheckerManager.getSimulator().restartAnimator();
 	}
 	
+	/**
+	 * 
+	 */
 	private void doStartPlayback(){
 		playback = true;
 		if (debug) System.out.println("Oracle startPlayback");
@@ -231,22 +234,9 @@ public class OracleHandler {
 		doStartRecording();
 		return ;
 	}
-
-//	/**
-//	 * returns the index in ops of the next operation according to the Oracle being replayed
-//	 * 
-//	 * @param animator
-//	 * @return index of operation in currently enabled operations
-//	 * @deprecated - use findNextOperation and look up its index yourself.
-//	 */
-//	public int selectNextOperation(Animator animator) {
-//		List<Operation_> ops = animator.getCurrentState().getEnabledOperations();
-//		return ops.indexOf(findNextOperation(animator));
-//	}
 	
 	/**
-	 * This consumes the next step 
-	 * so that the next find will return a different operation.
+	 * This consumes the next step so that the next find will return a different operation.
 	 * 
 	 * @param animator
 	 * @return
@@ -256,10 +246,8 @@ public class OracleHandler {
 	}
 	
 	/** 
-	 * returns the next operation according to the Oracle being replayed
+	 * Returns the next operation according to the Oracle being replayed
 	 * this does not change the Oracle state so can be called repeatedly
-	 * 
-	 * 
 	 * 
 	 * @return operation
 	 */
@@ -319,6 +307,9 @@ public class OracleHandler {
 		return null; 
 	}
 	
+	/**
+	 * @return
+	 */
 	private boolean hasNextStep(){
 		assert(playback==true);
 		if (nextStep == null) {
@@ -343,6 +334,11 @@ public class OracleHandler {
 	}
 	
 	/**
+	 * Stop playback from the current oracle file
+	 * @param save
+	 * @return
+	 */
+	public boolean stopPlayback() {
 		assert(playback==true);
 		if (debug) System.out.println("Oracle stopPlayback" ); //(save = "+save+")");
 		playback = false;
@@ -354,7 +350,6 @@ public class OracleHandler {
 	////////////////////////////////
 	private Shell shell = null;
 	private Machine machine = null;
-	//private String modelName = null;
 	private IFolder folder = null;
 	private TransactionalEditingDomain editingDomain;
 	private String oracleName = null;
@@ -378,6 +373,9 @@ public class OracleHandler {
 
 	private IFolder oracleFolder = null;
 
+	/**
+	 * @return
+	 */
 	private String getTimeStamp() {
 		String timestamp = "";
 		Calendar calendar =Calendar.getInstance();
@@ -390,46 +388,49 @@ public class OracleHandler {
 		return timestamp;
 	}
 
+	/**
+	 * @param integer
+	 * @return
+	 */
 	private String twoDigits(int integer) {
 		String ret = Integer.toString(integer);
 		if (ret.length()<2) ret = "0"+ret;
 		return ret;
 	}
 	
+	/**
+	 * @return
+	 */
 	private Run getGoldRun() {
-	try {
-	   FileDialog dialog = new FileDialog(shell, SWT.OPEN);
-	   dialog.setFilterExtensions(new String [] {"*."+goldOracleExtension, "*."+oracleExtension,"*.*"});
-	   dialog.setFilterPath(oracleFolder.getRawLocation().toString());
-	   dialog.setText("Select Gold Oracle File to Replay");
-	   String rawLocation = dialog.open();
-	   if (rawLocation==null) return null;
-	   IPath rawPath = new Path(rawLocation);
-	   
-//	   IPath workspacePath = ResourcesPlugin.getWorkspace().getRoot().getRawLocation();
-//	   IPath workspaceRelativePath = rawPath.makeRelativeTo(workspacePath);   
-//	   IPath path = new Path("platform:/resource");
-//	   path = path.append(workspaceRelativePath);
-//	   URI uri = URI.createURI(path.toString()); 
-	   
-	   URI uri = URI.createFileURI(rawPath.toString());
-	   ResourceSet rset = editingDomain.getResourceSet();
-	   Resource resource = rset.getResource(uri, true);	   
-	   Run run = loadRun(resource);
-	   return run;
-	}catch (Exception e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-		return null;
-	}
+		try {
+		   FileDialog dialog = new FileDialog(shell, SWT.OPEN);
+		   dialog.setFilterExtensions(new String [] {"*."+goldOracleExtension, "*."+oracleExtension,"*.*"});
+		   dialog.setFilterPath(oracleFolder.getRawLocation().toString());
+		   dialog.setText("Select Gold Oracle File to Replay");
+		   String rawLocation = dialog.open();
+		   if (rawLocation==null) return null;
+		   IPath rawPath = new Path(rawLocation);
+		   URI uri = URI.createFileURI(rawPath.toString());
+		   ResourceSet rset = editingDomain.getResourceSet();
+		   Resource resource = rset.getResource(uri, true);	   
+		   Run run = loadRun(resource);
+		   return run;
+		}catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 	
 
+	/**
+	 * @param resource
+	 * @return
+	 * @throws CoreException
+	 */
 	private Run loadRun(Resource resource) throws CoreException{
 		try {
 			resource.load(null);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return null;
 		}
@@ -444,6 +445,10 @@ public class OracleHandler {
 	}
 	
 	/**
+	 * @param run
+	 * @throws CoreException
+	 */
+	public void save(Run run) throws CoreException{	
 		final Resource resource = getResource(oracleName, getTimeStamp(), !playback);
 		final SaveRunCommand saveRunCommand = new SaveRunCommand(editingDomain, resource, shell, run);
 		if (saveRunCommand.canExecute()) {	
@@ -466,12 +471,18 @@ public class OracleHandler {
 				TransactionUtil.disconnectFromEditingDomain(resource);
 				EcoreUtil.remove(run);	
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} 
 		}
 	}
 
+	/**
+	 * @param name
+	 * @param timestamp
+	 * @param gold
+	 * @return
+	 * @throws CoreException
+	 */
 	private Resource getResource(String name, String timestamp, boolean gold) throws CoreException{
 		IPath filePath = folder.getFullPath();
 		filePath = filePath.append("/"+machine.getName());
@@ -517,6 +528,12 @@ public class OracleHandler {
 	
 	//////////////save command////////////
 	
+	/**
+	 * A command to save the oracle run
+	 * 
+	 * @author cfsnook
+	 *
+	 */
 	private static class SaveRunCommand extends AbstractEMFOperation {
 		
 		Resource resource;
@@ -524,7 +541,6 @@ public class OracleHandler {
 
 		public SaveRunCommand(TransactionalEditingDomain editingDomain, Resource resource, Shell shell, Run run) {
 			super(editingDomain, "what can I say?");
-			//setOptions(Collections.singletonMap(Transaction.OPTION_UNPROTECTED, Boolean.TRUE));
 			this.resource = resource;
 			this.run = run;
 		}
@@ -553,12 +569,10 @@ public class OracleHandler {
 				if (addCommand.canExecute()) addCommand.execute();
 			}
 			final Map<Object, Object> saveOptions = new HashMap<Object, Object>();
-			//saveOptions.put(Resource.OPTION_SAVE_ONLY_IF_CHANGED, Resource.OPTION_SAVE_ONLY_IF_CHANGED_MEMORY_BUFFER);
 			try {
 				resource.save(saveOptions);
 			}
 			catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 				return new Status(Status.ERROR, Activator.PLUGIN_ID, "Saving Oracle Failed" , e);
 			}
