@@ -55,7 +55,7 @@ public class ScenarioCheckerManager  {
 	private Clock clock = Clock.getInstance();	
 	private Operation_ manuallySelectedOp = null;
 	private List<Operation_> enabledOperations = null;
-	//private int historyPosition=0;
+	private boolean dirty = false;
 	
 	//classes that provide a control panel UI view for the simulation can register here
 	private static List<IScenarioCheckerControlPanel> scenarioCheckerControlPanels = new ArrayList<IScenarioCheckerControlPanel>();
@@ -84,6 +84,7 @@ public class ScenarioCheckerManager  {
 		if (inSetup()) {
 			setup();
 		}
+		dirty = false;
 	}
 
 	/**
@@ -241,9 +242,7 @@ public class ScenarioCheckerManager  {
 	 */
 	public void savePressed() {
 		saveToOracle();
-		for (IScenarioCheckerControlPanel controlPanel : scenarioCheckerControlPanels) {
-			controlPanel.updateModeIndicator(Mode.SAVED);
-		}
+		setDirty(false);
 	}
 	
 	/**
@@ -276,6 +275,16 @@ public class ScenarioCheckerManager  {
 			controlPanel.updateModeIndicator(Mode.RECORDING);
 		}
 	}
+	
+	/**
+	 * checks whether the scenario is dirty
+	 * (i.e. a scenario has been manually played beyond initialisation, but not yet saved)
+	 * @return
+	 */
+	public boolean isDirty() {
+		return dirty;
+	}
+	
 	
 	//////////////////// ProB listener interface ////////////
 	/**
@@ -474,6 +483,9 @@ public class ScenarioCheckerManager  {
 		AnimationManager.executeOperation(mchRoot, operation, silent);
 		Event ev =Utils.findEvent(operation.getName(), machine);
 		if (ev!=null && Utils.isExternal(ev)) clock.inc();
+		if (!playback && !SETUP.equals(operation.getName()) && !INITIALISATION.equals(operation.getName()) ) {
+			setDirty(true);
+		}
 		return true;
 	}
 	

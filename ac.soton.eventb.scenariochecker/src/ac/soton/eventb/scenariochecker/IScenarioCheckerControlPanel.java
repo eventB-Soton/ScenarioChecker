@@ -17,6 +17,8 @@ public interface IScenarioCheckerControlPanel {
 	void updateModeIndicator(Mode mode);
 	
 	void updateEnabledOperations(List<String> enabledOperations, int selected);
+	
+	void updateDirtyStatus(boolean dirty);
 
 	boolean isReady();
 

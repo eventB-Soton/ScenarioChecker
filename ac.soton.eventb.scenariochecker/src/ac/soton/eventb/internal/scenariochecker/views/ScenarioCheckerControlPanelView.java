@@ -375,5 +375,22 @@ public class ScenarioCheckerControlPanelView extends ViewPart implements IScenar
 		smallStepButton.setEnabled(true);
 		modeIndicator.setEnabled(true);
 	}
+	@Override
+	public void updateDirtyStatus(boolean dirty) {
+		Display.getDefault().asyncExec(new Runnable() {
+		    public void run() {
+				String title = getPartName();
+				if (dirty) {
+					if (title.indexOf("*")!=0) {
+						setPartName("*"+title);
+					}
+				}else {
+					if (title.indexOf("*")==0) {
+						setPartName(title.substring(1));
+					}
+				}
+		    }
+		});
+	}
 
 }
