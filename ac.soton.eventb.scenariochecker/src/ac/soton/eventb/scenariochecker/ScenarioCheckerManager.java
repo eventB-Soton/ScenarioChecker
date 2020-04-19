@@ -224,7 +224,7 @@ public class ScenarioCheckerManager  {
 		//historyPosition=0;
 		AnimationManager.restartAnimation(mchRoot);
 		if (OracleHandler.getOracle().isPlayback()){
-			OracleHandler.getOracle().stopPlayback(false);
+			OracleHandler.getOracle().stopPlayback();
 			OracleHandler.getOracle().startPlayback(true);
 			for (IScenarioCheckerControlPanel controlPanel : scenarioCheckerControlPanels) {
 				controlPanel.updateModeIndicator(Mode.PLAYBACK);
@@ -269,7 +269,7 @@ public class ScenarioCheckerManager  {
 	 */
 	public void stopPressed() {
 		if (OracleHandler.getOracle().isPlayback()){
-			OracleHandler.getOracle().stopPlayback(false);
+			OracleHandler.getOracle().stopPlayback();
 		}
 		for (IScenarioCheckerControlPanel controlPanel : scenarioCheckerControlPanels) {
 			controlPanel.updateModeIndicator(Mode.RECORDING);
