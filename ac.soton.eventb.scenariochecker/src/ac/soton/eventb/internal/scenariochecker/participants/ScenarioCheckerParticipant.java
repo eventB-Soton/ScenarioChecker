@@ -47,4 +47,14 @@ public class ScenarioCheckerParticipant implements IAnimationParticipant {
 		ScenarioCheckerManager.getDefault().currentStateChanged(mchRoot);
 	}
 	
+	/* (non-Javadoc)
+	 * @see ac.soton.eventb.probsupport.IAnimationParticipant#restartAnimation(org.eventb.core.IMachineRoot)
+	 */
+	@Override
+	public void restartAnimation(IMachineRoot mchRoot) {
+		if (ScenarioCheckerManager.getDefault().isOpen()) {
+			ScenarioCheckerManager.getDefault().initialise(mchRoot);
+		}
+	}
+	
 }
