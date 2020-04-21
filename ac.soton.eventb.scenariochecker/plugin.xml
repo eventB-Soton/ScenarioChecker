@@ -113,7 +113,7 @@
          point="org.eclipse.ui.perspectives">
       <perspective
             class="ac.soton.eventb.internal.scenariochecker.perspectives.ScenarioCheckerPerspective"
-            icon = "icons/umlb.png"
+            icon = "icons/RunningMan.png"
             id="ac.soton.eventb.scenariochecker.scenarioCheckerPerspective"
             name="%simPerspectiveName">
       </perspective>
@@ -131,6 +131,8 @@
                ratio="0.6f"
                relationship="bottom"
                relative="org.eclipse.ui.editorss"
+               showTitle="true"
+               standalone="false"
                visible="true">
          </view>
          <view
@@ -207,6 +209,29 @@
          </viewShortcut>
          <viewShortcut
                id="de.prob.ui.log">
+         </viewShortcut>
+      </perspectiveExtension>
+      <perspectiveExtension
+            targetID="org.eventb.ui.perspective.eventb">
+         <viewShortcut
+               id="ac.soton.eventb.scenariochecker.ScenarioCheckerControlPanelView">
+         </viewShortcut>
+      </perspectiveExtension>
+      <perspectiveExtension
+            targetID="de.bmotionstudio.perspective.run">
+         <view
+               closeable="true"
+               id="ac.soton.eventb.scenariochecker.ScenarioCheckerControlPanelView"
+               minimized="false"
+               moveable="true"
+               ratio="0.6f"
+               relationship="bottom"
+               relative="org.eclipse.ui.editorss"
+               showTitle="true"
+               visible="true">
+         </view>
+         <viewShortcut
+               id="ac.soton.eventb.scenariochecker.ScenarioCheckerControlPanelView">
          </viewShortcut>
       </perspectiveExtension>
    </extension>
