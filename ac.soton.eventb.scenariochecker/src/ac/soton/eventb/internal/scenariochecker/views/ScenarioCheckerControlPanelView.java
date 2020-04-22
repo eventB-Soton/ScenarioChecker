@@ -42,7 +42,6 @@ public class ScenarioCheckerControlPanelView extends ViewPart implements IScenar
 	public static final String ID = "ac.soton.eventb.internal.scenariochecker.views.ScenarioCheckerControlPanelView"; //$NON-NLS-1$
 	
 	private static final Color red = Display.getCurrent().getSystemColor(SWT.COLOR_RED);
-	private static final Color green = Display.getCurrent().getSystemColor(SWT.COLOR_GREEN);
 	private static final Color blue = Display.getCurrent().getSystemColor(SWT.COLOR_BLUE);
 	
 	/**
@@ -69,8 +68,6 @@ public class ScenarioCheckerControlPanelView extends ViewPart implements IScenar
 
 	private Text stepCount;
 	private String defaultStepCount = "5";
-
-	private Mode lastMode;
 	
 	private Table operationsTable;
 
@@ -108,7 +105,6 @@ public class ScenarioCheckerControlPanelView extends ViewPart implements IScenar
 						@Override
 						public void mouseUp(MouseEvent e) {
 							ScenarioCheckerManager.getDefault().bigStep();
-							updateModeIndicator(lastMode);
 						}
 					});
 					toolkit.adapt(bigStepButton, true, true);
@@ -120,7 +116,6 @@ public class ScenarioCheckerControlPanelView extends ViewPart implements IScenar
 						@Override
 						public void mouseUp(MouseEvent e) {
 							ScenarioCheckerManager.getDefault().singleStep();
-							updateModeIndicator(lastMode);
 						}
 					});
 					smallStepButton.setBounds(10, 70, 85, 25);
@@ -133,7 +128,6 @@ public class ScenarioCheckerControlPanelView extends ViewPart implements IScenar
 						@Override
 						public void mouseUp(MouseEvent e) {
 							ScenarioCheckerManager.getDefault().runForTicks(Integer.valueOf(stepCount.getText()));
-							updateModeIndicator(lastMode);
 						}
 					});
 					severalStepsButton.setBounds(10, 100, 80, 25);
@@ -230,7 +224,6 @@ public class ScenarioCheckerControlPanelView extends ViewPart implements IScenar
 							//tell the manager about the new selection
 							ScenarioCheckerManager.getDefault().selectionChanged(selected.getText(0), false);
 						}
-						updateModeIndicator(lastMode);
 					}
 					
 					@Override
@@ -243,7 +236,6 @@ public class ScenarioCheckerControlPanelView extends ViewPart implements IScenar
 							//tell the manager about the new selection and to fire it
 							ScenarioCheckerManager.getDefault().selectionChanged(selected.getText(0), true);
 						}
-						updateModeIndicator(lastMode);
 					}
 				});
 				FormData fd_methodsTable = new FormData();
@@ -339,21 +331,14 @@ public class ScenarioCheckerControlPanelView extends ViewPart implements IScenar
 						modeIndicator.setText("Recording");
 						modeIndicator.setBackground(red);
 						modeIndicator.setForeground(red);
-						//lastMode = Mode.RECORDING;
 					}else if (mode == Mode.PLAYBACK) {
 						modeIndicator.setText("Playback");
 						modeIndicator.setBackground(blue);
 						modeIndicator.setForeground(blue);
-						//lastMode = Mode.PLAYBACK;
-					}else if (mode == Mode.SAVED) {
-						modeIndicator.setText("Saved");
-						modeIndicator.setBackground(green);
-						modeIndicator.setForeground(green);
 					}
 		    	}
 		    }
 		});
-		if (mode!=Mode.SAVED) lastMode = mode;
 	}	
 	
 	
