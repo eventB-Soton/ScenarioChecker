@@ -54,6 +54,13 @@ public class ScenarioCheckerHandler extends AbstractHandler implements IHandler 
 		// Return if the current selection is not a machine root.
 		if (mchRoot == null) return null;
 
+		// If a machine is selected, start the animations for it
+		// This starts all animation participants that have open views/editors..
+		// ... including the scenario checker if it is open
+		if (mchRoot != null) {
+			AnimationManager.startAnimation(mchRoot);
+		}
+		
 		// Switch to Scenario Checker perspective.
 		IWorkbench workbench = PlatformUI.getWorkbench();
 		try {
@@ -61,13 +68,6 @@ public class ScenarioCheckerHandler extends AbstractHandler implements IHandler 
 		} catch (WorkbenchException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
-		
-		// If a machine is selected, start the animations for it
-		// This starts all animation participants that have open views/editors..
-		// ... including the scenario checker that we just opened the perspective for.
-		if (mchRoot != null) {
-			AnimationManager.startAnimation(mchRoot);
 		}
  
 		return null;
