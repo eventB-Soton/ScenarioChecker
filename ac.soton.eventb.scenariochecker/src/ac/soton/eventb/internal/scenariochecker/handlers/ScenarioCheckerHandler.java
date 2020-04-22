@@ -27,6 +27,10 @@ import ac.soton.eventb.probsupport.AnimationManager;
 
 
 /**
+ * This handler can be invoked via the scenario handlers context menu item.
+ * 
+ * It is the same as the ProB support handlers but will switch to the scenario checker perspective.
+ * 
  * @author cfsnook
  *
  */

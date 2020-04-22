@@ -12,6 +12,12 @@ package ac.soton.eventb.scenariochecker;
 
 import java.util.List;
 
+/**
+ * An interface for control panels for the scenario checker
+ * 
+ * @author cfsnook
+ *
+ */
 public interface IScenarioCheckerControlPanel {
 
 	void updateModeIndicator(Mode mode);

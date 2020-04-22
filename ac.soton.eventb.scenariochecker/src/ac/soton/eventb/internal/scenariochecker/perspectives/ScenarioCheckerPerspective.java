@@ -22,9 +22,7 @@ import org.eclipse.ui.IPerspectiveFactory;
  * </p>
  * 
  * @author cfsnook
- * @version 0.1
- * @see IPerspectiveFactory
- * @since 3.0
+ * 
  */
 public class ScenarioCheckerPerspective implements IPerspectiveFactory {
 

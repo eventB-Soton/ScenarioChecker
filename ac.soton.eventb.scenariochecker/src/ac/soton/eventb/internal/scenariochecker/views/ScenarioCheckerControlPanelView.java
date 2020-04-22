@@ -37,6 +37,12 @@ import ac.soton.eventb.scenariochecker.IScenarioCheckerControlPanel;
 import ac.soton.eventb.scenariochecker.Mode;
 import ac.soton.eventb.scenariochecker.ScenarioCheckerManager;
 
+/**
+ * This is the Control Panel view for the Scenario Checker
+ * 
+ * @author cfsnook
+ *
+ */
 public class ScenarioCheckerControlPanelView extends ViewPart implements IScenarioCheckerControlPanel{
 	
 	public static final String ID = "ac.soton.eventb.internal.scenariochecker.views.ScenarioCheckerControlPanelView"; //$NON-NLS-1$

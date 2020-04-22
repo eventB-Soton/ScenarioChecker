@@ -18,7 +18,12 @@ import org.eventb.emf.core.machine.Machine;
 import ac.soton.eventb.probsupport.AnimationManager;
 import ac.soton.eventb.probsupport.data.Operation_;
 
-public class Utils {
+/**
+ * Some utils used in the scenario checker
+ * 
+ * @author cfsnook
+ *
+ */
 
 public class Utils {
 

@@ -16,7 +16,9 @@ import ac.soton.eventb.probsupport.IAnimationParticipant;
 import ac.soton.eventb.scenariochecker.ScenarioCheckerManager;
 
 /**
- * @author cfs
+ * The Animation Participant for the Scenario Checker
+ * 
+ * @author cfsnook
  *
  */
 public class ScenarioCheckerParticipant implements IAnimationParticipant {

@@ -36,6 +36,13 @@ import ac.soton.eventb.probsupport.data.History_;
 import ac.soton.eventb.probsupport.data.Operation_;
 import ac.soton.eventb.probsupport.data.State_;
 
+/**
+ * 
+ * This is the Scenario Checker manager
+ * 
+ * @author cfsnook
+ *
+ */
 public class ScenarioCheckerManager  {
 	
 	private static final String recordingName = "Scenario";
@@ -304,19 +311,23 @@ public class ScenarioCheckerManager  {
 				operationSignatures.add(op.inStringFormat());
 			}
 		}
-		//
+		// find the selected op in playback
 		if (OracleHandler.getOracle().isPlayback()) {
 			selectedOp = OracleHandler.getOracle().findNextOperation();
+			// if we drop out of playback show switch to recording
 			if (!OracleHandler.getOracle().isPlayback()) {		
 				for (IScenarioCheckerControlPanel scenarioCheckerControlPanel : scenarioCheckerControlPanels) {
 					scenarioCheckerControlPanel.updateModeIndicator(Mode.RECORDING);
 				}	
 			}
 		}
+		//if no playback op selected, use manually selected op
 		if (selectedOp==null) {	
 			selectedOp = manuallySelectedOp;
 		}
+		// find index of selected op so that it can be highlighted
 		int select = selectedOp==null? -1 : operationSignatures.indexOf(selectedOp.inStringFormat());
+		// update operations tables in the control panels
 		for (IScenarioCheckerControlPanel scenarioCheckerControlPanel : scenarioCheckerControlPanels) {
 			scenarioCheckerControlPanel.updateEnabledOperations(operationSignatures, select);
 		}
