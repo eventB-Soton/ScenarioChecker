@@ -25,7 +25,7 @@ public class ScenarioCheckerParticipant implements IAnimationParticipant {
 	 * @see ac.soton.eventb.probsupport.IAnimationParticipant#startAnimating(org.eventb.core.IMachineRoot)
 	 */
 	@Override
-	public void startAnimating(IMachineRoot mchRoot) {
+	public void startAnimation(IMachineRoot mchRoot) {
 		if (ScenarioCheckerManager.getDefault().isOpen()) {
 			ScenarioCheckerManager.getDefault().initialise(mchRoot);
 		}
@@ -35,7 +35,7 @@ public class ScenarioCheckerParticipant implements IAnimationParticipant {
 	 * @see ac.soton.eventb.probsupport.IAnimationParticipant#stopAnimating(org.eventb.core.IMachineRoot)
 	 */
 	@Override
-	public void stopAnimating(IMachineRoot mchRoot) {
+	public void stopAnimation(IMachineRoot mchRoot) {
 		ScenarioCheckerManager.getDefault().stop(mchRoot);
 	}
 
