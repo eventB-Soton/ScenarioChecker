@@ -224,7 +224,6 @@ public class ScenarioCheckerManager  {
 	 */
 	public void restartPressed() {
 		clock.reset();
-		//historyPosition=0;
 		AnimationManager.restartAnimation(mchRoot);
 		if (OracleHandler.getOracle().isPlayback()){
 			OracleHandler.getOracle().stopPlayback();
@@ -253,10 +252,8 @@ public class ScenarioCheckerManager  {
 	 */
 	public void replayPressed() {
 		clock.reset();
-		//historyPosition=0;
 		AnimationManager.restartAnimation(mchRoot);
 		if (!OracleHandler.getOracle().isPlayback()){
-//			OracleHandler.getOracle().stopRecording(false);
 			OracleHandler.getOracle().startPlayback(false);
 			for (IScenarioCheckerControlPanel controlPanel : scenarioCheckerControlPanels) {
 				controlPanel.updateModeIndicator(Mode.PLAYBACK);
@@ -302,14 +299,9 @@ public class ScenarioCheckerManager  {
 		enabledOperations = AnimationManager.getEnabledOperations(mchRoot);
 		List<String> operationSignatures = new ArrayList<String>();
 		Operation_ selectedOp = null;
-		
-//		int select = 0;
 		for(Operation_ op: enabledOperations){
 			if (Utils.isExternal(Utils.findEvent(op.getName(), machine))) {
 				operationSignatures.add(op.inStringFormat());
-//				if (op.equals(selectedOp)) {
-//					select = enabledOperations.indexOf(op);
-//				}
 			}
 		}
 		//

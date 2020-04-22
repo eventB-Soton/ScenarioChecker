@@ -20,19 +20,7 @@ import ac.soton.eventb.probsupport.data.Operation_;
 
 public class Utils {
 
-	////////////////////////////// utils /////////////
-	
-//	/**
-//	 * 
-//	 * @param op
-//	 * @return
-//	 */
-//	public static boolean isNextOp(String opName, IMachineRoot mchRoot) {
-//		return (OracleHandler.getOracle().isPlayback() && 
-//				opName.equals(OracleHandler.getOracle().findNextOperation()));
-//	}
-
-
+public class Utils {
 
 	/**
 	 * 

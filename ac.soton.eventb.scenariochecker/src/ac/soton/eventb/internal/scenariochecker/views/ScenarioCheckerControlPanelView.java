@@ -258,7 +258,6 @@ public class ScenarioCheckerControlPanelView extends ViewPart implements IScenar
 			}
 			
 			stop();	//initialise as stopped (buttons all disabled and empty operations table)
-			//return;
 		    }
 		});
 	}
