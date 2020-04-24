@@ -23,8 +23,18 @@
          id="ac.soton.eventb.probsupport.feature"
          version="0.0.0"/>
 
-   <includes
-         id="ac.soton.eventb.probsupport.source.feature"
-         version="0.0.0"/>
+   <plugin
+         id="ac.soton.eventb.scenariochecker.source"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="ac.soton.eventb.scenariochecker.branding.source"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
 
 </feature>
