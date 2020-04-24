@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="ac.soton.eventb.scenariochecker.sdk"
+      label="%featureName"
+      version="0.0.0.qualifier"
+      provider-name="%featureVendor"
+      license-feature="org.rodinp.licence"
+      license-feature-version="1.0.0.release">
+
+   <description>
+      %featureDescription
+   </description>
+
+   <copyright>
+      %featureCopyright
+   </copyright>
+
+   <url>
+      <update label="%updateSiteName" url="http://rodin-b-sharp.sourceforge.net/updates"/>
+   </url>
+
+   <includes
+         id="ac.soton.eventb.probsupport.feature"
+         version="0.0.0"/>
+
+   <includes
+         id="ac.soton.eventb.probsupport.source.feature"
+         version="0.0.0"/>
+
+</feature>

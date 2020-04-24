@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="ac.soton.eventb.scenariochecker.feature"
+      label="%featureName"
+      version="0.0.0.qualifier"
+      provider-name="%featureVendor"
+      plugin="ac.soton.eventb.scenariochecker.branding"
+      license-feature="org.rodinp.licence"
+      license-feature-version="1.0.0.release">
+
+   <description>
+      %featureDescription
+   </description>
+
+   <copyright>
+      %featureCopyright
+   </copyright>
+
+   <url>
+      <update label="%updateSiteName" url="http://rodin-b-sharp.sourceforge.net/updates"/>
+   </url>
+
+   <requires>
+      <import plugin="org.eclipse.ui" version="3.7.0" match="compatible"/>
+      <import plugin="org.eclipse.emf.workspace" version="1.5.0" match="compatible"/>
+      <import plugin="org.eclipse.emf.ecore.xmi" version="2.12.0" match="compatible"/>
+      <import plugin="org.eventb.core" version="3.0.0" match="compatible"/>
+      <import plugin="org.eventb.emf.core" version="5.0.0" match="compatible"/>
+      <import plugin="org.eventb.emf.persistence" version="3.0.0" match="compatible"/>
+      <import plugin="ac.soton.eventb.emf.oracle" version="1.0.0" match="compatible"/>
+      <import plugin="org.eclipse.ui.forms" version="3.7.1" match="compatible"/>
+      <import plugin="ac.soton.eventb.probsupport" version="0.0.0" match="compatible"/>
+      <import plugin="org.rodinp.core" version="1.7.1" match="compatible"/>
+   </requires>
+
+   <plugin
+         id="ac.soton.eventb.scenariochecker"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="ac.soton.eventb.scenariochecker.branding"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"/>
+
+</feature>
