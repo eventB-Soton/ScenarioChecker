@@ -13,6 +13,7 @@ package ac.soton.eventb.scenariochecker;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 
@@ -30,6 +31,7 @@ import ac.soton.eventb.emf.oracle.Snapshot;
 import ac.soton.eventb.emf.oracle.Step;
 import ac.soton.eventb.internal.scenariochecker.Clock;
 import ac.soton.eventb.internal.scenariochecker.OracleHandler;
+import ac.soton.eventb.internal.scenariochecker.Triplet;
 import ac.soton.eventb.internal.scenariochecker.Utils;
 import ac.soton.eventb.probsupport.AnimationManager;
 import ac.soton.eventb.probsupport.data.History_;
@@ -302,6 +304,24 @@ public class ScenarioCheckerManager  {
 	 */
 	
 	public void currentStateChanged(IMachineRoot mchRoot) {
+		//check state matches oracle (if in playback)
+		List<Triplet <String, String, String>> result = new ArrayList<Triplet<String,String,String>>();
+		Map<String, String> currentState = AnimationManager.getCurrentState(mchRoot).getAllValues();
+		Snapshot goldSnapshot = OracleHandler.getOracle().getNextGoldSnapshot(); //returns null if not in playback
+		if (goldSnapshot!=null) {
+			for (Map.Entry<String, String> value : goldSnapshot.getValues()){
+				//if (!(currentState.containsKey(goldValue.getKey()) && currentState.get(goldValue.getKey()).equals(goldValue.getValue()))){
+					result.add(Triplet.of(value.getKey(), currentState.get(value.getKey()), value.getValue()));
+				//}
+			}
+		}else {
+			for (Map.Entry<String, String> value : currentState.entrySet()){
+				result.add(Triplet.of(value.getKey(), value.getValue(), ""));
+			}
+		}
+		for (IScenarioCheckerControlPanel scenarioCheckerControlPanel : scenarioCheckerControlPanels) {
+			scenarioCheckerControlPanel.updateFailures(result);
+		}
 		//update the enabled ops table
 		enabledOperations = AnimationManager.getEnabledOperations(mchRoot);
 		List<String> operationSignatures = new ArrayList<String>();

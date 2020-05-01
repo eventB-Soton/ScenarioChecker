@@ -21,17 +21,21 @@
             id="ac.soton.umlb.viewCategory"
             name="UML-B">
       </category>
-   </extension>
-   
-   <extension
-         point="org.eclipse.ui.views">
       <view
             category="ac.soton.umlb.viewCategory"
             class="ac.soton.eventb.internal.scenariochecker.views.ScenarioCheckerControlPanelView"
             id="ac.soton.eventb.scenariochecker.ScenarioCheckerControlPanelView"
-            name="%simViewName"
+            name="%scenarioCheckerControlPanelViewName"
             restorable="true">
       </view>
+      <view
+            category="ac.soton.umlb.viewCategory"
+            class="ac.soton.eventb.internal.scenariochecker.views.ScenarioCheckerStateView"
+            id="ac.soton.eventb.internal.scenariochecker.views.ScenarioCheckerStateView"
+            name="%scenarioCheckerStateViewName"
+            restorable="true">
+      </view>
+      
    </extension>
    
    <extension

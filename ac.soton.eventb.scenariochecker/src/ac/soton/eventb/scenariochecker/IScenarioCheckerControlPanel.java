@@ -12,6 +12,8 @@ package ac.soton.eventb.scenariochecker;
 
 import java.util.List;
 
+import ac.soton.eventb.internal.scenariochecker.Triplet;
+
 /**
  * An interface for control panels for the scenario checker
  * 
@@ -25,11 +27,13 @@ public interface IScenarioCheckerControlPanel {
 	void updateEnabledOperations(List<String> enabledOperations, int selected);
 	
 	void updateDirtyStatus(boolean dirty);
+	
+	void updateFailures(List<Triplet<String, String, String>> result);
 
 	boolean isReady();
 
 	void stop();
 
 	void start();
-
+	
 }

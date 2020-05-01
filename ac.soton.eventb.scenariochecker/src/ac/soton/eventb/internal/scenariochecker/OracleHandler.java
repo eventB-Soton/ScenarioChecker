@@ -131,33 +131,37 @@ public class OracleHandler {
 		}
 	}
 	
-	/////////////////// should be part of playback? /////////////
 	
-	/**
-	 * @param goldSnapshot
-	 * @param newSnapshot
-	 * @return
-	 */
-	private boolean compareSnapshots(Snapshot goldSnapshot, Snapshot newSnapshot) {
-		EMap<String, String> newValues = newSnapshot.getValues();
-		for (Map.Entry<String, String> goldValue : goldSnapshot.getValues()){
-			if (!(newValues.containsKey(goldValue.getKey()) && newValues.get(goldValue.getKey()).equals(goldValue.getValue()))){
-				return false;
-			}
-		}
-		return true;
-	}
+//	/**
+//	 * @param goldSnapshot
+//	 * @param newSnapshot
+//	 * @return
+//	 */
+//	private boolean compareSnapshots(Snapshot goldSnapshot, Snapshot newSnapshot) {
+//		EMap<String, String> newValues = newSnapshot.getValues();
+//		for (Map.Entry<String, String> goldValue : goldSnapshot.getValues()){
+//			if (!(newValues.containsKey(goldValue.getKey()) && newValues.get(goldValue.getKey()).equals(goldValue.getValue()))){
+//				return false;
+//			}
+//		}
+//		return true;
+//	}
 
 
 	/**
+	 * When in playback, returns the next snapshot.
+	 * 
+	 * If not in playback or a step is next, returns null;
+	 * 
 	 * @return
 	 */
-	private Snapshot getNextGoldSnapshot() {
-		if (currentPlaybackRun == null){return null;}
+	//	 * This assumes that the stepPointer is pointing to the last executed step
+	public Snapshot getNextGoldSnapshot() {
+		if (!isPlayback() || currentPlaybackRun == null){return null;}
 		EList<Entry> oracleEntries = currentPlaybackRun.getEntries();
-		if (snapShotPointer >= oracleEntries.size() || oracleEntries.get(snapShotPointer) instanceof Step){return null;}
-		snapShotPointer++;
-		return (Snapshot) oracleEntries.get(snapShotPointer-1);
+		if (stepPointer <0 || stepPointer+1 >= oracleEntries.size() || !(oracleEntries.get(stepPointer+1) instanceof Snapshot))
+			{return null;}
+		return (Snapshot) oracleEntries.get(stepPointer+1);
 	}
 	
 	/**
@@ -210,6 +214,7 @@ public class OracleHandler {
 	 */
 	public void consumeNextStep() {
 		nextStep = null;
+		snapShotPointer = stepPointer+1;
 	}
 	
 	/** 
@@ -542,5 +547,6 @@ public class OracleHandler {
 			return new Status(Status.OK, Activator.PLUGIN_ID, "Saving Oracle Succeeded");
 		}
 	}
+
 
 }
