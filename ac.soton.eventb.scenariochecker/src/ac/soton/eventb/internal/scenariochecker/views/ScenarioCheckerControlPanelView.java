@@ -33,6 +33,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.part.ViewPart;
 
+import ac.soton.eventb.internal.scenariochecker.Triplet;
 import ac.soton.eventb.scenariochecker.IScenarioCheckerControlPanel;
 import ac.soton.eventb.scenariochecker.Mode;
 import ac.soton.eventb.scenariochecker.ScenarioCheckerManager;
@@ -415,6 +416,11 @@ public class ScenarioCheckerControlPanelView extends ViewPart implements IScenar
 				}
 		    }
 		});
+	}
+
+	@Override
+	public void updateFailures(List<Triplet<String, String, String>> result) {
+		//do nothing
 	}
 
 }

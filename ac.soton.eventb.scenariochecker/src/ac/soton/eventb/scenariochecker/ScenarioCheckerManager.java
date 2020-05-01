@@ -398,9 +398,7 @@ public class ScenarioCheckerManager  {
 						}
 					}
 					if (!currentSnapshot.getValues().isEmpty()) {
-						//FIXME: In playback, we should check that the snapshot matches gold version - for now = true
-						boolean result = true;
-						currentSnapshot.setResult(result);	//for gold run all snapshots are result = true
+						currentSnapshot.setResult(true);	//for now, all snapshots are result = true
 						recording.getEntries().add(currentSnapshot);
 					}
 				}
@@ -408,7 +406,6 @@ public class ScenarioCheckerManager  {
 			try {
 				OracleHandler.getOracle().save(recording);
 			} catch (CoreException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
