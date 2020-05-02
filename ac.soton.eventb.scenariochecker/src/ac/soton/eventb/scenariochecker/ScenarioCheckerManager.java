@@ -246,6 +246,7 @@ public class ScenarioCheckerManager  {
 			}
 		}
 		OracleHandler.getOracle().restart(recordingName, machine);
+		setDirty(false);
 	}
 	
 	/**
@@ -269,6 +270,7 @@ public class ScenarioCheckerManager  {
 			}
 		}
 		OracleHandler.getOracle().restart(recordingName, machine);
+		setDirty(false);
 	}
 
 	/**
