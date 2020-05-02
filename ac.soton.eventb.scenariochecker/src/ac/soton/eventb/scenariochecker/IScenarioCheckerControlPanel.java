@@ -28,7 +28,7 @@ public interface IScenarioCheckerControlPanel {
 	
 	void updateDirtyStatus(boolean dirty);
 	
-	void updateFailures(List<Triplet<String, String, String>> result);
+	void updateState(List<Triplet<String, String, String>> result);
 
 	boolean isReady();
 

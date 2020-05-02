@@ -323,7 +323,7 @@ public class ScenarioCheckerManager  {
 			}
 		}
 		for (IScenarioCheckerControlPanel scenarioCheckerControlPanel : scenarioCheckerControlPanels) {
-			scenarioCheckerControlPanel.updateFailures(result);
+			scenarioCheckerControlPanel.updateState(result);
 		}
 		//update the enabled ops table
 		enabledOperations = AnimationManager.getEnabledOperations(mchRoot);

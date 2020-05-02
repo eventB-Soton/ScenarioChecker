@@ -152,7 +152,7 @@ public abstract class AbstractScenarioCheckerView extends ViewPart implements IS
 	}
 
 	@Override
-	public void updateFailures(List<Triplet<String, String, String>> result) {
+	public void updateState(List<Triplet<String, String, String>> result) {
 		//do nothing
 	}
 

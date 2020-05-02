@@ -116,7 +116,7 @@ public class ScenarioCheckerStateView extends AbstractScenarioCheckerView implem
 	 * @see ac.soton.eventb.internal.scenariochecker.views.AbstractScenarioCheckerView#updateFailures(java.util.List)
 	 */
 	@Override
-	public void updateFailures(List<Triplet<String, String, String>> result) {
+	public void updateState(List<Triplet<String, String, String>> result) {
 		Display.getDefault().asyncExec(new Runnable() {
 			public void run() {
 				failuresTable.clearAll();
