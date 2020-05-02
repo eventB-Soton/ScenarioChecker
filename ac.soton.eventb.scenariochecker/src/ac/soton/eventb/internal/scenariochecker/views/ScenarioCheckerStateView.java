@@ -33,21 +33,6 @@ public class ScenarioCheckerStateView extends AbstractScenarioCheckerView implem
 	
 	public static final String ID = "ac.soton.eventb.internal.scenariochecker.views.ScenarioCheckerStateView"; //$NON-NLS-1$
 	
-//	private static final Color red = Display.getCurrent().getSystemColor(SWT.COLOR_RED);
-//	private static final Color blue = Display.getCurrent().getSystemColor(SWT.COLOR_BLUE);
-//	private static final Color green = Display.getCurrent().getSystemColor(SWT.COLOR_GREEN);	
-	
-//	/**
-//	 * Creates a Scenario Checker control panel view and registers it with the Simulation Manager
-//	 */
-//	public ScenarioCheckerStateView() {
-//		super();
-//		//register with the manager as a Simulation Control Panel
-//		ScenarioCheckerManager.getDefault().addSimulationControlPanel(this);
-//	}
-//	
-//	private final FormToolkit toolkit = new FormToolkit(Display.getCurrent());
-//	private Composite container;
 	private Table failuresTable;
 
 	/* (non-Javadoc)
@@ -55,20 +40,15 @@ public class ScenarioCheckerStateView extends AbstractScenarioCheckerView implem
 	 */
 	@Override
 	protected void doCreatePartControl() {
-//			container = toolkit.createComposite(parent, SWT.V_SCROLL | SWT.H_SCROLL | SWT.NO_REDRAW_RESIZE );
-//			toolkit.paintBordersFor(container);
-//			container.setLayout(new FormLayout());
 							
 			failuresTable = new Table(container, SWT.BORDER	| SWT.FULL_SELECTION);
 			{
-				FormData fd_methodsTable = new FormData();
-				//fd_methodsTable.width=500;
-				fd_methodsTable.left = new FormAttachment(0, 5);
-				fd_methodsTable.right = new FormAttachment(100, -5);
-				fd_methodsTable.top = new FormAttachment(0, 5);
-				fd_methodsTable.bottom = new FormAttachment(100, -5);
-				failuresTable.setLayoutData(fd_methodsTable);
-				
+				FormData fd = new FormData();
+				fd.left = new FormAttachment(0, 5);
+				fd.right = new FormAttachment(100, -5);
+				fd.top = new FormAttachment(0, 5);
+				fd.bottom = new FormAttachment(100, -5);
+				failuresTable.setLayoutData(fd);
 				
 				failuresTable.setToolTipText("Displays any differences from the recorded state during playback");
 				toolkit.adapt(failuresTable);
@@ -76,29 +56,23 @@ public class ScenarioCheckerStateView extends AbstractScenarioCheckerView implem
 				failuresTable.setHeaderVisible(true);
 				failuresTable.setLinesVisible(true);
 				
-	
 				String[] titles = {"Variable", "Actual Value", "Expected Value"};
 			    for (int loopIndex = 0; loopIndex < titles.length; loopIndex++) {
 			      TableColumn column = new TableColumn(failuresTable, SWT.NULL);
 			      column.setText(titles[loopIndex]);
 			    }
-			    
 		        for (int i = 0; i < 1; i++) {
 		            TableItem item = new TableItem(failuresTable, SWT.NULL);
-		            item.setText("test");
 		            item.setText(0, "test0");
 		            item.setText(1, "test1");
 		            item.setText(2, "test2");
-		            item.setForeground(1,red);
-		          }
-				
+		         }
 			    for (int loopIndex = 0; loopIndex < titles.length; loopIndex++) {
 			        failuresTable.getColumn(loopIndex).pack();
-			      }
+			     }
 				failuresTable.pack();
 				failuresTable.redraw();
 			}
-			
 			stop();	//initialise as stopped
 	}
 	
@@ -111,8 +85,6 @@ public class ScenarioCheckerStateView extends AbstractScenarioCheckerView implem
 	public void setFocus() {
 		failuresTable.setFocus();
 	}
-	
-
 
 	/////////////  interface IScenarioCheckerControlPanel - API for Simulation Manager //////////////
 	
@@ -140,15 +112,15 @@ public class ScenarioCheckerStateView extends AbstractScenarioCheckerView implem
 		});
 	}
 
-
+	/* (non-Javadoc)
+	 * @see ac.soton.eventb.internal.scenariochecker.views.AbstractScenarioCheckerView#updateFailures(java.util.List)
+	 */
 	@Override
 	public void updateFailures(List<Triplet<String, String, String>> result) {
 		Display.getDefault().asyncExec(new Runnable() {
 			public void run() {
-				
 				failuresTable.clearAll();
 				failuresTable.removeAll();
-				
 		        for (int i = 0; i < result.size(); i++) {
 		            TableItem item = new TableItem(failuresTable, SWT.NULL);
 		            item.setText(result.get(i).first);
@@ -161,11 +133,9 @@ public class ScenarioCheckerStateView extends AbstractScenarioCheckerView implem
 		            	item.setForeground(1,red);		            	
 		            }
 		        }
-
 		        for (int loopIndex = 0; loopIndex < 3; loopIndex++) {
 	        	 	failuresTable.getColumn(loopIndex).pack();
 		        }
-	          
 		        failuresTable.redraw();
 		    }
 		});
