@@ -414,18 +414,18 @@ public class ScenarioCheckerManager  {
 		}
 	}
 	
-		/**
-		 * check whether the context needs to be set up
-		 */
-		private boolean inSetup(){
-			List<Operation_> enabledOperations = AnimationManager.getEnabledOperations(mchRoot);
-			for (Operation_ op : enabledOperations){
-				if ("SETUP_CONTEXT".equals(op.getName()) ){
-					return true;
-				}
+	/**
+	 * check whether the context needs to be set up
+	 */
+	private boolean inSetup(){
+		List<Operation_> enabledOperations = AnimationManager.getEnabledOperations(mchRoot);
+		for (Operation_ op : enabledOperations){
+			if ("SETUP_CONTEXT".equals(op.getName()) ){
+				return true;
 			}
-			return false;
 		}
+		return false;
+	}
 		
 		
 	/**
