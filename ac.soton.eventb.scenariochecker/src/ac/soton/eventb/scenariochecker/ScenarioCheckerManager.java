@@ -178,6 +178,7 @@ public class ScenarioCheckerManager  {
 			progress = executeOperation(op, false);
 			loop.add(op);
 		}
+		clock.inc();
 		return progress;
 	}
 	
