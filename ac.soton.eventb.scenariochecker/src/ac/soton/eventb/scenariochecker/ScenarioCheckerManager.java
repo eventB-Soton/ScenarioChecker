@@ -61,10 +61,11 @@ public class ScenarioCheckerManager  {
 		return instance;
 	}
 	
-	private IMachineRoot mchRoot;
-	private Machine machine;
-	//TODO: We could delete clock - it is not used for much now that we only save externals
+	private ScenarioCheckerManager() {	//make constructor private
+	}
+	
 	private IMachineRoot mchRoot = null;
+	private Machine machine = null;
 	private Clock clock = new Clock();	
 	private Operation_ manuallySelectedOp = null;
 	private List<Operation_> enabledOperations = null;
@@ -590,5 +591,6 @@ public class ScenarioCheckerManager  {
 		}
 		return true;
 	}
+	
 
 }
