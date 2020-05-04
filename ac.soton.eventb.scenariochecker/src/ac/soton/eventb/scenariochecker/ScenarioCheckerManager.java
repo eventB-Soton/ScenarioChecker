@@ -64,7 +64,8 @@ public class ScenarioCheckerManager  {
 	private IMachineRoot mchRoot;
 	private Machine machine;
 	//TODO: We could delete clock - it is not used for much now that we only save externals
-	private Clock clock = Clock.getInstance();	
+	private IMachineRoot mchRoot = null;
+	private Clock clock = new Clock();	
 	private Operation_ manuallySelectedOp = null;
 	private List<Operation_> enabledOperations = null;
 	private boolean dirty = false;
