@@ -112,7 +112,7 @@ public class ScenarioCheckerManager  {
 	 * @param mchRoot
 	 */
 	public void restart(IMachineRoot mchRoot) {
-		if (mchRoot!=this.mchRoot) return;
+		if (mchRoot.getCorrespondingResource() != this.mchRoot.getCorrespondingResource()) return;
 		clock.reset();
 		updateModeIndicator();
 		setDirty(false);
@@ -128,7 +128,6 @@ public class ScenarioCheckerManager  {
 	 * @param mchRoot
 	 */
 	public void stop(IMachineRoot mchRoot) {
-		if (mchRoot!=this.mchRoot) return;
 		if (mchRoot.getCorrespondingResource() != this.mchRoot.getCorrespondingResource()) return;
 		//stop the scenario checker views
 		for (IScenarioCheckerView scenarioCheckerView : scenarioCheckerViews) {
@@ -310,7 +309,7 @@ public class ScenarioCheckerManager  {
 	 */
 	
 	public void currentStateChanged(IMachineRoot mchRoot) {
-		if (mchRoot!=this.mchRoot) return;
+		if (mchRoot.getCorrespondingResource() != this.mchRoot.getCorrespondingResource()) return;
 		
 		{//update state views
 			List<Triplet <String, String, String>> result = new ArrayList<Triplet<String,String,String>>();
