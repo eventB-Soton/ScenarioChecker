@@ -199,7 +199,7 @@ public class ScenarioCheckerManager  {
 			progress = executeOperation(op, false);
 			loop.add(op);
 		}
-		clock.inc();
+		updateModeIndicator();
 		return progress;
 	}
 	
@@ -209,6 +209,7 @@ public class ScenarioCheckerManager  {
 	public void singleStep(){
 		Operation_ op = findNextOperation();
 		executeOperation(op, false);
+		updateModeIndicator();
 	}
 	
 	/**
@@ -290,11 +291,7 @@ public class ScenarioCheckerManager  {
 	public void replayPressed() {
 		clock.reset();
 		AnimationManager.restartAnimation(mchRoot);
-		if (!OracleHandler.getOracle().isPlayback()){
-			OracleHandler.getOracle().startPlayback(false);
-			for (IScenarioCheckerControlPanel controlPanel : scenarioCheckerControlPanels) {
-				controlPanel.updateModeIndicator(Mode.PLAYBACK);
-			}
+	}
 		}
 		OracleHandler.getOracle().restart(recordingName, machine);
 		setDirty(false);
@@ -308,9 +305,7 @@ public class ScenarioCheckerManager  {
 		if (OracleHandler.getOracle().isPlayback()){
 			OracleHandler.getOracle().stopPlayback();
 		}
-		for (IScenarioCheckerControlPanel controlPanel : scenarioCheckerControlPanels) {
-			controlPanel.updateModeIndicator(Mode.RECORDING);
-		}
+		updateModeIndicator();
 	}
 	
 	/**
@@ -369,7 +364,15 @@ public class ScenarioCheckerManager  {
 					scenarioCheckerControlPanel.updateModeIndicator(Mode.RECORDING);
 				}	
 			}
-		}
+	/**
+	 * update the mode indicator on scenario checker views
+	 * according to whether the scenario is in playback or recording
+	 */
+	private void updateModeIndicator() {
+		if (isPlayback()){
+			for (IScenarioCheckerView controlPanel : scenarioCheckerViews) {
+				controlPanel.updateModeIndicator(Mode.PLAYBACK);
+			}
 		//if no playback op selected, use manually selected op
 		if (selectedOp==null) {	
 			selectedOp = manuallySelectedOp;
