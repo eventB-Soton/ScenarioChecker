@@ -70,7 +70,6 @@ public class ScenarioCheckerHandler extends AbstractHandler implements IHandler 
 		try {
 			workbench.showPerspective(ScenarioCheckerPerspective.PERSPECTIVE_ID, HandlerUtil.getActiveWorkbenchWindow(event));   //activeWorkbenchWindow);
 		} catch (WorkbenchException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
  
