@@ -138,7 +138,7 @@ public class ScenarioCheckerManager  {
 		machine = null;
 		clock.reset();
 		manuallySelectedOp = null;
-		dirty=false;
+		setDirty(false);
 	}
 	
 	/**
@@ -393,7 +393,6 @@ public class ScenarioCheckerManager  {
 		for (IScenarioCheckerView controlPanel : scenarioCheckerViews) {
 			controlPanel.updateDirtyStatus(dirty);;
 		}
-		this.dirty=dirty;
 	}
 	
 	/**
