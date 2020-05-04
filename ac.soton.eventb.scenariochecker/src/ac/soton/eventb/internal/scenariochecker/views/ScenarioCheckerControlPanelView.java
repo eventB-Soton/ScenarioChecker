@@ -26,7 +26,7 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Text;
 
-import ac.soton.eventb.scenariochecker.IScenarioCheckerControlPanel;
+import ac.soton.eventb.scenariochecker.IScenarioCheckerView;
 import ac.soton.eventb.scenariochecker.Mode;
 import ac.soton.eventb.scenariochecker.ScenarioCheckerManager;
 
@@ -36,7 +36,7 @@ import ac.soton.eventb.scenariochecker.ScenarioCheckerManager;
  * @author cfsnook
  *
  */
-public class ScenarioCheckerControlPanelView extends AbstractScenarioCheckerView implements IScenarioCheckerControlPanel{
+public class ScenarioCheckerControlPanelView extends AbstractScenarioCheckerView implements IScenarioCheckerView{
 	
 	public static final String ID = "ac.soton.eventb.internal.scenariochecker.views.ScenarioCheckerControlPanelView"; //$NON-NLS-1$
 	
@@ -248,10 +248,10 @@ public class ScenarioCheckerControlPanelView extends AbstractScenarioCheckerView
 	}
 	
 
-	///////////// Control panel interface IScenarioCheckerControlPanel - API for Simulation Manager //////////////
+	///////////// Control panel interface IScenarioCheckerView - API for Simulation Manager //////////////
 	
 	/* (non-Javadoc)
-	 * @see ac.soton.eventb.scenariochecker.IScenarioCheckerControlPanel#start()
+	 * @see ac.soton.eventb.scenariochecker.IScenarioCheckerView#start()
 	 */
 	@Override
 	public void start() {
@@ -272,7 +272,7 @@ public class ScenarioCheckerControlPanelView extends AbstractScenarioCheckerView
 	}
 	
 	/* (non-Javadoc)
-	 * @see ac.soton.eventb.scenariochecker.IScenarioCheckerControlPanel#stop()
+	 * @see ac.soton.eventb.scenariochecker.IScenarioCheckerView#stop()
 	 */
 	@Override
 	public void stop() {
@@ -294,7 +294,7 @@ public class ScenarioCheckerControlPanelView extends AbstractScenarioCheckerView
 	}
 	
 	/* (non-Javadoc)
-	 * @see ac.soton.eventb.scenariochecker.IScenarioCheckerControlPanel#updateEnabledOperations(java.util.List, int)
+	 * @see ac.soton.eventb.scenariochecker.IScenarioCheckerView#updateEnabledOperations(java.util.List, int)
 	 */
 	@Override
 	public void updateEnabledOperations (java.util.List<String> enabledOperations, int selected) {
@@ -315,7 +315,7 @@ public class ScenarioCheckerControlPanelView extends AbstractScenarioCheckerView
 	}
 
 	/* (non-Javadoc)
-	 * @see ac.soton.eventb.scenariochecker.IScenarioCheckerControlPanel#updateModeIndicator(ac.soton.eventb.scenariochecker.Mode)
+	 * @see ac.soton.eventb.scenariochecker.IScenarioCheckerView#updateModeIndicator(ac.soton.eventb.scenariochecker.Mode)
 	 */
 	@Override
 	public void updateModeIndicator(Mode mode) {

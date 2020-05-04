@@ -70,14 +70,22 @@ public class ScenarioCheckerManager  {
 	private Operation_ manuallySelectedOp = null;
 	private List<Operation_> enabledOperations = null;
 	private boolean dirty = false;
+	private static List<IScenarioCheckerView> scenarioCheckerViews = new ArrayList<IScenarioCheckerView>();
 	
-	//classes that provide a control panel UI view for the simulation can register here
-	private static List<IScenarioCheckerControlPanel> scenarioCheckerControlPanels = new ArrayList<IScenarioCheckerControlPanel>();
-	public void addSimulationControlPanel(IScenarioCheckerControlPanel operationSelector) {
-		scenarioCheckerControlPanels.add(operationSelector);
+	/**
+	 * add a scenario checker view to those registered to receive notifications from the Scenario Checker Manager
+	 * 
+	 * @param scenarioCheckerView
+	 */
+	public void addSimulationView(IScenarioCheckerView scenarioCheckerView) {
+		scenarioCheckerViews.add(scenarioCheckerView);
 	}
-	public void removeSimulationControlPanel(IScenarioCheckerControlPanel scenarioCheckerControlPanel) {
-		scenarioCheckerControlPanels.remove(scenarioCheckerControlPanel);
+	/**
+	 * remove a scenario checker view from those registered to receive notifications from the Scenario Checker Manager
+	 * @param scenarioCheckerView
+	 */
+	public void removeSimulationControlPanel(IScenarioCheckerView scenarioCheckerView) {
+		scenarioCheckerViews.remove(scenarioCheckerView);
 	}
 	
 	
@@ -88,11 +96,9 @@ public class ScenarioCheckerManager  {
 		machine = (Machine) emfRodinDB.loadEventBComponent(mchRoot);
 		clock.reset();
 		//initialise oracle in record mode
-		OracleHandler.getOracle().initialise(machine);
-		OracleHandler.getOracle().restart(recordingName, machine);
-		//start the control panels
-		for (IScenarioCheckerControlPanel scenarioCheckerControlPanel : scenarioCheckerControlPanels) {
-			scenarioCheckerControlPanel.start();
+		//start the scenario checker views
+		for (IScenarioCheckerView scenarioCheckerView : scenarioCheckerViews) {
+			scenarioCheckerView.start();
 		}
 		//execute setup operation automatically
 		if (inSetup()) {
@@ -109,9 +115,9 @@ public class ScenarioCheckerManager  {
 	public void stop(IMachineRoot mchRoot) {
 		if (this.mchRoot==null) return;
 		if (mchRoot.getCorrespondingResource() != this.mchRoot.getCorrespondingResource()) return;
-		//stop the control panels
-		for (IScenarioCheckerControlPanel scenarioCheckerControlPanel : scenarioCheckerControlPanels) {
-			scenarioCheckerControlPanel.stop();
+		//stop the scenario checker views
+		for (IScenarioCheckerView scenarioCheckerView : scenarioCheckerViews) {
+			scenarioCheckerView.stop();
 		}
 		
 		// clear state
@@ -124,22 +130,22 @@ public class ScenarioCheckerManager  {
 	
 	/**
 	 * Tests whether the Scenario Checker is open and ready to start... 
-	 * .. i.e. whether there is an open simulation control panel view attached
+	 * .. i.e. whether there is an open scenario checker view  attached
 	 * @return
 	 */
 	public boolean isOpen() {
-		for (IScenarioCheckerControlPanel scp : scenarioCheckerControlPanels) {
-			if (scp.isReady()) return true;
+		for (IScenarioCheckerView scenarioCheckerView : scenarioCheckerViews) {
+			if (scenarioCheckerView.isReady()) return true;
 		}
 		return false;
 	}
 	
 	
-	////////// interface for control panel to implement user commands/////////
+	////////// interface for scenario checker views to implement user commands/////////
 	
 	/**
 	 * control panel selection changed.
-	 * This is called by the scenarioCheckerControlPanels when the user has selected an operation.
+	 * This is called by the scenarioCheckerViews when the user has selected an operation.
 	 * If 'fire' is true, the new selection will be executed as a big step now
 	 * 
 	 * @param opName
@@ -366,11 +372,12 @@ public class ScenarioCheckerManager  {
 	///////////////// private utilities to help with execution ///////////////////////////
 
 	/**
-	 * sets the dirty flag and tells the control panels to show as dirty
+	 * sets the dirty flag and tells the scenario checker views to show as dirty or not
 	 * @param dirty
 	 */
 	private void setDirty(boolean dirty) {
-		for (IScenarioCheckerControlPanel controlPanel : scenarioCheckerControlPanels) {
+		this.dirty=dirty;
+		for (IScenarioCheckerView controlPanel : scenarioCheckerViews) {
 			controlPanel.updateDirtyStatus(dirty);;
 		}
 		this.dirty=dirty;

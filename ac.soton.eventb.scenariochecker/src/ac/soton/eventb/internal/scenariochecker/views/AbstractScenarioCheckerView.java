@@ -8,6 +8,7 @@
  *  Contributors:
  *  University of Southampton - Initial implementation
  *******************************************************************************/
+
 package ac.soton.eventb.internal.scenariochecker.views;
 
 import java.util.List;
@@ -22,7 +23,7 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.part.ViewPart;
 
 import ac.soton.eventb.internal.scenariochecker.Triplet;
-import ac.soton.eventb.scenariochecker.IScenarioCheckerControlPanel;
+import ac.soton.eventb.scenariochecker.IScenarioCheckerView;
 import ac.soton.eventb.scenariochecker.Mode;
 import ac.soton.eventb.scenariochecker.ScenarioCheckerManager;
 
@@ -34,7 +35,7 @@ import ac.soton.eventb.scenariochecker.ScenarioCheckerManager;
  * @author cfsnook
  *
  */
-public abstract class AbstractScenarioCheckerView extends ViewPart implements IScenarioCheckerControlPanel{
+public abstract class AbstractScenarioCheckerView extends ViewPart implements IScenarioCheckerView{
 		
 	protected static final Color red = Display.getCurrent().getSystemColor(SWT.COLOR_RED);
 	protected static final Color blue = Display.getCurrent().getSystemColor(SWT.COLOR_BLUE);
@@ -46,7 +47,7 @@ public abstract class AbstractScenarioCheckerView extends ViewPart implements IS
 	public AbstractScenarioCheckerView() {
 		super();
 		//register with the manager as a Simulation Control Panel
-		ScenarioCheckerManager.getDefault().addSimulationControlPanel(this);
+		ScenarioCheckerManager.getDefault().addSimulationView(this);
 	}
 	
 	protected final FormToolkit toolkit = new FormToolkit(Display.getCurrent());
@@ -72,6 +73,11 @@ public abstract class AbstractScenarioCheckerView extends ViewPart implements IS
 		});
 	}
 	
+	/**
+	 * clients should override to specify the main body of the creation of the part
+	 * adding to the composite, container
+	 * 
+	 */
 	protected abstract void doCreatePartControl();
 	
 	/**
@@ -103,10 +109,10 @@ public abstract class AbstractScenarioCheckerView extends ViewPart implements IS
 		super.dispose();
 	}
 
-	/////////////  interface IScenarioCheckerControlPanel - API for Simulation Manager //////////////
+	/////////////  interface IScenarioCheckerView - API for Scenario Checker Manager //////////////
 	
 	/* (non-Javadoc)
-	 * @see ac.soton.eventb.scenariochecker.IScenarioCheckerControlPanel#isReady()
+	 * @see ac.soton.eventb.scenariochecker.IScenarioCheckerView#isReady()
 	 */
 	@Override
 	public boolean isReady() {
@@ -115,7 +121,7 @@ public abstract class AbstractScenarioCheckerView extends ViewPart implements IS
 	}
 	
 	/* (non-Javadoc)
-	 * @see ac.soton.eventb.scenariochecker.IScenarioCheckerControlPanel#start()
+	 * @see ac.soton.eventb.scenariochecker.IScenarioCheckerView#start()
 	 */
 	@Override
 	public void start() {
@@ -123,7 +129,7 @@ public abstract class AbstractScenarioCheckerView extends ViewPart implements IS
 	}
 	
 	/* (non-Javadoc)
-	 * @see ac.soton.eventb.scenariochecker.IScenarioCheckerControlPanel#stop()
+	 * @see ac.soton.eventb.scenariochecker.IScenarioCheckerView#stop()
 	 */
 	@Override
 	public void stop() {
@@ -131,7 +137,7 @@ public abstract class AbstractScenarioCheckerView extends ViewPart implements IS
 	}
 	
 	/* (non-Javadoc)
-	 * @see ac.soton.eventb.scenariochecker.IScenarioCheckerControlPanel#updateEnabledOperations(java.util.List, int)
+	 * @see ac.soton.eventb.scenariochecker.IScenarioCheckerView#updateEnabledOperations(java.util.List, int)
 	 */
 	@Override
 	public void updateEnabledOperations (List<String> enabledOperations, int selected) {
@@ -139,7 +145,7 @@ public abstract class AbstractScenarioCheckerView extends ViewPart implements IS
 	}
 
 	/* (non-Javadoc)
-	 * @see ac.soton.eventb.scenariochecker.IScenarioCheckerControlPanel#updateModeIndicator(ac.soton.eventb.scenariochecker.Mode)
+	 * @see ac.soton.eventb.scenariochecker.IScenarioCheckerView#updateModeIndicator(ac.soton.eventb.scenariochecker.Mode)
 	 */
 	@Override
 	public void updateModeIndicator(Mode mode) {

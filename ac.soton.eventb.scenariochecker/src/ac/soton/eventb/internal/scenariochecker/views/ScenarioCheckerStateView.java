@@ -21,7 +21,7 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
 import ac.soton.eventb.internal.scenariochecker.Triplet;
-import ac.soton.eventb.scenariochecker.IScenarioCheckerControlPanel;
+import ac.soton.eventb.scenariochecker.IScenarioCheckerView;
 
 /**
  * This is the State view for the Scenario Checker
@@ -29,7 +29,7 @@ import ac.soton.eventb.scenariochecker.IScenarioCheckerControlPanel;
  * @author cfsnook
  *
  */
-public class ScenarioCheckerStateView extends AbstractScenarioCheckerView implements IScenarioCheckerControlPanel{
+public class ScenarioCheckerStateView extends AbstractScenarioCheckerView implements IScenarioCheckerView{
 	
 	public static final String ID = "ac.soton.eventb.internal.scenariochecker.views.ScenarioCheckerStateView"; //$NON-NLS-1$
 	
@@ -86,10 +86,10 @@ public class ScenarioCheckerStateView extends AbstractScenarioCheckerView implem
 		stateTable.setFocus();
 	}
 
-	/////////////  interface IScenarioCheckerControlPanel - API for Simulation Manager //////////////
+	/////////////  interface IScenarioCheckerView - API for Simulation Manager //////////////
 	
 	/* (non-Javadoc)
-	 * @see ac.soton.eventb.scenariochecker.IScenarioCheckerControlPanel#stop()
+	 * @see ac.soton.eventb.scenariochecker.IScenarioCheckerView#stop()
 	 */
 	@Override
 	public void stop() {
@@ -101,7 +101,7 @@ public class ScenarioCheckerStateView extends AbstractScenarioCheckerView implem
 	}
 	
 	/* (non-Javadoc)
-	 * @see ac.soton.eventb.scenariochecker.IScenarioCheckerControlPanel#start()
+	 * @see ac.soton.eventb.scenariochecker.IScenarioCheckerView#start()
 	 */
 	@Override
 	public void start() {
@@ -121,7 +121,7 @@ public class ScenarioCheckerStateView extends AbstractScenarioCheckerView implem
 			public void run() {
 				stateTable.clearAll();
 				stateTable.removeAll();
-				TableItem item = new TableItem(stateTable, SWT.NULL);
+				TableItem item;
 		        for (int i = 0; i < result.size(); i++) {
 		            item = new TableItem(stateTable, SWT.NULL);
 		            item.setText(result.get(i).first);
