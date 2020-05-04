@@ -82,7 +82,14 @@ public class ScenarioCheckerControlPanelView extends AbstractScenarioCheckerView
 				bigStepButton.addMouseListener(new MouseAdapter() {
 					@Override
 					public void mouseUp(MouseEvent e) {
-						ScenarioCheckerManager.getDefault().bigStep();
+						if (!ScenarioCheckerManager.getDefault().bigStep()) {
+							if (ScenarioCheckerManager.getDefault().isPlayback()) {
+								messageUser("Information", "Playback has finished - press stop to continue in recording mode", SWT.ICON_INFORMATION | SWT.OK);
+							}else {
+								messageUser("Information", "Deadlock - nothing is enabled", SWT.ICON_INFORMATION | SWT.OK);
+							}
+						}
+						
 					}
 				});
 				toolkit.adapt(bigStepButton, true, true);
@@ -139,7 +146,10 @@ public class ScenarioCheckerControlPanelView extends AbstractScenarioCheckerView
 				restartButton.addMouseListener(new MouseAdapter() {
 					@Override
 					public void mouseUp(MouseEvent e) {	
-						ScenarioCheckerManager.getDefault().restartPressed();
+						if (!ScenarioCheckerManager.getDefault().isDirty() ||
+								SWT.OK == messageUser("Question", "Do you really want to discard this scenario?", SWT.ICON_QUESTION | SWT.OK | SWT.CANCEL)) {
+							ScenarioCheckerManager.getDefault().restartPressed();
+						}
 					}
 				});
 				toolkit.adapt(restartButton, true, true);
@@ -167,7 +177,7 @@ public class ScenarioCheckerControlPanelView extends AbstractScenarioCheckerView
 					@Override
 					public void mouseUp(MouseEvent e) {
 						if (!ScenarioCheckerManager.getDefault().isDirty() ||
-								SWT.OK == messageUser("Question", "Do you really want to discard the scenario we have just recorded?", SWT.ICON_QUESTION | SWT.OK | SWT.CANCEL)) {
+								SWT.OK == messageUser("Question", "Do you really want to discard this scenario?", SWT.ICON_QUESTION | SWT.OK | SWT.CANCEL)) {
 							ScenarioCheckerManager.getDefault().replayPressed();
 						}
 					}
