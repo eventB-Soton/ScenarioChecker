@@ -88,23 +88,36 @@ public class ScenarioCheckerManager  {
 		scenarioCheckerViews.remove(scenarioCheckerView);
 	}
 	
-	
-	
+	/**
+	 * Initialise the Scenario Checker Manager with a particular machine root
+	 * @param mchRoot
+	 */
 	public void initialise(IMachineRoot mchRoot) {
 		this.mchRoot = mchRoot;
 		EMFRodinDB emfRodinDB = new EMFRodinDB();
 		machine = (Machine) emfRodinDB.loadEventBComponent(mchRoot);
-		clock.reset();
-		//initialise oracle in record mode
+		//initialise oracle file handler
+		OracleHandler.getOracle().initialise(recordingName, machine);
 		//start the scenario checker views
 		for (IScenarioCheckerView scenarioCheckerView : scenarioCheckerViews) {
 			scenarioCheckerView.start();
-		}
+		}		
+		restart(mchRoot);
+	}
+	
+	/**
+	 * This (re)starts the scenario without affecting any playback settings etc.
+	 * @param mchRoot
+	 */
+	public void restart(IMachineRoot mchRoot) {
+		if (mchRoot!=this.mchRoot) return;
+		clock.reset();
+		updateModeIndicator();
+		setDirty(false);
 		//execute setup operation automatically
 		if (inSetup()) {
-			setup();
+			runSetup();
 		}
-		dirty = false;
 	}
 
 	/**

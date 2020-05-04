@@ -55,7 +55,7 @@ public class ScenarioCheckerParticipant implements IAnimationParticipant {
 	@Override
 	public void restartAnimation(IMachineRoot mchRoot) {
 		if (ScenarioCheckerManager.getDefault().isOpen()) {
-			ScenarioCheckerManager.getDefault().initialise(mchRoot);
+			ScenarioCheckerManager.getDefault().restart(mchRoot);
 		}
 	}
 	
