@@ -126,7 +126,7 @@ public class ScenarioCheckerManager  {
 	 * @param mchRoot
 	 */
 	public void stop(IMachineRoot mchRoot) {
-		if (this.mchRoot==null) return;
+		if (mchRoot!=this.mchRoot) return;
 		if (mchRoot.getCorrespondingResource() != this.mchRoot.getCorrespondingResource()) return;
 		//stop the scenario checker views
 		for (IScenarioCheckerView scenarioCheckerView : scenarioCheckerViews) {
