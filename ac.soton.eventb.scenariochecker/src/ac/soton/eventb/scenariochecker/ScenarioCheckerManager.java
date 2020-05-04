@@ -255,7 +255,12 @@ public class ScenarioCheckerManager  {
 	 * saves the current scenario
 	 */
 	public void savePressed() {
-		saveToOracle();
+		Run run = makeRun(recordingName, AnimationManager.getHistory(mchRoot));
+		try {
+			OracleHandler.getOracle().save(run);
+		} catch (CoreException e) {
+			e.printStackTrace();
+		}
 		setDirty(false);
 	}
 	
@@ -371,48 +376,74 @@ public class ScenarioCheckerManager  {
 	}
 	
 	/**
-	 * saves the history as a scenario
-	 * (the history is obtained from the animation manager)
-	 * 
+	 * make a new Run from the given animation History_
+	 * @param history
+	 * @param run
 	 */
-	private void saveToOracle() {
-		if (OracleHandler.getOracle()!=null) {
-			History_ history = AnimationManager.getHistory(mchRoot);
-			Run recording = OracleFactory.eINSTANCE.createRun();
-			recording.setName(recordingName);
-			for (History_.HistoryItem_ hi : history.getAllItems() ) { 
-				Operation_ op = hi.operation;
-				//we only record external events
-				if (op!=null && (Utils.isExternal(Utils.findEvent(op.getName(), machine)) || SETUP.equals(op.getName()))) {
-					Step step = OracleFactory.eINSTANCE.createStep();
-					step.setName(op.getName());
-					step.getArgs().addAll(op.getArguments());
-					step.setMachine(machine.getName());
-					step.setClock(clock.getValue());
-					recording.getEntries().add(step);	
-					Snapshot currentSnapshot = OracleFactory.eINSTANCE.createSnapshot();
-					currentSnapshot.setClock(clock.getValue());
-					currentSnapshot.setMachine(machine.getName());
-					State_ state = hi.state;
-					for (Entry<String, String> entry : state.getAllValues().entrySet()) {
-						if (!Utils.isPrivate(entry.getKey(), machine)){
-							if (hasChanged(entry.getKey(),entry.getValue(), recording)){
+	private Run makeRun(String name, History_ history) {
+		Run run = OracleFactory.eINSTANCE.createRun();
+		run.setName(name);
+		Clock runclock = new Clock();
+		Snapshot currentSnapshot = null;
+		for (History_.HistoryItem_ hi : history.getAllItems() ) { 
+			Operation_ op = hi.operation;
+			//we only record external events
+			if (op!=null) {
+				if (isExternal(op) || SETUP.equals(op.getName())) {
+					//create a new step entry in the recording
+					Step step = makeStep(op, runclock.getValue());
+					run.getEntries().add(step);
+					//create a new empty snapshot in the recording
+					currentSnapshot = makeSnapshot(runclock.getValue());
+					run.getEntries().add(currentSnapshot);
+					//update clock
+					runclock.inc();
+				}
+				//add any changed state to the current snapshot (for internal as well as external events)
+				//later state changes overwrite earlier ones so that we end up with the state at the end of the run
+				//(if a variable changes and then reverts this is still counted as a change)
+				State_ state = hi.state;
+				for (Entry<String, String> entry : state.getAllValues().entrySet()) {
+					if (!Utils.isPrivate(entry.getKey(), machine)){
+						if (hasChanged(entry.getKey(),entry.getValue(), run)){
+							if (currentSnapshot!=null) {
 								currentSnapshot.getValues().put(entry.getKey(), entry.getValue());
 							}
 						}
 					}
-					if (!currentSnapshot.getValues().isEmpty()) {
-						currentSnapshot.setResult(true);	//for now, all snapshots are result = true
-						recording.getEntries().add(currentSnapshot);
-					}
 				}
 			}
-			try {
-				OracleHandler.getOracle().save(recording);
-			} catch (CoreException e) {
-				e.printStackTrace();
-			}
 		}
+		return run;
+	}
+	
+	/**
+	 * make an empty Snapshot
+	 * 
+	 * @return
+	 */
+	private Snapshot makeSnapshot(String tick) {
+		Snapshot currentSnapshot;
+		currentSnapshot = OracleFactory.eINSTANCE.createSnapshot();
+		currentSnapshot.setClock(tick);
+		currentSnapshot.setMachine(machine.getName());
+		currentSnapshot.setResult(true);	//for now, all snapshots are result = true
+		return currentSnapshot;
+	}
+	
+	/**
+	 * make a new Step from the given Operation_
+	 * 
+	 * @param op
+	 * @return
+	 */
+	private Step makeStep(Operation_ op, String tick) {
+		Step step = OracleFactory.eINSTANCE.createStep();
+		step.setName(op.getName());
+		step.getArgs().addAll(op.getArguments());
+		step.setMachine(machine.getName());
+		step.setClock(tick);
+		return step;
 	}
 	
 	/**
