@@ -308,7 +308,6 @@ public class ScenarioCheckerControlPanelView extends AbstractScenarioCheckerView
 					if (selected>-1) {
 						operations.select(selected);
 					}
-					//operations.pack(true);
 					operations.redraw();
 			    }
 		    }
