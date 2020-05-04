@@ -87,7 +87,7 @@ public class ScenarioCheckerControlPanelView extends AbstractScenarioCheckerView
 				});
 				toolkit.adapt(bigStepButton, true, true);
 				bigStepButton.setText("Big Step");
-				bigStepButton.setToolTipText("Execute next external event and then execute internal events until non are unabled");
+				bigStepButton.setToolTipText("Execute next external event and then execute internal events until none are unabled");
 			}
 			{	//SML STEP
 				smallStepButton = new Button(buttonGroup, SWT.NONE);
