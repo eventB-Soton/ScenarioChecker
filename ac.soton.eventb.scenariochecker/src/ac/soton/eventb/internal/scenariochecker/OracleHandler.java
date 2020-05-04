@@ -71,7 +71,6 @@ import ac.soton.eventb.scenariochecker.Activator;
 public class OracleHandler {
 	
 	private final static String oracleExtension = "oracle";
-	private final static String goldOracleExtension = "gold_"+oracleExtension;
 	private boolean debug = true;
 	
 	/**
@@ -372,9 +371,9 @@ public class OracleHandler {
 	private Run getGoldRun() {
 		try {
 		   FileDialog dialog = new FileDialog(shell, SWT.OPEN);
-		   dialog.setFilterExtensions(new String [] {"*."+goldOracleExtension, "*."+oracleExtension,"*.*"});
+		   dialog.setFilterExtensions(new String [] {"*."+oracleExtension,"*.*"});
 		   dialog.setFilterPath(oracleFolder.getRawLocation().toString());
-		   dialog.setText("Select Gold Oracle File to Replay");
+		   dialog.setText("Select Oracle File to Replay");
 		   String rawLocation = dialog.open();
 		   if (rawLocation==null) return null;
 		   IPath rawPath = new Path(rawLocation);
@@ -417,7 +416,7 @@ public class OracleHandler {
 	 * @throws CoreException
 	 */
 	public void save(Run run) throws CoreException{	
-		final Resource resource = getResource(oracleName, getTimeStamp(), !playback);
+		final Resource resource = getResource(oracleName, getTimeStamp());
 		final SaveRunCommand saveRunCommand = new SaveRunCommand(editingDomain, resource, shell, run);
 		if (saveRunCommand.canExecute()) {	
 			// run with progress
@@ -447,17 +446,15 @@ public class OracleHandler {
 	/**
 	 * @param name
 	 * @param timestamp
-	 * @param gold
 	 * @return
 	 * @throws CoreException
 	 */
-	private Resource getResource(String name, String timestamp, boolean gold) throws CoreException{
+	private Resource getResource(String name, String timestamp) throws CoreException{
 		IPath filePath = folder.getFullPath();
 		filePath = filePath.append("/"+machine.getName());
 		filePath = filePath.addFileExtension(name);
-		filePath = filePath.addFileExtension(timestamp);
-		if (gold) filePath = filePath.addFileExtension(goldOracleExtension);
-		else filePath = filePath.addFileExtension(oracleExtension);
+		filePath = filePath.addFileExtension(timestamp); 
+		filePath = filePath.addFileExtension(oracleExtension);
 		IPath path = new Path("platform:/resource");
 		path = path.append(filePath);
 		URI uri = URI.createURI(path.toString(),true);
