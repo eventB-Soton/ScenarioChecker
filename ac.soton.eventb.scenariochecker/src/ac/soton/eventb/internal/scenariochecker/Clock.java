@@ -12,26 +12,14 @@
 package ac.soton.eventb.internal.scenariochecker;
 
 /**
- * Simple centralised clock for keeping track of the simulator ticks
- * 
- * A tick is defined as the run to completion of all internal events
- * 
- * 
+ * Simple clock for keeping track of the simulator ticks
  * 
  * @author cfsnook
  *
  */
 public class Clock {
-	
-	//singleton
-	private static Clock instance = null;
-	private Clock() {}
-	public static Clock getInstance() {
-		if (instance==null) {
-			instance = new Clock();
-		}
-		return instance;
-	}
+
+	public Clock() {}
 	
 	private Integer clock = -1;
 	

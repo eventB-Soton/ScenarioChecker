@@ -13,6 +13,7 @@ package ac.soton.eventb.scenariochecker;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 
@@ -30,6 +31,8 @@ import ac.soton.eventb.emf.oracle.Snapshot;
 import ac.soton.eventb.emf.oracle.Step;
 import ac.soton.eventb.internal.scenariochecker.Clock;
 import ac.soton.eventb.internal.scenariochecker.OracleHandler;
+import ac.soton.eventb.internal.scenariochecker.Playback;
+import ac.soton.eventb.internal.scenariochecker.Triplet;
 import ac.soton.eventb.internal.scenariochecker.Utils;
 import ac.soton.eventb.probsupport.AnimationManager;
 import ac.soton.eventb.probsupport.data.History_;
@@ -59,42 +62,64 @@ public class ScenarioCheckerManager  {
 		return instance;
 	}
 	
-	private IMachineRoot mchRoot;
-	private Machine machine;
-	//TODO: We could delete clock - it is not used for much now that we only save externals
-	private Clock clock = Clock.getInstance();	
+	private ScenarioCheckerManager() {	//make constructor private
+	}
+	
+	private IMachineRoot mchRoot = null;
+	private Machine machine = null;
+	private Clock clock = new Clock();	
 	private Operation_ manuallySelectedOp = null;
 	private List<Operation_> enabledOperations = null;
 	private boolean dirty = false;
+	private Playback playback = null;
+	private static List<IScenarioCheckerView> scenarioCheckerViews = new ArrayList<IScenarioCheckerView>();
 	
-	//classes that provide a control panel UI view for the simulation can register here
-	private static List<IScenarioCheckerControlPanel> scenarioCheckerControlPanels = new ArrayList<IScenarioCheckerControlPanel>();
-	public void addSimulationControlPanel(IScenarioCheckerControlPanel operationSelector) {
-		scenarioCheckerControlPanels.add(operationSelector);
+	/**
+	 * add a scenario checker view to those registered to receive notifications from the Scenario Checker Manager
+	 * 
+	 * @param scenarioCheckerView
+	 */
+	public void addSimulationView(IScenarioCheckerView scenarioCheckerView) {
+		scenarioCheckerViews.add(scenarioCheckerView);
 	}
-	public void removeSimulationControlPanel(IScenarioCheckerControlPanel scenarioCheckerControlPanel) {
-		scenarioCheckerControlPanels.remove(scenarioCheckerControlPanel);
+	/**
+	 * remove a scenario checker view from those registered to receive notifications from the Scenario Checker Manager
+	 * @param scenarioCheckerView
+	 */
+	public void removeSimulationControlPanel(IScenarioCheckerView scenarioCheckerView) {
+		scenarioCheckerViews.remove(scenarioCheckerView);
 	}
 	
-	
-	
+	/**
+	 * Initialise the Scenario Checker Manager with a particular machine root
+	 * @param mchRoot
+	 */
 	public void initialise(IMachineRoot mchRoot) {
 		this.mchRoot = mchRoot;
 		EMFRodinDB emfRodinDB = new EMFRodinDB();
 		machine = (Machine) emfRodinDB.loadEventBComponent(mchRoot);
+		//initialise oracle file handler
+		OracleHandler.getOracle().initialise(recordingName, machine);
+		//start the scenario checker views
+		for (IScenarioCheckerView scenarioCheckerView : scenarioCheckerViews) {
+			scenarioCheckerView.start();
+		}		
+		restart(mchRoot);
+	}
+	
+	/**
+	 * This (re)starts the scenario without affecting any playback settings etc.
+	 * @param mchRoot
+	 */
+	public void restart(IMachineRoot mchRoot) {
+		if (mchRoot.getCorrespondingResource() != this.mchRoot.getCorrespondingResource()) return;
 		clock.reset();
-		//initialise oracle in record mode
-		OracleHandler.getOracle().initialise(machine);
-		OracleHandler.getOracle().restart(recordingName, machine);
-		//start the control panels
-		for (IScenarioCheckerControlPanel scenarioCheckerControlPanel : scenarioCheckerControlPanels) {
-			scenarioCheckerControlPanel.start();
-		}
+		updateModeIndicator();
+		setDirty(false);
 		//execute setup operation automatically
 		if (inSetup()) {
-			setup();
+			runSetup();
 		}
-		dirty = false;
 	}
 
 	/**
@@ -103,11 +128,10 @@ public class ScenarioCheckerManager  {
 	 * @param mchRoot
 	 */
 	public void stop(IMachineRoot mchRoot) {
-		if (this.mchRoot==null) return;
 		if (mchRoot.getCorrespondingResource() != this.mchRoot.getCorrespondingResource()) return;
-		//stop the control panels
-		for (IScenarioCheckerControlPanel scenarioCheckerControlPanel : scenarioCheckerControlPanels) {
-			scenarioCheckerControlPanel.stop();
+		//stop the scenario checker views
+		for (IScenarioCheckerView scenarioCheckerView : scenarioCheckerViews) {
+			scenarioCheckerView.stop();
 		}
 		
 		// clear state
@@ -115,27 +139,27 @@ public class ScenarioCheckerManager  {
 		machine = null;
 		clock.reset();
 		manuallySelectedOp = null;
-		dirty=false;
+		setDirty(false);
 	}
 	
 	/**
 	 * Tests whether the Scenario Checker is open and ready to start... 
-	 * .. i.e. whether there is an open simulation control panel view attached
+	 * .. i.e. whether there is an open scenario checker view  attached
 	 * @return
 	 */
 	public boolean isOpen() {
-		for (IScenarioCheckerControlPanel scp : scenarioCheckerControlPanels) {
-			if (scp.isReady()) return true;
+		for (IScenarioCheckerView scenarioCheckerView : scenarioCheckerViews) {
+			if (scenarioCheckerView.isReady()) return true;
 		}
 		return false;
 	}
 	
 	
-	////////// interface for control panel to implement user commands/////////
+	////////// interface for scenario checker views to implement user commands/////////
 	
 	/**
 	 * control panel selection changed.
-	 * This is called by the scenarioCheckerControlPanels when the user has selected an operation.
+	 * This is called by the scenarioCheckerViews when the user has selected an operation.
 	 * If 'fire' is true, the new selection will be executed as a big step now
 	 * 
 	 * @param opName
@@ -153,29 +177,36 @@ public class ScenarioCheckerManager  {
 		}
 	}
 	
+	/**
+	 * check whether running in playback mode or not
+	 * 
+	 * @return
+	 */
 	public boolean isPlayback() {
-		return OracleHandler.getOracle().isPlayback();
+		return playback!=null && playback.isPlayback();
 	}
 	
 	/**
 	 * 	implements the big step behaviour where we fire the next operation and then run to completion of all internal operations
 	 */
-
 	public boolean bigStep() {	
 		if (inSetup()) return false;	
-		Operation_ op = findNextOperation();
+		Operation_ op = pickNextOperation();
 		//Animator animator = Animator.getAnimator();
 		boolean progress = true;
 		//execute at least one
 		progress = executeOperation(op, false);
 		//continue executing any internal operations
 		List<Operation_> loop = new ArrayList<Operation_>(); //prevent infinite looping in case doesn't converge
-		while (progress && (op = findNextOperation())!=null &&
-				Utils.isInternal(Utils.findEvent(op.getName(), machine)) &&
-				!loop.contains(op)) {
+		while (	progress && 
+				(op = pickNextOperation())!=null &&
+				!isExternal(op) &&
+				!loop.contains(op)
+				) {
 			progress = executeOperation(op, false);
 			loop.add(op);
 		}
+		updateModeIndicator();
 		return progress;
 	}
 	
@@ -183,8 +214,9 @@ public class ScenarioCheckerManager  {
 	 *  implements the small step behaviour where we fire one enabled external or internal operation
 	 */
 	public void singleStep(){
-		Operation_ op = findNextOperation();
+		Operation_ op = pickNextOperation();
 		executeOperation(op, false);
+		updateModeIndicator();
 	}
 	
 	/**
@@ -205,81 +237,56 @@ public class ScenarioCheckerManager  {
 		}
 		return "ok";
 	}
-	
-	/**
-	 * run the context set-up operation if enabled
-	 **/
-	public boolean setup(){
-		boolean ret = false;
-		for (Operation_ op : AnimationManager.getEnabledOperations(mchRoot)){
-			if (SETUP.equals(op.getName())){
-				if (OracleHandler.getOracle().isPlayback()) {
-					Operation_ nextop = OracleHandler.getOracle().findNextOperation();
-					if (nextop!=null && SETUP.equals(nextop.getName())){
-						OracleHandler.getOracle().consumeNextStep();
-					}
-				}
-				executeOperation(op,false);
-				ret=true;
-			}
-		}
-		return ret;
-	}
 
 	/**
-	 * restarts the current scenario
+	 * restarts the animation.
+	 * if in playback, the current scenario is replayed.
+	 * if not, the animation will be reset in recording mode
+	 * 
 	 */
 	public void restartPressed() {
-		clock.reset();
-		AnimationManager.restartAnimation(mchRoot);
-		if (OracleHandler.getOracle().isPlayback()){
-			OracleHandler.getOracle().stopPlayback();
-			OracleHandler.getOracle().startPlayback(true);
-			for (IScenarioCheckerControlPanel controlPanel : scenarioCheckerControlPanels) {
-				controlPanel.updateModeIndicator(Mode.PLAYBACK);
-			}
-		}else{
-			for (IScenarioCheckerControlPanel controlPanel : scenarioCheckerControlPanels) {
-				controlPanel.updateModeIndicator(Mode.RECORDING);
-			}
+		if (isPlayback()){
+			playback.reset();
 		}
-		OracleHandler.getOracle().restart(recordingName, machine);
+		AnimationManager.restartAnimation(mchRoot);
 	}
 	
 	/**
 	 * saves the current scenario
 	 */
 	public void savePressed() {
-		saveToOracle();
+		Run run = makeRun(recordingName, AnimationManager.getHistory(mchRoot));
+		try {
+			OracleHandler.getOracle().save(run);
+		} catch (CoreException e) {
+			e.printStackTrace();
+		}
 		setDirty(false);
 	}
 	
 	/**
-	 * starts playing back the selected scenario
+	 * starts playing back a scenario
+	 * if already in playback, the current scenario is restarted,
+	 * if not, the user can select an oracle file
 	 */
 	public void replayPressed() {
-		clock.reset();
-		AnimationManager.restartAnimation(mchRoot);
-		if (!OracleHandler.getOracle().isPlayback()){
-			OracleHandler.getOracle().startPlayback(false);
-			for (IScenarioCheckerControlPanel controlPanel : scenarioCheckerControlPanels) {
-				controlPanel.updateModeIndicator(Mode.PLAYBACK);
-			}
+		if (isPlayback()){
+			playback.reset();
+		}else {
+			playback = new Playback(OracleHandler.getOracle().getRun().getEntries());
 		}
-		OracleHandler.getOracle().restart(recordingName, machine);
+		AnimationManager.restartAnimation(mchRoot);
 	}
-
+	
 	/**
 	 * stops the current playback and switches to recording mode
 	 * (without restarting - so a new scenario can continue from the played back one)
 	 */
 	public void stopPressed() {
-		if (OracleHandler.getOracle().isPlayback()){
-			OracleHandler.getOracle().stopPlayback();
+		if (isPlayback()){
+			playback=null;;
 		}
-		for (IScenarioCheckerControlPanel controlPanel : scenarioCheckerControlPanels) {
-			controlPanel.updateModeIndicator(Mode.RECORDING);
-		}
+		updateModeIndicator();
 	}
 	
 	/**
@@ -302,140 +309,195 @@ public class ScenarioCheckerManager  {
 	 */
 	
 	public void currentStateChanged(IMachineRoot mchRoot) {
-		//update the enabled ops table
-		enabledOperations = AnimationManager.getEnabledOperations(mchRoot);
-		List<String> operationSignatures = new ArrayList<String>();
-		Operation_ selectedOp = null;
-		for(Operation_ op: enabledOperations){
-			if (Utils.isExternal(Utils.findEvent(op.getName(), machine))) {
-				operationSignatures.add(op.inStringFormat());
+		if (mchRoot.getCorrespondingResource() != this.mchRoot.getCorrespondingResource()) return;
+		
+		{//update state views
+			List<Triplet <String, String, String>> result = new ArrayList<Triplet<String,String,String>>();
+			Map<String, String> currentState = AnimationManager.getCurrentState(mchRoot).getAllValues();
+			// if in playback check state matches oracle
+			if (isPlayback() && playback.getCurrentSnapshot()!=null) {
+				for (Map.Entry<String, String> value : playback.getCurrentSnapshot().getValues()){
+						result.add(Triplet.of(value.getKey(), currentState.get(value.getKey()), value.getValue()));
+				}
+			}else {
+				for (Map.Entry<String, String> value : currentState.entrySet()){
+					result.add(Triplet.of(value.getKey(), value.getValue(), ""));
+				}
+			}
+			for (IScenarioCheckerView scenarioCheckerView : scenarioCheckerViews) {
+				scenarioCheckerView.updateState(result);
 			}
 		}
-		// find the selected op in playback
-		if (OracleHandler.getOracle().isPlayback()) {
-			selectedOp = OracleHandler.getOracle().findNextOperation();
-			// if we drop out of playback show switch to recording
-			if (!OracleHandler.getOracle().isPlayback()) {		
-				for (IScenarioCheckerControlPanel scenarioCheckerControlPanel : scenarioCheckerControlPanels) {
-					scenarioCheckerControlPanel.updateModeIndicator(Mode.RECORDING);
-				}	
+		
+		{//update the enabled external events views
+			enabledOperations = AnimationManager.getEnabledOperations(mchRoot);
+			List<String> operationSignatures = new ArrayList<String>();
+			for(Operation_ op: enabledOperations){
+				if (isExternal(op)) {
+					operationSignatures.add(op.inStringFormat());
+				}
 			}
-		}
-		//if no playback op selected, use manually selected op
-		if (selectedOp==null) {	
-			selectedOp = manuallySelectedOp;
-		}
-		// find index of selected op so that it can be highlighted
-		int select = selectedOp==null? -1 : operationSignatures.indexOf(selectedOp.inStringFormat());
-		// update operations tables in the control panels
-		for (IScenarioCheckerControlPanel scenarioCheckerControlPanel : scenarioCheckerControlPanels) {
-			scenarioCheckerControlPanel.updateEnabledOperations(operationSignatures, select);
+			
+			// find index of the next op in playback
+			int selectedOp = -1;
+			if (isPlayback() && playback.getNextOperation()!=null) {
+				selectedOp = enabledOperations.indexOf(playback.getNextOperation());
+			}
+
+			// update operations tables in the scenario checker views
+			for (IScenarioCheckerView scenarioCheckerView : scenarioCheckerViews) {
+				scenarioCheckerView.updateEnabledOperations(operationSignatures, selectedOp);
+			}
 		}
 	}		
 		
 	///////////////// private utilities to help with execution ///////////////////////////
 
 	/**
-	 * sets the dirty flag and tells the control panels to show as dirty
-	 * @param dirty
+	 * update the mode indicator on scenario checker views
+	 * according to whether the scenario is in playback or recording
 	 */
-	private void setDirty(boolean dirty) {
-		for (IScenarioCheckerControlPanel controlPanel : scenarioCheckerControlPanels) {
-			controlPanel.updateDirtyStatus(dirty);;
+	private void updateModeIndicator() {
+		if (isPlayback()){
+			for (IScenarioCheckerView controlPanel : scenarioCheckerViews) {
+				controlPanel.updateModeIndicator(Mode.PLAYBACK);
+			}
+		}else{
+			for (IScenarioCheckerView controlPanel : scenarioCheckerViews) {
+				controlPanel.updateModeIndicator(Mode.RECORDING);
+			}
 		}
-		this.dirty=dirty;
 	}
 	
 	/**
-	 * saves the history as a scenario
-	 * (the history is obtained from the animation manager)
-	 * 
+	 * sets the dirty flag and tells the scenario checker views to show as dirty or not
+	 * @param dirty
 	 */
-	private void saveToOracle() {
-		if (OracleHandler.getOracle()!=null) {
-			History_ history = AnimationManager.getHistory(mchRoot);
-			Run recording = OracleFactory.eINSTANCE.createRun();
-			recording.setName(recordingName);
-			for (History_.HistoryItem_ hi : history.getAllItems() ) { 
-				Operation_ op = hi.operation;
-				//we only record external events
-				if (op!=null && (Utils.isExternal(Utils.findEvent(op.getName(), machine)) || SETUP.equals(op.getName()))) {
-					Step step = OracleFactory.eINSTANCE.createStep();
-					step.setName(op.getName());
-					step.getArgs().addAll(op.getArguments());
-					step.setMachine(machine.getName());
-					step.setClock(clock.getValue());
-					recording.getEntries().add(step);	
-					Snapshot currentSnapshot = OracleFactory.eINSTANCE.createSnapshot();
-					currentSnapshot.setClock(clock.getValue());
-					currentSnapshot.setMachine(machine.getName());
-					State_ state = hi.state;
-					for (Entry<String, String> entry : state.getAllValues().entrySet()) {
-						if (!Utils.isPrivate(entry.getKey(), machine)){
-							if (hasChanged(entry.getKey(),entry.getValue(), recording)){
+	private void setDirty(boolean dirty) {
+		this.dirty=dirty;
+		for (IScenarioCheckerView controlPanel : scenarioCheckerViews) {
+			controlPanel.updateDirtyStatus(dirty);;
+		}
+	}
+	
+	/**
+	 * make a new Run from the given animation History_
+	 * @param history
+	 * @param run
+	 */
+	private Run makeRun(String name, History_ history) {
+		Run run = OracleFactory.eINSTANCE.createRun();
+		run.setName(name);
+		Clock runclock = new Clock();
+		Snapshot currentSnapshot = null;
+		for (History_.HistoryItem_ hi : history.getAllItems() ) { 
+			Operation_ op = hi.operation;
+			//we only record external events
+			if (op!=null) {
+				if (isExternal(op) || SETUP.equals(op.getName())) {
+					//create a new step entry in the recording
+					Step step = makeStep(op, runclock.getValue());
+					run.getEntries().add(step);
+					//create a new empty snapshot in the recording
+					currentSnapshot = makeSnapshot(runclock.getValue());
+					run.getEntries().add(currentSnapshot);
+					//update clock
+					runclock.inc();
+				}
+				//add any changed state to the current snapshot (for internal as well as external events)
+				//later state changes overwrite earlier ones so that we end up with the state at the end of the run
+				//(if a variable changes and then reverts this is still counted as a change)
+				State_ state = hi.state;
+				for (Entry<String, String> entry : state.getAllValues().entrySet()) {
+					if (!Utils.isPrivate(entry.getKey(), machine)){
+						if (hasChanged(entry.getKey(),entry.getValue(), run)){
+							if (currentSnapshot!=null) {
 								currentSnapshot.getValues().put(entry.getKey(), entry.getValue());
 							}
 						}
 					}
-					if (!currentSnapshot.getValues().isEmpty()) {
-						//FIXME: In playback, we should check that the snapshot matches gold version - for now = true
-						boolean result = true;
-						currentSnapshot.setResult(result);	//for gold run all snapshots are result = true
-						recording.getEntries().add(currentSnapshot);
-					}
 				}
 			}
-			try {
-				OracleHandler.getOracle().save(recording);
-			} catch (CoreException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
 		}
+		return run;
 	}
 	
-		/**
-		 * check whether the context needs to be set up
-		 */
-		private boolean inSetup(){
-			List<Operation_> enabledOperations = AnimationManager.getEnabledOperations(mchRoot);
-			for (Operation_ op : enabledOperations){
-				if ("SETUP_CONTEXT".equals(op.getName()) ){
-					return true;
-				}
+	/**
+	 * make an empty Snapshot
+	 * 
+	 * @return
+	 */
+	private Snapshot makeSnapshot(String tick) {
+		Snapshot currentSnapshot;
+		currentSnapshot = OracleFactory.eINSTANCE.createSnapshot();
+		currentSnapshot.setClock(tick);
+		currentSnapshot.setMachine(machine.getName());
+		currentSnapshot.setResult(true);	//for now, all snapshots are result = true
+		return currentSnapshot;
+	}
+	
+	/**
+	 * make a new Step from the given Operation_
+	 * 
+	 * @param op
+	 * @return
+	 */
+	private Step makeStep(Operation_ op, String tick) {
+		Step step = OracleFactory.eINSTANCE.createStep();
+		step.setName(op.getName());
+		step.getArgs().addAll(op.getArguments());
+		step.setMachine(machine.getName());
+		step.setClock(tick);
+		return step;
+	}
+	
+	/**
+	 * check whether the context needs to be set up
+	 */
+	private boolean inSetup(){
+		List<Operation_> enabledOperations = AnimationManager.getEnabledOperations(mchRoot);
+		for (Operation_ op : enabledOperations){
+			if ("SETUP_CONTEXT".equals(op.getName()) ){
+				return true;
 			}
-			return false;
 		}
-		
+		return false;
+	}
+
+	/**
+	 * run the context set-up operation if enabled
+	 **/
+	private boolean runSetup(){
+		boolean ret = false;
+		for (Operation_ op : AnimationManager.getEnabledOperations(mchRoot)){
+			if (SETUP.equals(op.getName())){
+				if (isPlayback() && SETUP.equals(playback.getNextStep().getName())){
+					playback.consumeStep();
+				}
+				executeOperation(op,false);
+				ret=true;
+			}
+		}
+		return ret;
+	}
 		
 	/**
 	 * finds the next operation to be executed.
 	 * when not in playback mode, it is manually (or randomly) selected from those that are enabled according to priority (internal first)
-	 * when in playback mode, external events are given by the next operation in the OracleHandler.getOracle() being replayed,
+	 * when in playback mode, external events are given by the next operation in the playback being replayed,
 	 * 
 	 * @param animator
 	 * @return
 	 */
-	private Operation_ findNextOperation() {	
-		Operation_ nextOp = null;
-		nextOp = 	manuallySelectedOp!=null && 
-				isEnabled(manuallySelectedOp) ? manuallySelectedOp :
-					pickFrom(prioritise(AnimationManager.getEnabledOperations(mchRoot)));
-		if (OracleHandler.getOracle().isPlayback() && Utils.isExternal(Utils.findEvent(nextOp.getName(), machine))){
-			Operation_ playbackOp = OracleHandler.getOracle().findNextOperation();
-			if ("INITIALISATION".equals(nextOp.getName()) &&
-					"SETUP_CONTEXT".equals(playbackOp.getName())) {
-				OracleHandler.getOracle().consumeNextStep();
-				playbackOp = OracleHandler.getOracle().findNextOperation();
-			}
-			nextOp = playbackOp;
-			//it may come out of playback here.. in which case update control panel
-			if (!OracleHandler.getOracle().isPlayback()) {
-				for (IScenarioCheckerControlPanel controlPanel : scenarioCheckerControlPanels) {
-					controlPanel.updateModeIndicator(Mode.RECORDING);
-				}
-			}
+	private Operation_ pickNextOperation() {	
+		Operation_  nextOp = manuallySelectedOp!=null && isEnabled(manuallySelectedOp) ?
+							manuallySelectedOp :
+							pickFrom(prioritise(AnimationManager.getEnabledOperations(mchRoot)));
+		
+		if (isPlayback() && isExternal(nextOp)){
+			nextOp = playback.getNextOperation();
 		}
+		
 		return nextOp;
 	}
 
@@ -488,9 +550,11 @@ public class ScenarioCheckerManager  {
 	}
 
 	/**
-	 * execute the given operation while maintaining the clock
-	 * If the operation execution succeeds, and the operation is not internal,
-	 * the clock is incremented
+	 * Execute the given operation.
+	 * If recording and the operation is not setup nor initialisation, the scenario becomes dirty.
+	 * If in playback and the operation is the next step, the playback progresses
+	 * If the operation is external, the clock is incremented
+	 * 
 	 * 
 	 * @param animator
 	 * @param operation
@@ -499,18 +563,36 @@ public class ScenarioCheckerManager  {
 	 */
 	private boolean executeOperation(Operation_ operation, boolean silent){
 		if (operation==null) return false;
-		boolean playback = OracleHandler.getOracle().isPlayback();
-		if (playback && Utils.isExternal(Utils.findEvent(operation.getName(), machine))) {
-			OracleHandler.getOracle().consumeNextStep();
-		}
 		System.out.println("executing operation : "+operation.getName()+" "+operation.getArguments() );
-		AnimationManager.executeOperation(mchRoot, operation, silent);
-		Event ev =Utils.findEvent(operation.getName(), machine);
-		if (ev!=null && Utils.isExternal(ev)) clock.inc();
-		if (!playback && !SETUP.equals(operation.getName()) && !INITIALISATION.equals(operation.getName()) ) {
+		
+		if (!isPlayback() && 
+				!SETUP.equals(operation.getName()) && 
+				!INITIALISATION.equals(operation.getName()) ) {
 			setDirty(true);
 		}
+		
+		if (isPlayback() && 
+				operation.equals(playback.getNextOperation())) {
+			playback.consumeStep();;
+		}
+		
+		if (isExternal(operation)) {
+			clock.inc();
+		}
+		
+		//must make sure everything else is updated BEFORE executing,
+		// as ProB will immediately call the listeners to update the views
+		AnimationManager.executeOperation(mchRoot, operation, silent);
+		
 		return true;
+	}
+	
+	/**
+	 * checks whether the given operation is external
+	 * @return
+	 */
+	private boolean isExternal(Operation_ operation) {
+		return Utils.isExternal(Utils.findEvent(operation.getName(), machine));
 	}
 	
 	/**
@@ -538,5 +620,6 @@ public class ScenarioCheckerManager  {
 		}
 		return true;
 	}
+	
 
 }
