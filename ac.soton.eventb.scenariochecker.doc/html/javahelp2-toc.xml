@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='ISO-8859-1' ?>
+<toc version="2.0">
+<tocitem text="EMF2EMF Transformation Framework Developers Manual">
+    <tocitem target="sec:overview" text="EMF2EMF Translator Overview" /><tocitem target="sec:getting-started" text="Getting Started">
+        <tocitem target="sec:setup" text="Setup" /><tocitem target="sec:ui" text="Setting up the UI to initiate your translator" /><tocitem target="sec:translatorDecln" text="Declaring your translator" /><tocitem target="sec:rulesDecln" text="Declaring Rules" /><tocitem target="sec:configure" text="Configuring your translator" /><tocitem target="sec:rulesWriting" text="Writing Rules" /><tocitem target="sec:release-notes" text="Release Notes" />
+    </tocitem><tocitem target="sec:concepts" text="Concepts">
+        <tocitem target="sec:adapter" text="Adapter" /><tocitem target="sec:descriptors" text="Generation Descriptors" /><tocitem target="sec:rules" text="Rules" /><tocitem target="sec:priorities" text="Priorities" /><tocitem target="sec:editable" text="Editable" />
+    </tocitem><tocitem target="sec:tasks" text="Tasks" /><tocitem target="sec:reference" text="Reference" /><tocitem target="sec:legal" text="Legal">
+        <tocitem target="sec:user-agreement" text="EPL Software User Agreement" />
+    </tocitem>
+</tocitem>
+</toc>

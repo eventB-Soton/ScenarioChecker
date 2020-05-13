@@ -1,0 +1,81 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="stylesheet" href="style.css" type="text/css" />
+<link rel="shortcut icon" href="icons/pyfav.png" type="image/png" />
+<link href="index.html" title="EMF2EMF Transformation Framework Developers Manual" rel="start" />
+<link href="index.html" title="EMF2EMF Transformation Framework Developers Manual" rel="first" />
+<link href="index.html" rel="contents" title="Contents" />
+<link rel="index" title="Index" />
+<link href="sec-rules.html" rel="next" />
+<link href="sec-adapter.html" rel="prev" />
+<link href="sec-concepts.html" rel="parent" />
+<meta name="aesop" content="information" />
+<title>3.2 Generation Descriptors</title>
+</head>
+<body>
+<div class="navigation">
+<div id="top-navigation-panel" xml:id="top-navigation-panel">
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class="online-navigation"><a title="3.1 Adapter" href="sec-adapter.html" rel="prev"><img src="icons/previous.png" border="0" height="32" alt="Previous Page" width="32" /></a></td>
+<td class="online-navigation"><a title="3 Concepts" href="sec-concepts.html" rel="parent"><img src="icons/up.png" border="0" height="32" alt="Up One Level" width="32" /></a></td>
+<td class="online-navigation"><a title="Rules" href="sec-rules.html" rel="next"><img src="icons/next.png" border="0" height="32" alt="Next Page" width="32" /></a></td>
+<td align="center" width="100%">EMF2EMF Transformation Framework Developers Manual</td>
+<td class="online-navigation"><a href="index.html" rel="contents" title="Table of Contents"><img src="icons/contents.png" border="0" height="32" alt="Contents" width="32" /></a></td>
+<td class="online-navigation"><img src="icons/blank.png" border="0" height="32" alt="" width="32" /></td>
+<td class="online-navigation"><img src="icons/blank.png" border="0" height="32" width="32" /></td>
+</tr></table>
+<div class="online-navigation">
+<span><b class="navlabel">Previous:</b>
+<a href="sec-adapter.html" class="sectref" rel="prev">Adapter</a></span>
+<span><b class="navlabel">Up:</b>
+<a href="sec-concepts.html" class="sectref" rel="parent">Concepts</a></span>
+<span><b class="navlabel">Next:</b>
+<a href="sec-rules.html" class="sectref" rel="next">Rules</a></span>
+</div>
+<hr /></div>
+</div>
+
+
+
+<div><h2 id="sec:descriptors">3.2 Generation Descriptors</h2>
+<p>Each rule should return a collection of one or more Generation Descriptors. Generation Descriptors have the following fields which are explained in this section. </p><p>* EventBElement parent; * EStructuralFeature feature; * Object value; * Integer priority; * Boolean editable; * Boolean remove; </p><p>The feature of the parent will be changed in the following ways: </p><p>If remove is false: * 1) If the feature is a containment and the value is an element of the correct kind, the value will be added to the containment in a position according to the priority * 2) If the feature is a reference and the value is an element of the correct kind, the value will be added to the reference in a position according to the priority * 3) If the feature is an EAttribute and the value is of the correct type, the feature will be set to the value </p><p>Priority can be used to control the relative position of the generated elements * 1 - must come first * 10 - not important * —user entered items— * 0 must come after user entered items * -10 must come last </p><p>Editable - this affects read-only status of the generated element and whether or not it will be preserved or re-generated in a subsequent generation. * false - the element is set as read-only (the user cannot change its attributes nor add/remove children), any existing copy of the element will be deleted and re-generated at each re-generation * true - the element is not read-only and will not be deleted before re-generation. (N.B. It is the responsibility of the client rules to check whether this element already exists and only only generate a new one if it does not) </p><p>If remove is true: * 1) If the feature is a containment and the value is an element of the correct kind, the value will be deleted from the containment * 2) If the feature is a reference and the value is an element of the correct kind, the value will be removed from the reference * 3) If the feature is an EAttribute, the feature will be unset </p></div>
+
+
+
+<div class="navigation">
+<div class="online-navigation">
+<hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class="online-navigation"><a title="3.1 Adapter" href="sec-adapter.html" rel="prev"><img src="icons/previous.png" border="0" height="32" alt="Previous Page" width="32" /></a></td>
+<td class="online-navigation"><a title="3 Concepts" href="sec-concepts.html" rel="parent"><img src="icons/up.png" border="0" height="32" alt="Up One Level" width="32" /></a></td>
+<td class="online-navigation"><a title="Rules" href="sec-rules.html" rel="next"><img src="icons/next.png" border="0" height="32" alt="Next Page" width="32" /></a></td>
+<td align="center" width="100%">EMF2EMF Transformation Framework Developers Manual</td>
+<td class="online-navigation"><a href="index.html" rel="contents" title="Table of Contents"><img src="icons/contents.png" border="0" height="32" alt="Contents" width="32" /></a></td>
+<td class="online-navigation"><img src="icons/blank.png" border="0" height="32" alt="" width="32" /></td>
+<td class="online-navigation"><img src="icons/blank.png" border="0" height="32" width="32" /></td>
+</tr></table>
+<div class="online-navigation">
+<span><b class="navlabel">Previous:</b>
+<a href="sec-adapter.html" class="sectref" rel="prev">Adapter</a></span>
+<span><b class="navlabel">Up:</b>
+<a href="sec-concepts.html" class="sectref" rel="parent">Concepts</a></span>
+<span><b class="navlabel">Next:</b>
+<a href="sec-rules.html" class="sectref" rel="next">Rules</a></span>
+</div>
+</div>
+<hr />
+<!--
+<span class="release-info">Release 2.4.3, documentation updated on 29 March 2006.</span>
+-->
+</div>
+<!--End of Navigation Panel-->
+<!--
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+-->
+</body>
+</html>

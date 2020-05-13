@@ -1,0 +1,81 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="stylesheet" href="style.css" type="text/css" />
+<link rel="shortcut icon" href="icons/pyfav.png" type="image/png" />
+<link href="index.html" title="EMF2EMF Transformation Framework Developers Manual" rel="start" />
+<link href="index.html" title="EMF2EMF Transformation Framework Developers Manual" rel="first" />
+<link href="index.html" rel="contents" title="Contents" />
+<link rel="index" title="Index" />
+<link href="sec-editable.html" rel="next" />
+<link href="sec-rules.html" rel="prev" />
+<link href="sec-concepts.html" rel="parent" />
+<meta name="aesop" content="information" />
+<title>3.4 Priorities</title>
+</head>
+<body>
+<div class="navigation">
+<div id="top-navigation-panel" xml:id="top-navigation-panel">
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class="online-navigation"><a title="3.3 Rules" href="sec-rules.html" rel="prev"><img src="icons/previous.png" border="0" height="32" alt="Previous Page" width="32" /></a></td>
+<td class="online-navigation"><a title="3 Concepts" href="sec-concepts.html" rel="parent"><img src="icons/up.png" border="0" height="32" alt="Up One Level" width="32" /></a></td>
+<td class="online-navigation"><a title="Editable" href="sec-editable.html" rel="next"><img src="icons/next.png" border="0" height="32" alt="Next Page" width="32" /></a></td>
+<td align="center" width="100%">EMF2EMF Transformation Framework Developers Manual</td>
+<td class="online-navigation"><a href="index.html" rel="contents" title="Table of Contents"><img src="icons/contents.png" border="0" height="32" alt="Contents" width="32" /></a></td>
+<td class="online-navigation"><img src="icons/blank.png" border="0" height="32" alt="" width="32" /></td>
+<td class="online-navigation"><img src="icons/blank.png" border="0" height="32" width="32" /></td>
+</tr></table>
+<div class="online-navigation">
+<span><b class="navlabel">Previous:</b>
+<a href="sec-rules.html" class="sectref" rel="prev">Rules</a></span>
+<span><b class="navlabel">Up:</b>
+<a href="sec-concepts.html" class="sectref" rel="parent">Concepts</a></span>
+<span><b class="navlabel">Next:</b>
+<a href="sec-editable.html" class="sectref" rel="next">Editable</a></span>
+</div>
+<hr /></div>
+</div>
+
+
+
+<div><h2 id="sec:priorities">3.4 Priorities</h2>
+<p>Priority may be from 10 to -10, where 1 indicates first in the containment and -10 last in the containment. Elements in the containment that are not (currently) being generated are placed between priorities 10 and 0. Bear in mind that the relative position of different diagrams (extensions)is preserved within each priority band. Also the order of source elements within their containment is preserved within each priority band. </p><p>1 2 3 4 5 6 7 8 9 10 &lt;other content&gt; 0 -1 -2 -3 -4 -5 -6 -7 -8 -9 -10 </p><p>For example, a basic type invariant that doesn’t depend on other variables might be placed at position 1 whereas a theorem or invariant included purely for proof purposes might be placed at position -10. </p><p>A current limitation of the priority scheme is that there are a limited number of priorities. For example, this could be a problem if a rule needs to calculate positions of each element within a collection based on dependencies of the element instance. </p></div>
+
+
+
+<div class="navigation">
+<div class="online-navigation">
+<hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class="online-navigation"><a title="3.3 Rules" href="sec-rules.html" rel="prev"><img src="icons/previous.png" border="0" height="32" alt="Previous Page" width="32" /></a></td>
+<td class="online-navigation"><a title="3 Concepts" href="sec-concepts.html" rel="parent"><img src="icons/up.png" border="0" height="32" alt="Up One Level" width="32" /></a></td>
+<td class="online-navigation"><a title="Editable" href="sec-editable.html" rel="next"><img src="icons/next.png" border="0" height="32" alt="Next Page" width="32" /></a></td>
+<td align="center" width="100%">EMF2EMF Transformation Framework Developers Manual</td>
+<td class="online-navigation"><a href="index.html" rel="contents" title="Table of Contents"><img src="icons/contents.png" border="0" height="32" alt="Contents" width="32" /></a></td>
+<td class="online-navigation"><img src="icons/blank.png" border="0" height="32" alt="" width="32" /></td>
+<td class="online-navigation"><img src="icons/blank.png" border="0" height="32" width="32" /></td>
+</tr></table>
+<div class="online-navigation">
+<span><b class="navlabel">Previous:</b>
+<a href="sec-rules.html" class="sectref" rel="prev">Rules</a></span>
+<span><b class="navlabel">Up:</b>
+<a href="sec-concepts.html" class="sectref" rel="parent">Concepts</a></span>
+<span><b class="navlabel">Next:</b>
+<a href="sec-editable.html" class="sectref" rel="next">Editable</a></span>
+</div>
+</div>
+<hr />
+<!--
+<span class="release-info">Release 2.4.3, documentation updated on 29 March 2006.</span>
+-->
+</div>
+<!--End of Navigation Panel-->
+<!--
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+-->
+</body>
+</html>

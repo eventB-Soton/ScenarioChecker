@@ -1,0 +1,91 @@
+\documentclass[a4paper,10pt]{article}
+%\documentclass[preview=false]{standalone}
+% %%%% Define new conditional \ifplastex
+% %%%% This ensure that the file complied normally without plasTeX.
+\usepackage{plastex}
+
+\usepackage{hyperref}
+
+\ifplastex\else
+\usepackage{standalone} %%%% Only load standalone when not in plasTeX
+\standalonetrue
+\usepackage{longtable} %%%% Only load longtable and ltcaption when not in plasTeX
+\usepackage{ltcaption}
+\fi
+
+% Package for typesetting URLs
+\usepackage{url}
+
+% Package for including graphics.
+\usepackage{graphicx}
+
+\usepackage{multicol}
+
+\usepackage{bsymb}
+
+% Package for typesetting Event-B models
+\usepackage[colour]{eventB}
+%\usepackage{eventB-vhdl}
+
+% Package for typesetting dates and times
+\ifplastex
+\newcommand{\SCManualDate}{May 12th, 2020}
+\else
+\usepackage{datetime}
+\newdate{SCManualDate}{27}{7}{2017}
+\fi
+\newcommand{\SCFeatureVersion}{0.0.0}
+\newcommand{\SCManualVersion}{0.0.0}
+
+% Title
+\title{Scenario Checker User Manual} 
+
+% Author
+\author{%s
+  Colin Snook\\%
+  ECS, University of Southampton\\%
+  \texttt{\href{mailto:cfs@soton.ac.uk}{cfs at soton dot ac dot uk}}%
+}%
+
+
+% Date
+\date{%
+  Version \SCManualVersion\\%
+  (for feature version \SCFeatureVersion)\\
+  \ifplastex
+  \SCManualDate
+  \else
+  \displaydate{SCManualDate}%
+  \fi
+}
+
+\begin{document}
+\ifplastex%
+\maketitle% Make title if in plasTeX mode.
+\else%
+ \ifstandalone%
+ \maketitle % Make title if in standalone mode.
+ \else%
+ \fi%
+\fi%
+
+\input{overview}
+
+\input{getting_started}
+
+\input{concepts}
+
+\input{tasks}
+
+\input{reference}
+
+%\input{samples}
+
+\input{legal}
+
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:

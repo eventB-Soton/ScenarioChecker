@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='ISO-8859-1' ?>
+<toc topic="html/index.html" label="EMF2EMF Transformation Framework Developers Manual">
+    <topic label="EMF2EMF Translator Overview" href="html/sec-overview.html" /><topic label="Getting Started" href="html/sec-getting-started.html">
+       <topic label="Setup" href="html/sec-setup.html" /><topic label="Setting up the UI to initiate your translator" href="html/sec-ui.html" /><topic label="Declaring your translator" href="html/sec-translatorDecln.html" /><topic label="Declaring Rules" href="html/sec-rulesDecln.html" /><topic label="Configuring your translator" href="html/sec-configure.html" /><topic label="Writing Rules" href="html/sec-rulesWriting.html" /><topic label="Release Notes" href="html/sec-release-notes.html" />
+    </topic><topic label="Concepts" href="html/sec-concepts.html">
+       <topic label="Adapter" href="html/sec-adapter.html" /><topic label="Generation Descriptors" href="html/sec-descriptors.html" /><topic label="Rules" href="html/sec-rules.html" /><topic label="Priorities" href="html/sec-priorities.html" /><topic label="Editable" href="html/sec-editable.html" />
+    </topic><topic label="Tasks" href="html/sec-tasks.html" /><topic label="Reference" href="html/sec-reference.html" /><topic label="Legal" href="html/sec-legal.html">
+       <topic label="EPL Software User Agreement" href="html/sec-user-agreement.html" />
+    </topic>
+</toc>

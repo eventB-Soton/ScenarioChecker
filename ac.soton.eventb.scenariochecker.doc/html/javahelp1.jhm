@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='ISO-8859-1' ?>
+<map version="1.0"> 
+<mapID target="toplevelfolder">
+<mapID target="sec:overview" url="sec-overview.html" />
+<mapID target="sec:getting-started" url="sec-getting-started.html" />
+<mapID target="sec:setup" url="sec-setup.html" />
+<mapID target="sec:ui" url="sec-ui.html" />
+<mapID target="sec:translatorDecln" url="sec-translatorDecln.html" />
+<mapID target="sec:rulesDecln" url="sec-rulesDecln.html" />
+<mapID target="sec:configure" url="sec-configure.html" />
+<mapID target="sec:rulesWriting" url="sec-rulesWriting.html" />
+<mapID target="sec:release-notes" url="sec-release-notes.html" />
+<mapID target="sec:concepts" url="sec-concepts.html" />
+<mapID target="sec:adapter" url="sec-adapter.html" />
+<mapID target="sec:descriptors" url="sec-descriptors.html" />
+<mapID target="sec:rules" url="sec-rules.html" />
+<mapID target="sec:priorities" url="sec-priorities.html" />
+<mapID target="sec:editable" url="sec-editable.html" />
+<mapID target="sec:tasks" url="sec-tasks.html" />
+<mapID target="sec:reference" url="sec-reference.html" />
+<mapID target="sec:legal" url="sec-legal.html" />
+<mapID target="sec:user-agreement" url="sec-user-agreement.html" />
+</mapID>
+</map>

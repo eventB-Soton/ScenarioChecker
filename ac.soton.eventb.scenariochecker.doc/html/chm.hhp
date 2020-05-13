@@ -1,0 +1,40 @@
+[OPTIONS]
+Compatibility=1.1 or later
+Compiled file=user_manual.chm
+Contents file=chm.hhc
+Default Window=Help
+Default topic=index.html
+Display compile progress=Yes
+Error log file=help.log
+Full-text search=Yes
+Index file=chm.hhk
+Language=0x0 
+Title=EMF2EMF Transformation Framework Developers Manual
+
+[WINDOWS]
+Help="EMF2EMF Transformation Framework Developers Manual","chm.hhc","chm.hhk","index.html","index.html",,,,,0x73520,,0x383e,[200,200,1000,800],,,,,,,0
+
+[FILES]
+sec-overview.html
+sec-editable.html
+sec-adapter.html
+index.html
+sec-configure.html
+sec-descriptors.html
+sec-release-notes.html
+sec-priorities.html
+sec-concepts.html
+sec-legal.html
+sec-rulesWriting.html
+sec-ui.html
+sec-tasks.html
+sec-setup.html
+sec-reference.html
+sec-rulesDecln.html
+sec-translatorDecln.html
+sec-user-agreement.html
+sec-getting-started.html
+sec-rules.html
+
+
+[MERGE FILES]

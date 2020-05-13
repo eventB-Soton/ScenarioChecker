@@ -1,0 +1,85 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="stylesheet" href="style.css" type="text/css" />
+<link rel="shortcut icon" href="icons/pyfav.png" type="image/png" />
+<link href="index.html" title="EMF2EMF Transformation Framework Developers Manual" rel="start" />
+<link href="index.html" title="EMF2EMF Transformation Framework Developers Manual" rel="first" />
+<link href="index.html" rel="contents" title="Contents" />
+<link rel="index" title="Index" />
+<link href="sec-configure.html" rel="next" />
+<link href="sec-translatorDecln.html" rel="prev" />
+<link href="sec-getting-started.html" rel="parent" />
+<meta name="aesop" content="information" />
+<title>2.4 Declaring Rules</title>
+</head>
+<body>
+<div class="navigation">
+<div id="top-navigation-panel" xml:id="top-navigation-panel">
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class="online-navigation"><a title="2.3 Declaring your translator" href="sec-translatorDecln.html" rel="prev"><img src="icons/previous.png" border="0" height="32" alt="Previous Page" width="32" /></a></td>
+<td class="online-navigation"><a title="2 Getting Started" href="sec-getting-started.html" rel="parent"><img src="icons/up.png" border="0" height="32" alt="Up One Level" width="32" /></a></td>
+<td class="online-navigation"><a title="Configuring your translator" href="sec-configure.html" rel="next"><img src="icons/next.png" border="0" height="32" alt="Next Page" width="32" /></a></td>
+<td align="center" width="100%">EMF2EMF Transformation Framework Developers Manual</td>
+<td class="online-navigation"><a href="index.html" rel="contents" title="Table of Contents"><img src="icons/contents.png" border="0" height="32" alt="Contents" width="32" /></a></td>
+<td class="online-navigation"><img src="icons/blank.png" border="0" height="32" alt="" width="32" /></td>
+<td class="online-navigation"><img src="icons/blank.png" border="0" height="32" width="32" /></td>
+</tr></table>
+<div class="online-navigation">
+<span><b class="navlabel">Previous:</b>
+<a href="sec-translatorDecln.html" class="sectref" rel="prev">Declaring your translator</a></span>
+<span><b class="navlabel">Up:</b>
+<a href="sec-getting-started.html" class="sectref" rel="parent">Getting Started</a></span>
+<span><b class="navlabel">Next:</b>
+<a href="sec-configure.html" class="sectref" rel="next">Configuring your translator</a></span>
+</div>
+<hr /></div>
+</div>
+
+
+
+<div><h2 id="sec:rulesDecln">2.4 Declaring Rules</h2>
+<p>Add an extension for <tt class="ttfamily">ac.soton.emf.translator.rulesets</tt>. Then via its context menu add a new <tt class="ttfamily">ruleset</tt>. Fill in the extension point element details as follows. </p><ul class="itemize">
+<li><p><b class="bfseries">translator_id:</b> this must be the id of your translator. I.e. it must match the field with the same name in the translators extension above. </p></li><li><p><b class="bfseries">name:</b> this is just a readable name used for your ruleset in the extensions (not very important but helps you maintain these extensions). </p></li>
+</ul><p> Now right click on the <tt class="ttfamily">ruleset</tt> and add a child <tt class="ttfamily">rule</tt> with details as follows. For this first rule you should focus on something near the root of your model. I.e. the element that contains everything else you want to translate. This does not have to be the root_source_class defined in the translators extension but it is the first (highest) level element that is of interest to your translation. For example, a root element is often used as an organisational device for persistence purposes and then it contains some components that you would like to translate. </p><ul class="itemize">
+<li><p><b class="bfseries">source_class:</b> the meta-class of elements that this rule will translate. Unless you specify a different source_package (see below), the meta-class must be in the ecore meta-model that you specified in the translators extension using the source_package field in section <a href="sec-translatorDecln.html">2.3</a>. </p></li><li><p><b class="bfseries">rule_class:</b> a java class in your plug-in that will do the translation of elements of this kind. As you don’t have any rules classes, you can click on the blue field name, <em>rule_class</em> in order to create a new class in your plug-in. Your rule should extend AbstractRule and implement IRule. </p></li><li><p><b class="bfseries">name:</b> this is just a readable name used for your rule in the extensions (not very important but helps you maintain these extensions). </p></li><li><p><b class="bfseries">source_package:</b> if the source_class is in the source_package defined for the translator in section <a href="sec-translatorDecln.html">2.3</a>, you can leave this field blank. However, sometimes a model may contain children from a different meta-model. In this case you need to specify the nsURI of the ecore meta-model that contains the source_class. </p></li>
+</ul><p> Now that you have specified a rule for a class of source elements you can start writing some java code to implement the rule. See section <a href="sec-rulesWriting.html">2.6</a> for details on how to do this. However we recommend that you just add some stub methods first and breakpoint them to check that your declarations in sections <a href="sec-ui.html">2.2</a>, <a href="sec-translatorDecln.html">2.3</a> and <a href="sec-rulesDecln.html">2.4</a> worked and your translator is recognised and called correctly by EMF2EMF. Once you have checked this and discovered how to write rules, you will need to return her to this extension to add more rules for different kinds of source elements that you want to translate (i.e. children of the first source_class that you translated). The translator will work irrespective of the order of the rule extensions, but it is more efficient if you can declare them in the order of dependencies. I.e. if rule B needs rule A to have fired before it can work, then declare the extension for rule A before rule B. These dependecies are discussed more in section <a href="sec-rulesWriting.html">2.6</a>. </p></div>
+
+
+
+<div class="navigation">
+<div class="online-navigation">
+<hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class="online-navigation"><a title="2.3 Declaring your translator" href="sec-translatorDecln.html" rel="prev"><img src="icons/previous.png" border="0" height="32" alt="Previous Page" width="32" /></a></td>
+<td class="online-navigation"><a title="2 Getting Started" href="sec-getting-started.html" rel="parent"><img src="icons/up.png" border="0" height="32" alt="Up One Level" width="32" /></a></td>
+<td class="online-navigation"><a title="Configuring your translator" href="sec-configure.html" rel="next"><img src="icons/next.png" border="0" height="32" alt="Next Page" width="32" /></a></td>
+<td align="center" width="100%">EMF2EMF Transformation Framework Developers Manual</td>
+<td class="online-navigation"><a href="index.html" rel="contents" title="Table of Contents"><img src="icons/contents.png" border="0" height="32" alt="Contents" width="32" /></a></td>
+<td class="online-navigation"><img src="icons/blank.png" border="0" height="32" alt="" width="32" /></td>
+<td class="online-navigation"><img src="icons/blank.png" border="0" height="32" width="32" /></td>
+</tr></table>
+<div class="online-navigation">
+<span><b class="navlabel">Previous:</b>
+<a href="sec-translatorDecln.html" class="sectref" rel="prev">Declaring your translator</a></span>
+<span><b class="navlabel">Up:</b>
+<a href="sec-getting-started.html" class="sectref" rel="parent">Getting Started</a></span>
+<span><b class="navlabel">Next:</b>
+<a href="sec-configure.html" class="sectref" rel="next">Configuring your translator</a></span>
+</div>
+</div>
+<hr />
+<!--
+<span class="release-info">Release 2.4.3, documentation updated on 29 March 2006.</span>
+-->
+</div>
+<!--End of Navigation Panel-->
+<!--
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+-->
+</body>
+</html>

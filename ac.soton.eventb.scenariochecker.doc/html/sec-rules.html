@@ -1,0 +1,89 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="stylesheet" href="style.css" type="text/css" />
+<link rel="shortcut icon" href="icons/pyfav.png" type="image/png" />
+<link href="index.html" title="EMF2EMF Transformation Framework Developers Manual" rel="start" />
+<link href="index.html" title="EMF2EMF Transformation Framework Developers Manual" rel="first" />
+<link href="index.html" rel="contents" title="Contents" />
+<link rel="index" title="Index" />
+<link href="sec-priorities.html" rel="next" />
+<link href="sec-descriptors.html" rel="prev" />
+<link href="sec-concepts.html" rel="parent" />
+<meta name="aesop" content="information" />
+<title>3.3 Rules</title>
+</head>
+<body>
+<div class="navigation">
+<div id="top-navigation-panel" xml:id="top-navigation-panel">
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class="online-navigation"><a title="3.2 Generation Descriptors" href="sec-descriptors.html" rel="prev"><img src="icons/previous.png" border="0" height="32" alt="Previous Page" width="32" /></a></td>
+<td class="online-navigation"><a title="3 Concepts" href="sec-concepts.html" rel="parent"><img src="icons/up.png" border="0" height="32" alt="Up One Level" width="32" /></a></td>
+<td class="online-navigation"><a title="Priorities" href="sec-priorities.html" rel="next"><img src="icons/next.png" border="0" height="32" alt="Next Page" width="32" /></a></td>
+<td align="center" width="100%">EMF2EMF Transformation Framework Developers Manual</td>
+<td class="online-navigation"><a href="index.html" rel="contents" title="Table of Contents"><img src="icons/contents.png" border="0" height="32" alt="Contents" width="32" /></a></td>
+<td class="online-navigation"><img src="icons/blank.png" border="0" height="32" alt="" width="32" /></td>
+<td class="online-navigation"><img src="icons/blank.png" border="0" height="32" width="32" /></td>
+</tr></table>
+<div class="online-navigation">
+<span><b class="navlabel">Previous:</b>
+<a href="sec-descriptors.html" class="sectref" rel="prev">Generation Descriptors</a></span>
+<span><b class="navlabel">Up:</b>
+<a href="sec-concepts.html" class="sectref" rel="parent">Concepts</a></span>
+<span><b class="navlabel">Next:</b>
+<a href="sec-priorities.html" class="sectref" rel="next">Priorities</a></span>
+</div>
+<hr /></div>
+</div>
+
+
+
+<div><h2 id="sec:rules">3.3 Rules</h2>
+<p>Rule classes must implement IRule. It is recommended the rule classes extend </p><pre>
+ ac.soton.eventb.emf.diagrams.generator#AbstractRule
+ </pre><p> which provides some concise constants for the commonly needed containments and defines some default behaviour (always enabled and dependencies ok). Note that the rule will only be attempted for the type of source element defined in the extension point. However, this could be defined as an abstract base class to allow the rule to operate on several types of element. </p><p>Where a tree structure is entirely generated within one rule firing (e.g. an event with guards and actions) it is more efficient to construct the entire event and return a single Generation Descriptor that adds that event. It is also possible to do this by returning separate Generation Descriptors to add the event and each guard and action individually. Using a single descriptor is more efficient but means that some features of the translator framework are bypassed. For example, the priority scheme cannot be used, your code will determine the order. </p><p>A typical line from a rule class might look like this: </p><pre>
+ ret.add(Make.descriptor(machine,invariants,
+			Make.invariant("myInvariantName", "myVar &gt;0","my comment")
+			,10));
+ </pre><p> where, ret is the list to be returned and machine is the parent element containing the invariants to be added to. </p><p>A rule has 4 methods: </p><ul class="itemize">
+<li><p>boolean enabled (final EventBElement sourceElement) </p></li><li><p>boolean dependenciesOK(EventBElement sourceElement,List&lt;GenerationDescriptor&gt; generatedElements) </p></li><li><p>boolean fireLate() </p></li><li><p>List&lt;GenerationDescriptor&gt; fire(EventBElement sourceElement, List&lt;GenerationDescriptor&gt; generatedElements) </p></li>
+</ul><p>The <b class="bfseries">enabled</b> method can be used to restrict when it applies. More than one rule can be defined for the same kind of element allowing the generation to be decomposed in a maintainable way. </p><p>The <b class="bfseries">DependenciesOK</b> method allows the method to be deferred since the success of rules may depend on what has already been generated. The dependenciesOK method is passed the list of GenerationDescriptors created so far. </p><p>The <b class="bfseries">fireLate</b> method forces the rule to be fired when all other rules have been fired. This is usually used when the rules behaviour depends on what other rules have done. </p><p>The <b class="bfseries">fire</b> method must return a list of GenerationDescriptors describing what should be generated. The Utility class, Make, provides a convenience method to help construct a GenerationDescriptor from the parent element, the containment feature, the new child and the priority indicator and if needed the editable setting. </p></div>
+
+
+
+<div class="navigation">
+<div class="online-navigation">
+<hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class="online-navigation"><a title="3.2 Generation Descriptors" href="sec-descriptors.html" rel="prev"><img src="icons/previous.png" border="0" height="32" alt="Previous Page" width="32" /></a></td>
+<td class="online-navigation"><a title="3 Concepts" href="sec-concepts.html" rel="parent"><img src="icons/up.png" border="0" height="32" alt="Up One Level" width="32" /></a></td>
+<td class="online-navigation"><a title="Priorities" href="sec-priorities.html" rel="next"><img src="icons/next.png" border="0" height="32" alt="Next Page" width="32" /></a></td>
+<td align="center" width="100%">EMF2EMF Transformation Framework Developers Manual</td>
+<td class="online-navigation"><a href="index.html" rel="contents" title="Table of Contents"><img src="icons/contents.png" border="0" height="32" alt="Contents" width="32" /></a></td>
+<td class="online-navigation"><img src="icons/blank.png" border="0" height="32" alt="" width="32" /></td>
+<td class="online-navigation"><img src="icons/blank.png" border="0" height="32" width="32" /></td>
+</tr></table>
+<div class="online-navigation">
+<span><b class="navlabel">Previous:</b>
+<a href="sec-descriptors.html" class="sectref" rel="prev">Generation Descriptors</a></span>
+<span><b class="navlabel">Up:</b>
+<a href="sec-concepts.html" class="sectref" rel="parent">Concepts</a></span>
+<span><b class="navlabel">Next:</b>
+<a href="sec-priorities.html" class="sectref" rel="next">Priorities</a></span>
+</div>
+</div>
+<hr />
+<!--
+<span class="release-info">Release 2.4.3, documentation updated on 29 March 2006.</span>
+-->
+</div>
+<!--End of Navigation Panel-->
+<!--
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+-->
+</body>
+</html>

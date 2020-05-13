@@ -1,0 +1,83 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="stylesheet" href="style.css" type="text/css" />
+<link rel="shortcut icon" href="icons/pyfav.png" type="image/png" />
+<link href="index.html" title="EMF2EMF Transformation Framework Developers Manual" rel="start" />
+<link href="index.html" title="EMF2EMF Transformation Framework Developers Manual" rel="first" />
+<link href="index.html" rel="contents" title="Contents" />
+<link rel="index" title="Index" />
+<link href="sec-rulesDecln.html" rel="next" />
+<link href="sec-ui.html" rel="prev" />
+<link href="sec-getting-started.html" rel="parent" />
+<meta name="aesop" content="information" />
+<title>2.3 Declaring your translator</title>
+</head>
+<body>
+<div class="navigation">
+<div id="top-navigation-panel" xml:id="top-navigation-panel">
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class="online-navigation"><a title="2.2 Setting up the UI to initiate your translator" href="sec-ui.html" rel="prev"><img src="icons/previous.png" border="0" height="32" alt="Previous Page" width="32" /></a></td>
+<td class="online-navigation"><a title="2 Getting Started" href="sec-getting-started.html" rel="parent"><img src="icons/up.png" border="0" height="32" alt="Up One Level" width="32" /></a></td>
+<td class="online-navigation"><a title="Declaring Rules" href="sec-rulesDecln.html" rel="next"><img src="icons/next.png" border="0" height="32" alt="Next Page" width="32" /></a></td>
+<td align="center" width="100%">EMF2EMF Transformation Framework Developers Manual</td>
+<td class="online-navigation"><a href="index.html" rel="contents" title="Table of Contents"><img src="icons/contents.png" border="0" height="32" alt="Contents" width="32" /></a></td>
+<td class="online-navigation"><img src="icons/blank.png" border="0" height="32" alt="" width="32" /></td>
+<td class="online-navigation"><img src="icons/blank.png" border="0" height="32" width="32" /></td>
+</tr></table>
+<div class="online-navigation">
+<span><b class="navlabel">Previous:</b>
+<a href="sec-ui.html" class="sectref" rel="prev">Setting up the UI to initiate your translator</a></span>
+<span><b class="navlabel">Up:</b>
+<a href="sec-getting-started.html" class="sectref" rel="parent">Getting Started</a></span>
+<span><b class="navlabel">Next:</b>
+<a href="sec-rulesDecln.html" class="sectref" rel="next">Declaring Rules</a></span>
+</div>
+<hr /></div>
+</div>
+
+
+
+<div><h2 id="sec:translatorDecln">2.3 Declaring your translator</h2>
+<p>You now need to declare your translator to EMF2EMF so that it knows about your translation and what kind of EMF models it handles. This is also done using extensions in your <tt class="ttfamily">plugin.xml</tt> file. (If you want to look at the definitions of these extension points they are defined in the EMF2EMF plugin, <tt class="ttfamily">ac.soton.emf.translator</tt>). We first declare the translator and link it to the command that you defined in section <a href="sec-ui.html">2.2</a>, then we define a set of rules (ruleset) for the translator. The reason for defining the ruleset separately is so that several rulesets can be defined for the same translator. For example, other developers may want to extend your translator with new translation rules. </p><p>Open the <tt class="ttfamily">plugin.xml</tt> file of your plug-in and add an extension for <tt class="ttfamily">ac.soton.emf.translators</tt>. Then via its context menu add a new <tt class="ttfamily">translator</tt>. Fill in the extension point element details as follows. </p><ul class="itemize">
+<li><p><b class="bfseries">translator_id:</b> this must be a unique identifier for the translator. e.g. we would use something like <tt class="ttfamily">ac.soton.&lt;pluginName&gt;.translator</tt> </p></li><li><p><b class="bfseries">source_package:</b> this is the nsURI identifier of the source EMF meta-model (ecore). It is used to find the meta-model for your source model that you want to translate. (The nsURI is a property defined in the ecore file). </p></li><li><p><b class="bfseries">root_source_class:</b> this is the name of a meta-class in the ecore meta-model defined by source_package. It is the root (top) level of your source model. Everything that your translator translates must be contained within a tree structure starting from an element of this class. Elements of this class must be contained by the resource (File) when you save your model. Your translator will not start unless you invoke it with one of these selected in the UI. </p></li><li><p><b class="bfseries">name:</b> this is just a readable name used for your translator in the extensions (not very important but helps you maintain these extensions). </p></li><li><p><b class="bfseries">commandId:</b> this must be the identifier of the command that you added at the start of section <a href="sec-ui.html">2.2</a>. </p></li><li><p><b class="bfseries">adapter_class:</b> this class, which must implement<br /><tt class="ttfamily">ac.soton.emf.translator.configuration.IAdapter</tt>, provides some methods which configure the translator to your needs. It deals with variations in behaviour which are difficult to configure declaratively. A default adapter which does very little is provided by EMF2EMF. To use this default set <tt class="ttfamily">adapter_class</tt> to<br /><tt class="ttfamily">ac.soton.emf.translator.configuration.DefaultAdapter</tt>. If you need to configure the behaviour, clicking on the field name <tt class="ttfamily">adapter_class</tt> will start a wizard to create a new class that implements <tt class="ttfamily">IAdapter</tt>. We recommend setting Superclass to the <tt class="ttfamily">DefaultAdapter</tt> so that you only have to deal with the methods you need to change. More details on configuring the adapter class are given in section <a href="sec-adapter.html">3.1</a>. </p></li>
+</ul></div>
+
+
+
+<div class="navigation">
+<div class="online-navigation">
+<hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class="online-navigation"><a title="2.2 Setting up the UI to initiate your translator" href="sec-ui.html" rel="prev"><img src="icons/previous.png" border="0" height="32" alt="Previous Page" width="32" /></a></td>
+<td class="online-navigation"><a title="2 Getting Started" href="sec-getting-started.html" rel="parent"><img src="icons/up.png" border="0" height="32" alt="Up One Level" width="32" /></a></td>
+<td class="online-navigation"><a title="Declaring Rules" href="sec-rulesDecln.html" rel="next"><img src="icons/next.png" border="0" height="32" alt="Next Page" width="32" /></a></td>
+<td align="center" width="100%">EMF2EMF Transformation Framework Developers Manual</td>
+<td class="online-navigation"><a href="index.html" rel="contents" title="Table of Contents"><img src="icons/contents.png" border="0" height="32" alt="Contents" width="32" /></a></td>
+<td class="online-navigation"><img src="icons/blank.png" border="0" height="32" alt="" width="32" /></td>
+<td class="online-navigation"><img src="icons/blank.png" border="0" height="32" width="32" /></td>
+</tr></table>
+<div class="online-navigation">
+<span><b class="navlabel">Previous:</b>
+<a href="sec-ui.html" class="sectref" rel="prev">Setting up the UI to initiate your translator</a></span>
+<span><b class="navlabel">Up:</b>
+<a href="sec-getting-started.html" class="sectref" rel="parent">Getting Started</a></span>
+<span><b class="navlabel">Next:</b>
+<a href="sec-rulesDecln.html" class="sectref" rel="next">Declaring Rules</a></span>
+</div>
+</div>
+<hr />
+<!--
+<span class="release-info">Release 2.4.3, documentation updated on 29 March 2006.</span>
+-->
+</div>
+<!--End of Navigation Panel-->
+<!--
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+-->
+</body>
+</html>
