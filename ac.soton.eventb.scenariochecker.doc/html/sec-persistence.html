@@ -7,20 +7,20 @@
 <link href="index.html" title="Scenario Checker User Manual" rel="first" />
 <link href="index.html" rel="contents" title="Contents" />
 <link rel="index" title="Index" />
-<link href="sec-perspectives.html" rel="next" />
-<link href="sec-getting-started.html" rel="prev" />
+<link href="sec-concepts.html" rel="next" />
+<link href="sect0001.html" rel="prev" />
 <link href="sec-getting-started.html" rel="parent" />
 <meta name="aesop" content="information" />
-<title>2.1 Setup</title>
+<title>2.5 Persistence</title>
 </head>
 <body>
 <div class="navigation">
 <div id="top-navigation-panel" xml:id="top-navigation-panel">
 <table align="center" width="100%" cellpadding="0" cellspacing="2">
 <tr>
-<td class="online-navigation"><a title="2 Getting Started" href="sec-getting-started.html" rel="prev"><img src="icons/previous.png" border="0" height="32" alt="Previous Page" width="32" /></a></td>
+<td class="online-navigation"><a title="2.4 Setup" href="sect0001.html" rel="prev"><img src="icons/previous.png" border="0" height="32" alt="Previous Page" width="32" /></a></td>
 <td class="online-navigation"><a title="2 Getting Started" href="sec-getting-started.html" rel="parent"><img src="icons/up.png" border="0" height="32" alt="Up One Level" width="32" /></a></td>
-<td class="online-navigation"><a title="Perspectives" href="sec-perspectives.html" rel="next"><img src="icons/next.png" border="0" height="32" alt="Next Page" width="32" /></a></td>
+<td class="online-navigation"><a title="Concepts" href="sec-concepts.html" rel="next"><img src="icons/next.png" border="0" height="32" alt="Next Page" width="32" /></a></td>
 <td align="center" width="100%">Scenario Checker User Manual</td>
 <td class="online-navigation"><a href="index.html" rel="contents" title="Table of Contents"><img src="icons/contents.png" border="0" height="32" alt="Contents" width="32" /></a></td>
 <td class="online-navigation"><img src="icons/blank.png" border="0" height="32" alt="" width="32" /></td>
@@ -28,21 +28,19 @@
 </tr></table>
 <div class="online-navigation">
 <span><b class="navlabel">Previous:</b>
-<a href="sec-getting-started.html" class="sectref" rel="prev">Getting Started</a></span>
+<a href="sect0001.html" class="sectref" rel="prev">Setup</a></span>
 <span><b class="navlabel">Up:</b>
 <a href="sec-getting-started.html" class="sectref" rel="parent">Getting Started</a></span>
 <span><b class="navlabel">Next:</b>
-<a href="sec-perspectives.html" class="sectref" rel="next">Perspectives</a></span>
+<a href="sec-concepts.html" class="sectref" rel="next">Concepts</a></span>
 </div>
 <hr /></div>
 </div>
 
 
 
-<div><h2 id="sec:setup">2.1 Setup</h2>
-<p>The Scenario Checker is installed into Rodin from the plugin update site in the normal way. It is located under the Utilities category. </p><p>The Scenario Checker depends on (and will install elements from) </p><ul class="itemize">
-<li> <p>ProB - de.prob </p><p>ProB Support - ac.soton.eventb.probsupport </p><p>Event-B EMF framework - org.eventb.emf </p> </li><li><em>At the time of writing, the Scenario Checker is only available as a prototype on the soton prototypes update site.</em> </li>
-</ul></div>
+<div><h2 id="sec:persistence">2.5 Persistence</h2>
+<p>Scenarios are persisted in the Oracle format. This is an XML based format consisting of two types of elements which are expected to alternate. Steps consist of the event signature that fired as part of the scenario Snapshot records the state of changed variables and constants after the preceding steps. The first step is always the ProB setup and this is followed by the first snapshot giving the values of sets and constants. The second step is the initialisation followed by the snapshot giving the initial value of all variables. After this the steps and snapshots depend on the scenario. The oracle format is defined and generated from an EMF meta-model and hence is the default EMF XMI format for that meta-model. Scenarios can be read and edited using an EMF editor such as Rose. </p></div>
 
 
 
@@ -51,9 +49,9 @@
 <hr />
 <table align="center" width="100%" cellpadding="0" cellspacing="2">
 <tr>
-<td class="online-navigation"><a title="2 Getting Started" href="sec-getting-started.html" rel="prev"><img src="icons/previous.png" border="0" height="32" alt="Previous Page" width="32" /></a></td>
+<td class="online-navigation"><a title="2.4 Setup" href="sect0001.html" rel="prev"><img src="icons/previous.png" border="0" height="32" alt="Previous Page" width="32" /></a></td>
 <td class="online-navigation"><a title="2 Getting Started" href="sec-getting-started.html" rel="parent"><img src="icons/up.png" border="0" height="32" alt="Up One Level" width="32" /></a></td>
-<td class="online-navigation"><a title="Perspectives" href="sec-perspectives.html" rel="next"><img src="icons/next.png" border="0" height="32" alt="Next Page" width="32" /></a></td>
+<td class="online-navigation"><a title="Concepts" href="sec-concepts.html" rel="next"><img src="icons/next.png" border="0" height="32" alt="Next Page" width="32" /></a></td>
 <td align="center" width="100%">Scenario Checker User Manual</td>
 <td class="online-navigation"><a href="index.html" rel="contents" title="Table of Contents"><img src="icons/contents.png" border="0" height="32" alt="Contents" width="32" /></a></td>
 <td class="online-navigation"><img src="icons/blank.png" border="0" height="32" alt="" width="32" /></td>
@@ -61,11 +59,11 @@
 </tr></table>
 <div class="online-navigation">
 <span><b class="navlabel">Previous:</b>
-<a href="sec-getting-started.html" class="sectref" rel="prev">Getting Started</a></span>
+<a href="sect0001.html" class="sectref" rel="prev">Setup</a></span>
 <span><b class="navlabel">Up:</b>
 <a href="sec-getting-started.html" class="sectref" rel="parent">Getting Started</a></span>
 <span><b class="navlabel">Next:</b>
-<a href="sec-perspectives.html" class="sectref" rel="next">Perspectives</a></span>
+<a href="sec-concepts.html" class="sectref" rel="next">Concepts</a></span>
 </div>
 </div>
 <hr />

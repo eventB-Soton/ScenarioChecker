@@ -1,9 +1,11 @@
 <?xml version='1.0' encoding='ISO-8859-1' ?>
+<!DOCTYPE helpset PUBLIC "-//Sun Microsystems Inc.//DTD JavaHelp HelpSet Version 2.0//EN"
+"http://java.sun.com/products/javahelp/helpset_2_0.dtd">
 <helpset version="2.0">
-<title>EMF2EMF Transformation Framework Developers Manual</title>
+<title>Scenario Checker User Manual</title>
 <maps>
-<homeID>main_contents</homeID>
-<mapref location="javahelp2.jhm" />
+<homeid>main_contents</homeid>
+<mapref location="javahelp2.jhm"></mapref>
 </maps>
 <view>
 <name>TOC</name>

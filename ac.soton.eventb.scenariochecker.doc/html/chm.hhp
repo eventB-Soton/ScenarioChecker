@@ -9,32 +9,28 @@ Error log file=help.log
 Full-text search=Yes
 Index file=chm.hhk
 Language=0x0 
-Title=EMF2EMF Transformation Framework Developers Manual
+Title=Scenario Checker User Manual
 
 [WINDOWS]
-Help="EMF2EMF Transformation Framework Developers Manual","chm.hhc","chm.hhk","index.html","index.html",,,,,0x73520,,0x383e,[200,200,1000,800],,,,,,,0
+Help="Scenario Checker User Manual","chm.hhc","chm.hhk","index.html","index.html",,,,,0x73520,,0x383e,[200,200,1000,800],,,,,,,0
 
 [FILES]
 sec-overview.html
-sec-editable.html
-sec-adapter.html
 index.html
-sec-configure.html
-sec-descriptors.html
-sec-release-notes.html
-sec-priorities.html
-sec-concepts.html
-sec-legal.html
-sec-rulesWriting.html
-sec-ui.html
-sec-tasks.html
+sec-persistence.html
+sect0001.html
 sec-setup.html
+sec-starting.html
+sec-playback.html
 sec-reference.html
-sec-rulesDecln.html
-sec-translatorDecln.html
-sec-user-agreement.html
+sec-concepts.html
+sec-recording.html
 sec-getting-started.html
-sec-rules.html
+sec-tasks.html
+sec-user-agreement.html
+sec-perspectives.html
+sec-legal.html
+sec-release-notes.html
 
 
 [MERGE FILES]

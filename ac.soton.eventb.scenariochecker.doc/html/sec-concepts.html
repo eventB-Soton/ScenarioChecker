@@ -3,12 +3,12 @@
 <head>
 <link rel="stylesheet" href="style.css" type="text/css" />
 <link rel="shortcut icon" href="icons/pyfav.png" type="image/png" />
-<link href="index.html" title="EMF2EMF Transformation Framework Developers Manual" rel="start" />
-<link href="index.html" title="EMF2EMF Transformation Framework Developers Manual" rel="first" />
+<link href="index.html" title="Scenario Checker User Manual" rel="start" />
+<link href="index.html" title="Scenario Checker User Manual" rel="first" />
 <link href="index.html" rel="contents" title="Contents" />
 <link rel="index" title="Index" />
-<link href="sec-adapter.html" rel="next" />
-<link href="sec-release-notes.html" rel="prev" />
+<link href="sec-tasks.html" rel="next" />
+<link href="sec-persistence.html" rel="prev" />
 <link href="index.html" rel="parent" />
 <meta name="aesop" content="information" />
 <title>3 Concepts</title>
@@ -18,47 +18,33 @@
 <div id="top-navigation-panel" xml:id="top-navigation-panel">
 <table align="center" width="100%" cellpadding="0" cellspacing="2">
 <tr>
-<td class="online-navigation"><a title="2.7 Release Notes" href="sec-release-notes.html" rel="prev"><img src="icons/previous.png" border="0" height="32" alt="Previous Page" width="32" /></a></td>
-<td class="online-navigation"><a title="EMF2EMF Transformation Framework Developers Manual" href="index.html" rel="parent"><img src="icons/up.png" border="0" height="32" alt="Up One Level" width="32" /></a></td>
-<td class="online-navigation"><a title="Adapter" href="sec-adapter.html" rel="next"><img src="icons/next.png" border="0" height="32" alt="Next Page" width="32" /></a></td>
-<td align="center" width="100%">EMF2EMF Transformation Framework Developers Manual</td>
+<td class="online-navigation"><a title="2.5 Persistence" href="sec-persistence.html" rel="prev"><img src="icons/previous.png" border="0" height="32" alt="Previous Page" width="32" /></a></td>
+<td class="online-navigation"><a title="Scenario Checker User Manual" href="index.html" rel="parent"><img src="icons/up.png" border="0" height="32" alt="Up One Level" width="32" /></a></td>
+<td class="online-navigation"><a title="Tasks" href="sec-tasks.html" rel="next"><img src="icons/next.png" border="0" height="32" alt="Next Page" width="32" /></a></td>
+<td align="center" width="100%">Scenario Checker User Manual</td>
 <td class="online-navigation"><a href="index.html" rel="contents" title="Table of Contents"><img src="icons/contents.png" border="0" height="32" alt="Contents" width="32" /></a></td>
 <td class="online-navigation"><img src="icons/blank.png" border="0" height="32" alt="" width="32" /></td>
 <td class="online-navigation"><img src="icons/blank.png" border="0" height="32" width="32" /></td>
 </tr></table>
 <div class="online-navigation">
 <span><b class="navlabel">Previous:</b>
-<a href="sec-release-notes.html" class="sectref" rel="prev">Release Notes</a></span>
+<a href="sec-persistence.html" class="sectref" rel="prev">Persistence</a></span>
 <span><b class="navlabel">Up:</b>
-<a href="index.html" class="sectref" rel="parent">EMF2EMF Transformation Framework Developers Manual</a></span>
+<a href="index.html" class="sectref" rel="parent">Scenario Checker User Manual</a></span>
 <span><b class="navlabel">Next:</b>
-<a href="sec-adapter.html" class="sectref" rel="next">Adapter</a></span>
+<a href="sec-tasks.html" class="sectref" rel="next">Tasks</a></span>
 </div>
 <hr /></div>
 </div>
 
-<div class="contents section-contents"><strong>Subsections</strong>
-<ul>
-<li><a href="sec-adapter.html">3.1 Adapter</a>
-   
-</li><li><a href="sec-descriptors.html">3.2 Generation Descriptors</a>
-   
-</li><li><a href="sec-rules.html">3.3 Rules</a>
-   
-</li><li><a href="sec-priorities.html">3.4 Priorities</a>
-   
-</li><li><a href="sec-editable.html">3.5 Editable</a>
-   
-</li>
 
-
-
-</ul>
-<hr />
-</div>
 
 <div><h1 id="sec:concepts">3 Concepts</h1>
-<p>The Generator framework provides: </p><p>* A toolbar button to initiate the generation * Generic code to remove previously generated elements * Generic code to organise the incorporation of newly generated elements * Utilities to aid the creation of new elements * An abstract basis for client defined rules * An extension point for clients to declare generators and generation rules </p><p>The client rules return generation descriptors (rather than modifying the target model directly). The framework takes care of updating the model (within the clients Transactional Editing Domain) provided the generation completes successfully. This ensures that the model is not left in an inconsistent state should the generation fail. The generation descriptors allow the client to specify where the new element should be contained and a priority which will be used to influence the placement of the new element within the containment ordering. </p><p>To define a particular generator a client should: </p><p>* Define an extension of org.eclipse.ui.handlers to enable the generate command when the activePartID is their Editor (see [[Defining a generator handler]]) * Define an extension of ac.soton.eventb.emf.diagrams.generator.rule to make the generator framework aware of your generator and its rule classes. * Implement your rule classes </p></div>
+<p>The Scenario Checker is based on the following concepts: </p><ul class="itemize">
+<li><p>A model represents a closed system involving a controller and the sensed and controlled environment. </p></li><li><p>A scenario consists of a sequence of external events that occur in the sensed environment. </p></li><li><p>After each external event, a resulting state is expected. </p></li><li><p>The model of the controller may include internal events which are not specified in the scenario. Events in the model may be designated as internal by adding a generic boolean attribute, Internal=true, or inserting &lt;INTERNAL&gt; in the comment property. </p></li><li><p>The model of the controller may include private variables which are not specified in the scenario. Variables in the model may be designated as private by adding a generic boolean attribute, Private=true, or inserting &lt;PRIVATE&gt; in the comment property. </p></li><li><p>Events may be given a priority to add control of ordering of events when this is not specified by the model. Event priority is given by adding a generic integer attribute, Priority=n, or inserting &lt;PRIORITY=n&gt; in the comment property, where n is a natural number. (Low priority numbers are executed first). Note that prioritising events results in validating a particular refinement of the actual model. </p></li>
+</ul><p>The Scenario Checker provides: </p><ul class="itemize">
+<li><p>A Control Panel to control the execution of external events, recording and playback of scenarios, and to view the enabled external events. </p></li><li><p>A State View to monitor the value of variables and to indicate differences from the expected values. </p></li>
+</ul></div>
 
 
 
@@ -67,21 +53,21 @@
 <hr />
 <table align="center" width="100%" cellpadding="0" cellspacing="2">
 <tr>
-<td class="online-navigation"><a title="2.7 Release Notes" href="sec-release-notes.html" rel="prev"><img src="icons/previous.png" border="0" height="32" alt="Previous Page" width="32" /></a></td>
-<td class="online-navigation"><a title="EMF2EMF Transformation Framework Developers Manual" href="index.html" rel="parent"><img src="icons/up.png" border="0" height="32" alt="Up One Level" width="32" /></a></td>
-<td class="online-navigation"><a title="Adapter" href="sec-adapter.html" rel="next"><img src="icons/next.png" border="0" height="32" alt="Next Page" width="32" /></a></td>
-<td align="center" width="100%">EMF2EMF Transformation Framework Developers Manual</td>
+<td class="online-navigation"><a title="2.5 Persistence" href="sec-persistence.html" rel="prev"><img src="icons/previous.png" border="0" height="32" alt="Previous Page" width="32" /></a></td>
+<td class="online-navigation"><a title="Scenario Checker User Manual" href="index.html" rel="parent"><img src="icons/up.png" border="0" height="32" alt="Up One Level" width="32" /></a></td>
+<td class="online-navigation"><a title="Tasks" href="sec-tasks.html" rel="next"><img src="icons/next.png" border="0" height="32" alt="Next Page" width="32" /></a></td>
+<td align="center" width="100%">Scenario Checker User Manual</td>
 <td class="online-navigation"><a href="index.html" rel="contents" title="Table of Contents"><img src="icons/contents.png" border="0" height="32" alt="Contents" width="32" /></a></td>
 <td class="online-navigation"><img src="icons/blank.png" border="0" height="32" alt="" width="32" /></td>
 <td class="online-navigation"><img src="icons/blank.png" border="0" height="32" width="32" /></td>
 </tr></table>
 <div class="online-navigation">
 <span><b class="navlabel">Previous:</b>
-<a href="sec-release-notes.html" class="sectref" rel="prev">Release Notes</a></span>
+<a href="sec-persistence.html" class="sectref" rel="prev">Persistence</a></span>
 <span><b class="navlabel">Up:</b>
-<a href="index.html" class="sectref" rel="parent">EMF2EMF Transformation Framework Developers Manual</a></span>
+<a href="index.html" class="sectref" rel="parent">Scenario Checker User Manual</a></span>
 <span><b class="navlabel">Next:</b>
-<a href="sec-adapter.html" class="sectref" rel="next">Adapter</a></span>
+<a href="sec-tasks.html" class="sectref" rel="next">Tasks</a></span>
 </div>
 </div>
 <hr />
