@@ -12,4 +12,4 @@ The following tools are used to build the documentations
 - sh
 - sed
 
-To build, run *gradle* in the **latex** folder.
+To build, run *gradle build* in the **latex** folder.

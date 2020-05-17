@@ -9,11 +9,11 @@ The Scenario Checker is based on the following concepts:
 		\item A scenario consists of a sequence of external events that occur in the sensed environment. 
 		\item After each external event, a resulting state is expected.
 		\item The model of the controller may include internal events which are not specified in the scenario. 
-		Events in the model may be designated as internal by adding a generic boolean attribute, Internal=true, or inserting <INTERNAL> in the comment property.
+		Events in the model may be designated as internal by adding a generic boolean attribute, \texttt{Internal=true}, or inserting \texttt{<INTERNAL>} in the comment property.
 		\item The model of the controller may include private variables which are not specified in the scenario.
-		Variables in the model may be designated as private by adding a generic boolean attribute, Private=true, or inserting <PRIVATE> in the comment property.
+		Variables in the model may be designated as private by adding a generic boolean attribute, \texttt{Private=true}, or inserting \texttt{<PRIVATE>} in the comment property.
 		\item Events may be given a priority to add control of ordering of events when this is not specified by the model. 
-		Event priority is given by adding a generic integer attribute, Priority=n, or inserting <PRIORITY=n> in the comment property, where n is a natural number.
+		Event priority is given by adding a generic integer attribute, \texttt{Priority=n}, or inserting \texttt{<PRIORITY=n>} in the comment property, where n is a natural number.
 		(Low priority numbers are executed first).
 		Note that prioritising events results in validating a particular refinement of the actual model.
 \end{itemize}

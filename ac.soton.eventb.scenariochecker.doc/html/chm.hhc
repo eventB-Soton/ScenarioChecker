@@ -47,8 +47,8 @@
          
          
          <li><object type="text/sitemap">
-             <param name="Name" value="Perspectives">
-             <param name="Local" value="sec-perspectives.html">
+             <param name="Name" value="Perspective">
+             <param name="Local" value="sec-perspective.html">
              <param name="ImageNumber" value="11">
          </object></li>
          

@@ -17,20 +17,20 @@ Help="Scenario Checker User Manual","chm.hhc","chm.hhk","index.html","index.html
 [FILES]
 sec-overview.html
 index.html
-sec-persistence.html
-sect0001.html
 sec-setup.html
-sec-starting.html
-sec-playback.html
-sec-reference.html
+sect0001.html
 sec-concepts.html
+sec-legal.html
+sec-starting.html
+sec-release-notes.html
+sec-persistence.html
 sec-recording.html
 sec-getting-started.html
+sec-reference.html
 sec-tasks.html
+sec-perspective.html
 sec-user-agreement.html
-sec-perspectives.html
-sec-legal.html
-sec-release-notes.html
+sec-playback.html
 
 
 [MERGE FILES]

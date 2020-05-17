@@ -3,14 +3,15 @@
 
 The Scenario Checker is a tool to help develop useful Event-B models.
 The Scenario Checker focusses on a behaviour-driven approach to validate model behaviour.
-It is assumed that the Rodin automatic provers will be used to verify models.
-
-The Scenario Checker allows scenarios to be animated and recorded while visualising state and event enabledness.
-They can then be re-played after the model is modified to check for changes.
-Events may be designated as internal (e.g. part of a controllers response to external stimuli) so that they are run automatically until completion (i.e. no more internal events are enabled). 
-Private variables of the controller are ignored during playback.
-Events may also be prioritised to resolve non-deterministic choices remaining in the model.
+The Scenario Checker does not verify that models are consistent: Rodin automatic provers should be used to verify models.
 The Scenario Checker uses the ProB animator to execute the model.
+
+The Scenario Checker allows scenarios to be animated and recorded while visualising the state of variables and enabledness of events in the model.
+When the model has been modified, scenarios can then be re-played to check for changes.
+
+It is assumed that part of the model represents a controller and other parts represent the controlled devices in the environment.
+Events designated as internal steps of the controller are run automatically until completion (i.e. until no more internal events are enabled) and private variables of the controller are ignored.
+Events may also be prioritised to resolve non-deterministic choices remaining in the model.
 
 \subsection{Release Notes}
 \label{sec:release-notes}
@@ -23,8 +24,8 @@ The Scenario Checker uses the ProB animator to execute the model.
 \label{sec:known-issues}
 
 \begin{itemize}
-	\item `Run for..' button does not work in playback mode
-	\item `Small step' button does not work in playback mode - possibly should be disabled
+	\item \textbf{Run for..} button does not work in playback mode
+	\item \textbf{Small step} button does not work in playback mode - possibly should be disabled
 \end{itemize}
 
 

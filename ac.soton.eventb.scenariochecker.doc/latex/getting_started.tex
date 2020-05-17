@@ -16,38 +16,62 @@ The Scenario Checker depends on (and will install elements from)
 
 \emph{At the time of writing, the Scenario Checker is only available as a prototype on the soton prototypes update site.}
 
-\subsection{Perspectives}
-\label{sec:perspectives}
+\subsection{Perspective}
+\label{sec:perspective}
 
-The Scenario Checker defines a perspective which includes the Scenario Checker Control and Scenario Checker State views as well as the ProB history view which is useful to see the executed scenario (including internal events). 
-The ProB state view is also open (stacked behind Scenario Checker State) in case a more detailed view of state is needed.
+The Scenario Checker defines a perspective (see Fig. \ref{fig:perspective}) which includes the Scenario Checker Control Panel view and the Scenario Checker State view.
+The perspective also includes the ProB History view which is used to see the executed scenario (including internal events). 
+The ProB State view is also included (stacked behind Scenario Checker State) in case a more detailed view of state is needed.
+
+\begin{figure}[!htbp]
+	\centering
+	\ifplastex
+	\includegraphics[width=900]{figures/perspective}
+	\else
+	\includegraphics[width=0.9\textwidth]{figures/perspective}
+	\fi
+	\caption{Scenario Checker Perspective}
+	\label{fig:perspective}
+\end{figure}
 
 The Scenario Checker views are also contributed to the BMotion Studio Run perspective and are available as short cuts on the Event-B perspective.
 
 \subsection{Starting}
 \label{sec:starting}
 
-The Scenario Checker is started using the context menu of a machine as shown in Fig.~\ref{fig:starting}.
+The Scenario Checker is started using the context menu of a machine as shown in Fig. \ref{fig:starting1}.
 I.e. by right clicking on a machine in the Event-B navigator and selecting the \textbf{Scenario Checker} menu item.
-An alternative is to ensure that at least one of the scenario views is opened (e.g. by selecting the Scenario Checker perspective) and then using the start toolbar button of the ProB support plug-in. 
-(This is the green running man shown circled in red in \ref{fig:starting}).
-In both cases, the ProB support plug-in will be used to launch the scenario checker as well as any other participating animation plugins that are opened representing the same machine.
-For example, in Fig.~\ref{fig:starting}, the BMotion Studio visualisation and state-machine will also start animating if they are linked to the machine that is being started for the Scenario Checker.
-
-The Scenario Checker should be stopped by selecting the machine again and using the red standing man toolbar button.
-If another machine is started via the ProB support plugin, any current animation will first be stopped.
-
 
 \begin{figure}[!htbp]
-  \centering
-  \ifplastex
-  \includegraphics[width=512]{figures/starting}
-  \else
-  \includegraphics[width=0.9\textwidth]{figures/starting}
-  \fi
-  \caption{Starting the Scenario Checker}
-  \label{fig:starting}
+	\centering
+	\ifplastex
+	\includegraphics[width=700]{figures/starting1}
+	\else
+	\includegraphics[width=0.75\textwidth]{figures/starting1}
+	\fi
+	\caption{Starting the Scenario Checker from the context menu}
+	\label{fig:starting1}
 \end{figure}
+
+An alternative way to start the Scenario Checker is to ensure that at least one of the scenario views is opened (e.g. by selecting the Scenario Checker perspective) and then using the toolbar button of the ProB support plug-in (the green running man shown circled in red in \ref{fig:starting2}).
+
+\begin{figure}[!htbp]
+	\centering
+	\ifplastex
+	\includegraphics[width=400]{figures/starting2}
+	\else
+	\includegraphics[width=0.4\textwidth]{figures/starting2}
+	\fi
+	\caption{Starting/Stopping the Scenario Checker using the toolbar icons}
+	\label{fig:starting2}
+\end{figure}
+
+In either case, the ProB support plug-in will be used to simultaneously launch the scenario checker and any other participating animation plugins that are open for  the same machine.
+For example, a BMotion Studio visualisation and/or a UML-B state-machine could be used to visualise the state of the model to assist validation.
+
+The Scenario Checker should be stopped by selecting the machine again and using the red standing man toolbar button.
+
+Warning: If another animation is started using the ProB support plugin, any current animation will be aborted.
 
 \subsection{Setup}
 \label{sec:setup}
@@ -61,11 +85,11 @@ This can be done by adding an animation context that is seen by the machine to b
 \label{sec:persistence}
 
 Scenarios are persisted in the Oracle format.
-This is an XML based format consisting of two types of elements which are expected to alternate.
-Steps consist of the event signature that fired as part of the scenario
-Snapshot records the state of changed variables and constants after the preceding steps.
-The first step is always the ProB setup and this is followed by the first snapshot giving the values of sets and constants.
-The second step is the initialisation followed by the snapshot giving the initial value of all variables.
+This is an XML based format consisting of two types of elements (Steps and Snapshots) which are expected to alternate.
+A \textbf{Step} records the event signature that fired as part of the scenario.
+A \textbf{Snapshot} records the state of any variables and constants that changed value as a result of the preceding step.
+The first step is always the ProB \texttt{SETUP} operation and this is followed by the first snapshot giving the values of sets and constants.
+The second step is the \texttt{INITIALISATION} followed by the snapshot giving the initial value of all variables.
 After this the steps and snapshots depend on the scenario.
 The oracle format is defined and generated from an EMF meta-model and hence is the default EMF XMI format for that meta-model.
 Scenarios can be read and edited using an EMF editor such as Rose.
