@@ -271,7 +271,7 @@ public class ScenarioCheckerControlPanelView extends AbstractScenarioCheckerView
 					bigStepButton.setEnabled(true);
 					saveButton.setEnabled(true);
 					severalStepsButton.setEnabled(true);
-					stopButton.setEnabled(true);
+					stopButton.setEnabled(false);	//start in recording mode - stop is disabled
 					replayButton.setEnabled(true);
 					restartButton.setEnabled(true);
 					smallStepButton.setEnabled(true);
@@ -336,10 +336,14 @@ public class ScenarioCheckerControlPanelView extends AbstractScenarioCheckerView
 						modeIndicator.setText("Recording");
 						modeIndicator.setBackground(red);
 						modeIndicator.setForeground(red);
+						replayButton.setEnabled(true);
+						stopButton.setEnabled(false);
 					}else if (mode == Mode.PLAYBACK) {
 						modeIndicator.setText("Playback");
 						modeIndicator.setBackground(blue);
 						modeIndicator.setForeground(blue);
+						replayButton.setEnabled(false);
+						stopButton.setEnabled(true);
 					}
 		    	}
 		    }
