@@ -290,6 +290,23 @@ public class ScenarioCheckerManager  {
 	}
 	
 	/**
+	 *
+	 * if playing back, stops and switches to recording mode
+	 * 		(without restarting - so a new scenario can continue from the played back one)
+	 * if recording, starts playing back a scenario selected by the user
+	 */
+	public void modeButtonPressed() {
+		if (isPlayback()){
+			playback=null;
+		}else {// if recording, switch to playback
+			playback = new Playback(OracleHandler.getOracle().getRun().getEntries());
+			AnimationManager.restartAnimation(mchRoot);
+		}
+		updateModeIndicator();
+	}
+	
+	
+	/**
 	 * checks whether the scenario is dirty
 	 * (i.e. a scenario has been manually played beyond initialisation, but not yet saved)
 	 * @return

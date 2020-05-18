@@ -40,7 +40,7 @@ public class ScenarioCheckerControlPanelView extends AbstractScenarioCheckerView
 	
 	public static final String ID = "ac.soton.eventb.internal.scenariochecker.views.ScenarioCheckerControlPanelView"; //$NON-NLS-1$
 	
-	private Button modeIndicator; //not really a button.. used to display the record/playback mode
+	private Button modeIndicator; 
 	
 	private Button bigStepButton;
 	private Button smallStepButton;
@@ -73,6 +73,16 @@ public class ScenarioCheckerControlPanelView extends AbstractScenarioCheckerView
 			{	//INDICATOR - not a button
 				modeIndicator = new Button(buttonGroup, SWT.NONE);
 				modeIndicator.setBounds(10, 10, 110, 25);
+				modeIndicator.addMouseListener(new MouseAdapter() {
+					@Override
+					public void mouseUp(MouseEvent e) {
+						if (!ScenarioCheckerManager.getDefault().isDirty() ||
+								SWT.OK == messageUser("Question", "Do you really want to discard this scenario?", SWT.ICON_QUESTION | SWT.OK | SWT.CANCEL)) {
+							ScenarioCheckerManager.getDefault().modeButtonPressed();
+						}
+
+					}
+				});
 				toolkit.adapt(modeIndicator, true, true);
 				updateModeIndicator(Mode.RECORDING);	//start off in recording mode
 			}
