@@ -12,6 +12,9 @@
 package ac.soton.eventb.internal.scenariochecker;
 
 import org.eventb.core.IMachineRoot;
+import org.eventb.emf.core.Attribute;
+import org.eventb.emf.core.AttributeType;
+import org.eventb.emf.core.EventBElement;
 import org.eventb.emf.core.machine.Event;
 import org.eventb.emf.core.machine.Machine;
 
@@ -56,8 +59,10 @@ public class Utils {
 	 */
 	public static boolean isInternal(Event ev) {
 		String comment = ev.getComment();
-		return comment!=null && comment.contains("<INTERNAL>");
+		return (comment!=null && comment.contains("<INTERNAL>")) || getBooleanAttribute(ev, "INTERNAL");
 	}
+	
+
 	
 	/**
 	 * return true if the given variable is private 
@@ -70,8 +75,27 @@ public class Utils {
 			return false;
 		}else {
 			String comment = var.getComment();
-			return comment!=null && comment.contains("<PRIVATE>");
+			return (comment!=null && comment.contains("<PRIVATE>")) || getBooleanAttribute(var, "PRIVATE");
 		}
+	}
+	
+	/**
+	 * utility method - returns true if the element has a boolean attribute with the given key, 
+	 * that is set to value true
+	 * 
+	 * @param element
+	 * @param key
+	 * @return
+	 */
+	private static boolean getBooleanAttribute(EventBElement element, String key) {
+		Attribute value = element.getAttributes().get(key);
+		if (value!= null) {
+			if (value.getType().equals(AttributeType.BOOLEAN) &&
+					value.getValue().equals(Boolean.TRUE)) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	/** 
@@ -89,7 +113,10 @@ public class Utils {
 		Integer pri = Integer.MAX_VALUE;
 		if (isInternal(ev)) {
 			pri = pri-1;	//internal events default to slightly higher priority than external
-			if (priString!=null && priString.contains("<PRIORITY=")) {
+			Integer priAtt = getIntegerAttribute(ev, "PRIORITY");
+			if (priAtt != null) {
+				pri = priAtt;
+			}else if (priString!=null && priString.contains("<PRIORITY=")) {
 				priString = priString.substring(priString.indexOf("<PRIORITY=")+10);
 				int i = priString.indexOf(">"); 
 				if (i>0)  priString =  priString.substring(0,i);
@@ -99,6 +126,23 @@ public class Utils {
 		return pri;
 	}
 	
+	/**
+	 * utility method - returns the value of the integer attribute with the given key,
+	 * or null if the element has no such attribute 
+	 * 
+	 * @param element
+	 * @param key
+	 * @return
+	 */
+	private static Integer getIntegerAttribute(EventBElement element, String key) {
+		Attribute value = element.getAttributes().get(key);
+		if (value!= null) {
+			if (value.getType().equals(AttributeType.INTEGER) ) {
+					return (int) value.getValue();
+			}
+		}
+		return null;
+	}
 	
 	/**
 	 * find an event in the machine with the given name
