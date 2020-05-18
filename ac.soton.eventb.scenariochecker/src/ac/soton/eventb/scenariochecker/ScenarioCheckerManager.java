@@ -265,31 +265,6 @@ public class ScenarioCheckerManager  {
 	}
 	
 	/**
-	 * starts playing back a scenario
-	 * if already in playback, the current scenario is restarted,
-	 * if not, the user can select an oracle file
-	 */
-	public void replayPressed() {
-		if (isPlayback()){
-			playback.reset();
-		}else {
-			playback = new Playback(OracleHandler.getOracle().getRun().getEntries());
-		}
-		AnimationManager.restartAnimation(mchRoot);
-	}
-	
-	/**
-	 * stops the current playback and switches to recording mode
-	 * (without restarting - so a new scenario can continue from the played back one)
-	 */
-	public void stopPressed() {
-		if (isPlayback()){
-			playback=null;;
-		}
-		updateModeIndicator();
-	}
-	
-	/**
 	 *
 	 * if playing back, stops and switches to recording mode
 	 * 		(without restarting - so a new scenario can continue from the played back one)
