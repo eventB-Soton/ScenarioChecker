@@ -40,8 +40,7 @@ public class ScenarioCheckerControlPanelView extends AbstractScenarioCheckerView
 	
 	public static final String ID = "ac.soton.eventb.internal.scenariochecker.views.ScenarioCheckerControlPanelView"; //$NON-NLS-1$
 	
-	private Button modeIndicator; 
-	
+	private Button modeButton;
 	private Button bigStepButton;
 	private Button smallStepButton;
 	private Button severalStepsButton;
@@ -71,9 +70,9 @@ public class ScenarioCheckerControlPanelView extends AbstractScenarioCheckerView
 			toolkit.paintBordersFor(buttonGroup);
 			buttonGroup.setLayout(null);
 			{	//INDICATOR - not a button
-				modeIndicator = new Button(buttonGroup, SWT.NONE);
-				modeIndicator.setBounds(10, 10, 110, 25);
-				modeIndicator.addMouseListener(new MouseAdapter() {
+				modeButton = new Button(buttonGroup, SWT.NONE);
+				modeButton.setBounds(10, 10, 110, 25);
+				modeButton.addMouseListener(new MouseAdapter() {
 					@Override
 					public void mouseUp(MouseEvent e) {
 						if (!ScenarioCheckerManager.getDefault().isDirty() ||
@@ -83,7 +82,7 @@ public class ScenarioCheckerControlPanelView extends AbstractScenarioCheckerView
 
 					}
 				});
-				toolkit.adapt(modeIndicator, true, true);
+				toolkit.adapt(modeButton, true, true);
 				updateModeIndicator(Mode.RECORDING);	//start off in recording mode
 			}
 			{	//BIG STEP
@@ -277,7 +276,7 @@ public class ScenarioCheckerControlPanelView extends AbstractScenarioCheckerView
 	public void start() {
 		Display.getDefault().asyncExec(new Runnable() {
 		    public void run() {
-		    	if (!modeIndicator.isDisposed()) {
+		    	if (!modeButton.isDisposed()) {
 					bigStepButton.setEnabled(true);
 					saveButton.setEnabled(true);
 					severalStepsButton.setEnabled(true);
@@ -285,7 +284,7 @@ public class ScenarioCheckerControlPanelView extends AbstractScenarioCheckerView
 					replayButton.setEnabled(true);
 					restartButton.setEnabled(true);
 					smallStepButton.setEnabled(true);
-					modeIndicator.setEnabled(true);
+					modeButton.setEnabled(true);
 		    	}
 		    }
 		});
@@ -298,7 +297,7 @@ public class ScenarioCheckerControlPanelView extends AbstractScenarioCheckerView
 	public void stop() {
 		Display.getDefault().asyncExec(new Runnable() {
 		    public void run() {
-		    	if (!modeIndicator.isDisposed()) {
+		    	if (!modeButton.isDisposed()) {
 					updateEnabledOperations(Collections.emptyList(),-1);
 					bigStepButton.setEnabled(false);
 					saveButton.setEnabled(false);
@@ -307,7 +306,7 @@ public class ScenarioCheckerControlPanelView extends AbstractScenarioCheckerView
 					replayButton.setEnabled(false);
 					restartButton.setEnabled(false);
 					smallStepButton.setEnabled(false);
-					modeIndicator.setEnabled(false);
+					modeButton.setEnabled(false);
 		    	}
 		    }
 		});
@@ -341,17 +340,17 @@ public class ScenarioCheckerControlPanelView extends AbstractScenarioCheckerView
 	public void updateModeIndicator(Mode mode) {
 		Display.getDefault().asyncExec(new Runnable() {
 		    public void run() {
-		    	if (!modeIndicator.isDisposed()) {
+		    	if (!modeButton.isDisposed()) {
 					if (mode == Mode.RECORDING) {
-						modeIndicator.setText("Recording");
-						modeIndicator.setBackground(red);
-						modeIndicator.setForeground(red);
+						modeButton.setText("Recording");
+						modeButton.setBackground(red);
+						modeButton.setForeground(red);
 						replayButton.setEnabled(true);
 						stopButton.setEnabled(false);
 					}else if (mode == Mode.PLAYBACK) {
-						modeIndicator.setText("Playback");
-						modeIndicator.setBackground(blue);
-						modeIndicator.setForeground(blue);
+						modeButton.setText("Playback");
+						modeButton.setBackground(blue);
+						modeButton.setForeground(blue);
 						replayButton.setEnabled(false);
 						stopButton.setEnabled(true);
 					}
