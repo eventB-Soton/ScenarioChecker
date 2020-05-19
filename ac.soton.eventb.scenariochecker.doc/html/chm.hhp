@@ -1,0 +1,36 @@
+[OPTIONS]
+Compatibility=1.1 or later
+Compiled file=user_manual.chm
+Contents file=chm.hhc
+Default Window=Help
+Default topic=index.html
+Display compile progress=Yes
+Error log file=help.log
+Full-text search=Yes
+Index file=chm.hhk
+Language=0x0 
+Title=Scenario Checker User Manual
+
+[WINDOWS]
+Help="Scenario Checker User Manual","chm.hhc","chm.hhk","index.html","index.html",,,,,0x73520,,0x383e,[200,200,1000,800],,,,,,,0
+
+[FILES]
+sec-overview.html
+index.html
+sec-setup.html
+sec-playback.html
+sec-tasks.html
+sec-user-agreement.html
+sec-concepts.html
+sec-persistence.html
+sec-release-notes.html
+sec-recording.html
+sec-getting-started.html
+sec-legal.html
+sec-reference.html
+sect0001.html
+sec-perspective.html
+sec-starting.html
+
+
+[MERGE FILES]

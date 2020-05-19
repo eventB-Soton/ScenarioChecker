@@ -265,29 +265,21 @@ public class ScenarioCheckerManager  {
 	}
 	
 	/**
-	 * starts playing back a scenario
-	 * if already in playback, the current scenario is restarted,
-	 * if not, the user can select an oracle file
+	 *
+	 * if playing back, stops and switches to recording mode
+	 * 		(without restarting - so a new scenario can continue from the played back one)
+	 * if recording, starts playing back a scenario selected by the user
 	 */
-	public void replayPressed() {
+	public void modeButtonPressed() {
 		if (isPlayback()){
-			playback.reset();
-		}else {
+			playback=null;
+		}else {// if recording, switch to playback
 			playback = new Playback(OracleHandler.getOracle().getRun().getEntries());
-		}
-		AnimationManager.restartAnimation(mchRoot);
-	}
-	
-	/**
-	 * stops the current playback and switches to recording mode
-	 * (without restarting - so a new scenario can continue from the played back one)
-	 */
-	public void stopPressed() {
-		if (isPlayback()){
-			playback=null;;
+			AnimationManager.restartAnimation(mchRoot);
 		}
 		updateModeIndicator();
 	}
+	
 	
 	/**
 	 * checks whether the scenario is dirty

@@ -1,0 +1,84 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="stylesheet" href="style.css" type="text/css" />
+<link rel="shortcut icon" href="icons/pyfav.png" type="image/png" />
+<link href="index.html" title="Scenario Checker User Manual" rel="start" />
+<link href="index.html" title="Scenario Checker User Manual" rel="first" />
+<link href="index.html" rel="contents" title="Contents" />
+<link rel="index" title="Index" />
+<link href="sec-playback.html" rel="next" />
+<link href="sec-tasks.html" rel="prev" />
+<link href="sec-tasks.html" rel="parent" />
+<meta name="aesop" content="information" />
+<title>4.1 Recording a Scenario</title>
+</head>
+<body>
+<div class="navigation">
+<div id="top-navigation-panel" xml:id="top-navigation-panel">
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class="online-navigation"><a title="4 Tasks" href="sec-tasks.html" rel="prev"><img src="icons/previous.png" border="0" height="32" alt="Previous Page" width="32" /></a></td>
+<td class="online-navigation"><a title="4 Tasks" href="sec-tasks.html" rel="parent"><img src="icons/up.png" border="0" height="32" alt="Up One Level" width="32" /></a></td>
+<td class="online-navigation"><a title="Re-playing a Scenario" href="sec-playback.html" rel="next"><img src="icons/next.png" border="0" height="32" alt="Next Page" width="32" /></a></td>
+<td align="center" width="100%">Scenario Checker User Manual</td>
+<td class="online-navigation"><a href="index.html" rel="contents" title="Table of Contents"><img src="icons/contents.png" border="0" height="32" alt="Contents" width="32" /></a></td>
+<td class="online-navigation"><img src="icons/blank.png" border="0" height="32" alt="" width="32" /></td>
+<td class="online-navigation"><img src="icons/blank.png" border="0" height="32" width="32" /></td>
+</tr></table>
+<div class="online-navigation">
+<span><b class="navlabel">Previous:</b>
+<a href="sec-tasks.html" class="sectref" rel="prev">Tasks</a></span>
+<span><b class="navlabel">Up:</b>
+<a href="sec-tasks.html" class="sectref" rel="parent">Tasks</a></span>
+<span><b class="navlabel">Next:</b>
+<a href="sec-playback.html" class="sectref" rel="next">Re-playing a Scenario</a></span>
+</div>
+<hr /></div>
+</div>
+
+
+
+<div><h2 id="sec:recording">4.1 Recording a Scenario</h2>
+<p>With the Scenario Checker in recording mode, the user can choose from the available external events and arguments that are listed in the Scenario Checker Control Panel (see lower left view in Fig. <a href="sec-recording.html#fig:recording">5</a>). The chosen event is executed (either by double clicking on it, or selecting it and then pressing the Big Step button). The Scenario Checker automatically runs internal events until completion and then updates the Scenario Checker State view to show the state of all non-private variables. </p><p>At any point, after firing a sequence of events, the scenario can be saved without altering the current scenario execution. This makes it easy to record intermediate points in a scenario. The ProB history view can be used to return to any point in the scenario history. For example if the user makes a mistake or decides that a different event trace would have been better, the ProB History view can be used to discard the later part of the trace and a new sequence can be continued from that point on. (Note that, when saving, the scenario execution is always obtained from the ProB animation history, rather than any user interaction with the Scenario Checker). </p><p>In recording mode, the Scenario Checker Control Panel buttons have the following function: </p><ul class="itemize">
+<li><p><b class="bfseries">Mode (Recording)</b> Switches to playback mode and allows the user to select a previously recorded scenario oracle file to play. This discards the current scenario after a warning confirmation from the user. </p></li><li><p><b class="bfseries">Restart</b> Discards the current scenario and restarts animation from the <tt class="ttfamily">INITIALISATION</tt>. If the scenario had progressed beyond the <tt class="ttfamily">INITIALISATION</tt> event, a warning and confirmation message box is displayed. </p></li><li><p><b class="bfseries">Save</b> Saves the current scenario and continues without interruption. This enables common prefixes to be saved as partial scenarios for later completion. The scenario is saved in a folder called <tt class="ttfamily">Oracle</tt> inside the Event-B project. The filename is automatically constructed from the machine name and a timestamp with the extension, <tt class="ttfamily">.oracle</tt>. </p></li><li><p><b class="bfseries">Big Step</b> Executes events until completion of the next big step. If an operation has been selected from the list of enabled external events in the Scenario Checker Control Panel (by single clicking on it), that event will be executed. If no such event is selected, one will be picked at random. In either case, if after executing the external event any internal events are enabled, one will be executed at random and according to any priority that has been defined in the model (see Section <a href="sec-concepts.html">3</a>). Firing of internal events will continue in this way until none are enabled or a loop is detected. (A loop is detected when the same event has already been executed in this run to completion). Double clicking on an event in the list of enabled events in the Scenario Checker Control Panel is exactly the same as selecting the event and using the big step button. </p></li><li><p><b class="bfseries">Small Step</b> Executes one event which is selected as follows. If an operation has been selected from the list of enabled external events in the Scenario Checker Control Panel (by single clicking on it), that event will be executed. Otherwise, if any internal events are enabled, one will be executed at random and according to any priority that has been defined in the model (see section <a href="sec-concepts.html">3</a>). Note that it is possible to ignore internal events using the small step button which may lead to scenarios that fail when played back (since it is not usual behaviour to ignore internal events). </p></li><li><p><b class="bfseries">Run For..</b> Executes the number of big steps shown in the text box next to the button. The number can be changed by clicking in the box and editing the number. </p></li>
+</ul><p>In recording mode, if the scenario has progressed beyond <tt class="ttfamily">INITIALISATION</tt> (i.e. there is a useful scenario that could be saved) the Scenario Checker Control Panel indicates that a scenario could be saved by displaying an <tt class="ttfamily">*</tt> in the title bar. </p><p>In recording mode the Scenario Checker View displays the current value of all non-private variables irrespective of whether they have changed or not. The Expected value column is left blank. </p><div id="fig:recording" class="figure"><center>
+<img src="images/img-0005.png" alt="\includegraphics[width=900]{figures/recording}" style="width:900" /> <div class="caption"><b> 5</b>: <span>Scenario Checker in Recording Mode</span></div>  </center></div></div>
+
+
+
+<div class="navigation">
+<div class="online-navigation">
+<hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class="online-navigation"><a title="4 Tasks" href="sec-tasks.html" rel="prev"><img src="icons/previous.png" border="0" height="32" alt="Previous Page" width="32" /></a></td>
+<td class="online-navigation"><a title="4 Tasks" href="sec-tasks.html" rel="parent"><img src="icons/up.png" border="0" height="32" alt="Up One Level" width="32" /></a></td>
+<td class="online-navigation"><a title="Re-playing a Scenario" href="sec-playback.html" rel="next"><img src="icons/next.png" border="0" height="32" alt="Next Page" width="32" /></a></td>
+<td align="center" width="100%">Scenario Checker User Manual</td>
+<td class="online-navigation"><a href="index.html" rel="contents" title="Table of Contents"><img src="icons/contents.png" border="0" height="32" alt="Contents" width="32" /></a></td>
+<td class="online-navigation"><img src="icons/blank.png" border="0" height="32" alt="" width="32" /></td>
+<td class="online-navigation"><img src="icons/blank.png" border="0" height="32" width="32" /></td>
+</tr></table>
+<div class="online-navigation">
+<span><b class="navlabel">Previous:</b>
+<a href="sec-tasks.html" class="sectref" rel="prev">Tasks</a></span>
+<span><b class="navlabel">Up:</b>
+<a href="sec-tasks.html" class="sectref" rel="parent">Tasks</a></span>
+<span><b class="navlabel">Next:</b>
+<a href="sec-playback.html" class="sectref" rel="next">Re-playing a Scenario</a></span>
+</div>
+</div>
+<hr />
+<!--
+<span class="release-info">Release 2.4.3, documentation updated on 29 March 2006.</span>
+-->
+</div>
+<!--End of Navigation Panel-->
+<!--
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+-->
+</body>
+</html>

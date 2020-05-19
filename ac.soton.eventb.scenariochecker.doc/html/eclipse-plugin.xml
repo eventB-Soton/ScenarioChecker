@@ -1,0 +1,6 @@
+<?xml version='1.0' encoding='ISO-8859-1' ?>
+<plugin name="Scenario Checker User Manual" id="a0000000001" version="1.0.0">
+   <extension point="org.eclipse.help.toc">
+      <toc file="eclipse-contents.xml" primary="true"></toc>
+   </extension>
+</plugin>

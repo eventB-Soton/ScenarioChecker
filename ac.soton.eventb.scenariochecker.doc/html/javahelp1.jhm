@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='ISO-8859-1' ?>
+<!DOCTYPE map PUBLIC "-//Sun Microsystems Inc.//DTD JavaHelp Map Version 1.0//EN" 
+"http://java.sun.com/products/javahelp/map_1_0.dtd"> 
+<map version="1.0"> 
+<mapid target="toplevelfolder">
+<mapid target="sec:overview" url="sec-overview.html"></mapid>
+<mapid target="sec:release-notes" url="sec-release-notes.html"></mapid>
+<mapid target="sec:getting-started" url="sec-getting-started.html"></mapid>
+<mapid target="sec:setup" url="sec-setup.html"></mapid>
+<mapid target="sec:perspective" url="sec-perspective.html"></mapid>
+<mapid target="sec:starting" url="sec-starting.html"></mapid>
+<mapid target="sec:setup" url="sect0001.html"></mapid>
+<mapid target="sec:persistence" url="sec-persistence.html"></mapid>
+<mapid target="sec:concepts" url="sec-concepts.html"></mapid>
+<mapid target="sec:tasks" url="sec-tasks.html"></mapid>
+<mapid target="sec:recording" url="sec-recording.html"></mapid>
+<mapid target="sec:playback" url="sec-playback.html"></mapid>
+<mapid target="sec:reference" url="sec-reference.html"></mapid>
+<mapid target="sec:legal" url="sec-legal.html"></mapid>
+<mapid target="sec:user-agreement" url="sec-user-agreement.html"></mapid>
+</mapid>
+</map>
