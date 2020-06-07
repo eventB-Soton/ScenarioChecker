@@ -15,6 +15,7 @@
 
   <modules>
     <module>ac.soton.eventb.scenariochecker</module>
+    <module>ac.soton.eventb.scenariochecker.doc</module>
     <module>ac.soton.eventb.scenariochecker.branding</module>
     <module>ac.soton.eventb.scenariochecker.feature</module>
     <module>ac.soton.eventb.scenariochecker.sdk</module>
