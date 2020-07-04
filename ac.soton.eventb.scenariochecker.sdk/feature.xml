@@ -16,7 +16,7 @@
    </copyright>
 
    <url>
-      <update label="%updateSiteName" url="http://rodin-b-sharp.sourceforge.net/updates"/>
+      <update label="%updateSiteName" url="https://eventB-soton.github.io/updateSite"/>
    </url>
 
    <includes
