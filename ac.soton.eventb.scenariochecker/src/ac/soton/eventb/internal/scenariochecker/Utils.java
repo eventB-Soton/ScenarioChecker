@@ -31,9 +31,11 @@ import ac.soton.eventb.probsupport.data.Operation_;
 public class Utils {
 
 	/**
+	 * Find an operation with the given signature in the animation of the given machine root
 	 * 
-	 * @param opSignature
-	 * @return
+	 * 
+	 * @param opSignature - a simple string representation of the operation signature
+	 * @return	Operation_ - the operation in the format of the Soton ProBSupport plugin
 	 */
 	public static Operation_ findOperation(IMachineRoot mchRoot, String opSignature) {
 		for (Operation_ op : AnimationManager.getEnabledOperations(mchRoot)) {
@@ -46,13 +48,21 @@ public class Utils {
 	
 
 	
+	/**
+	 * returns true if the event is not null and is not annotated as internal
+	 * 
+	 * @param ev
+	 * @return
+	 */
 	public static boolean isExternal(Event ev) {
 		if (ev == null) return false;
 		return !isInternal(ev);
 	}
 		
 	/**
-	 * return true if the given event is internal
+	 * return true if the given event is annotated as internal 
+	 * 
+	 * The annotation may either be in a comment or in an attribute with key "INTERNAL"
 	 * 
 	 * @param event
 	 * @return
@@ -65,7 +75,11 @@ public class Utils {
 
 	
 	/**
-	 * return true if the given variable is private 
+	 * return true if the given machine has a variable with the given name
+	 * and that variable is annotated as private 
+	 * 
+	 * The annotation may either be in a comment or in an attribute with key "PRIVATE"
+	 * 
 	 * @param name
 	 * @return
 	 */

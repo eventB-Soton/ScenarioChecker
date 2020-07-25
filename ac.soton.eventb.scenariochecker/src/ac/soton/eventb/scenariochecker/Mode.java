@@ -11,6 +11,12 @@
 
 package ac.soton.eventb.scenariochecker;
 
+/**
+ * Simple enumeration Mode = PLAYBACK | RECORDING
+ * 
+ * @author cfs
+ *
+ */
 public enum Mode {
 	PLAYBACK,
 	RECORDING

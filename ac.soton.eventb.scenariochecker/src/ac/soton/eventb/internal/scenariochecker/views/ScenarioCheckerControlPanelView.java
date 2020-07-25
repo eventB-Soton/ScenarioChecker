@@ -225,9 +225,12 @@ public class ScenarioCheckerControlPanelView extends AbstractScenarioCheckerView
 	}
 	
 	/**
-	 * When the part is focused, pass the focus to the step button.
+	 * When the part is focused, pass the focus to the big step button.
 	 * 
 	 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
+	 */
+	/* (non-Javadoc)
+	 * @see ac.soton.eventb.internal.scenariochecker.views.AbstractScenarioCheckerView#setFocus()
 	 */
 	@Override
 	public void setFocus() {
@@ -319,6 +322,9 @@ public class ScenarioCheckerControlPanelView extends AbstractScenarioCheckerView
 		});
 	}	
 
+	/* (non-Javadoc)
+	 * @see ac.soton.eventb.internal.scenariochecker.views.AbstractScenarioCheckerView#updateDirtyStatus(boolean)
+	 */
 	@Override
 	public void updateDirtyStatus(boolean dirty) {
 		Display.getDefault().asyncExec(new Runnable() {
