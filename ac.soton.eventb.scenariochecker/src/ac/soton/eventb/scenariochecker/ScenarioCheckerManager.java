@@ -86,7 +86,7 @@ public class ScenarioCheckerManager  {
 	 * remove a scenario checker view from those registered to receive notifications from the Scenario Checker Manager
 	 * @param scenarioCheckerView
 	 */
-	public void removeSimulationControlPanel(IScenarioCheckerView scenarioCheckerView) {
+	public void removeSimulationView(IScenarioCheckerView scenarioCheckerView) {
 		scenarioCheckerViews.remove(scenarioCheckerView);
 	}
 	
