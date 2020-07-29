@@ -30,8 +30,8 @@
     <!-- <gmf_notation_milestones-repo.url>https://download.eclipse.org/modeling/gmp/gmf-notation/updates/releases/</gmf_notation_milestones-repo.url> -->
     <!-- <!-\- URL for the Rodin Update site -\-> -->
     <!-- <rodin_update_site-repo.url>http://rodin-b-sharp.sourceforge.net/updates</rodin_update_site-repo.url> -->
-    <!-- URL for the Soton Prototype Update site -->
-    <soton_prototype-repo.url>http://eventb-soton.github.io/media_bin/ac.soton.eventb.prototypes.updateSite</soton_prototype-repo.url>
+    <!-- URL for the Soton Update site -->
+    <soton-repo.url>http://eventb-soton.github.io/updateSite</soton-repo.url>
     <!-- URL for ProB -->
     <prob-repo.url>http://www.stups.hhu.de/prob_updates_rodin3</prob-repo.url>
     <!-- URL for the Rodin Licence Update site -->
@@ -94,10 +94,10 @@
     <!--   <url>${rodin_update_site-repo.url}</url> -->
     <!--   <layout>p2</layout> -->
     <!-- </repository> -->
-    <!-- Soton Prototype repository -->
+    <!-- Soton repository -->
     <repository>
-      <id>soton-prototype</id>
-      <url>${soton_prototype-repo.url}</url>
+      <id>soton</id>
+      <url>${soton-repo.url}</url>
       <layout>p2</layout>
     </repository>
     <!-- ProB repository -->
