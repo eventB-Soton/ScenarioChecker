@@ -30,7 +30,7 @@ import ac.soton.eventb.scenariochecker.ScenarioCheckerManager;
 /**
  * This is an abstract basis for the Scenario Checker Views
  * 
- * update methods that do nothing
+ * It has default update methods that do nothing
  * 
  * @author cfsnook
  *
@@ -105,7 +105,7 @@ public abstract class AbstractScenarioCheckerView extends ViewPart implements IS
 	 */
 	@Override
 	public void dispose() {
-		ScenarioCheckerManager.getDefault().removeSimulationControlPanel(this);
+		ScenarioCheckerManager.getDefault().removeSimulationView(this);
 		super.dispose();
 	}
 

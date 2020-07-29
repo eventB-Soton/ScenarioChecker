@@ -48,6 +48,7 @@ public class Playback {
 	
 	/**
 	 * Constructs a new playback using the given list of entries
+	 * 
 	 * @param run
 	 * 
 	 */

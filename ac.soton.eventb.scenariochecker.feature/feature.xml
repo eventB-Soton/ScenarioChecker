@@ -2,7 +2,7 @@
 <feature
       id="ac.soton.eventb.scenariochecker.feature"
       label="%featureName"
-      version="0.0.0.qualifier"
+      version="0.0.0.release"
       provider-name="%featureVendor"
       plugin="ac.soton.eventb.scenariochecker.branding"
       license-feature="org.rodinp.licence"
@@ -17,7 +17,7 @@
    </copyright>
 
    <url>
-      <update label="%updateSiteName" url="http://rodin-b-sharp.sourceforge.net/updates"/>
+      <update label="%updateSiteName" url="https://eventB-soton.github.io/updateSite"/>
    </url>
 
    <requires>

@@ -135,7 +135,8 @@ public class OracleHandler {
 	}
 	
 	/**
-	 * @return
+	 * loads an oracle run by asking the user to select an oracle file from the workspace
+	 * @return Run - the run contained inside the file selected by the user
 	 */
 	public Run getRun() {
 		try {
@@ -181,6 +182,11 @@ public class OracleHandler {
 	}
 	
 	/**
+	 * save the given run as an oracle file.
+	 * The filename is automatically constructed from the current time stamp
+	 * The run is then disconnected from the resource so that further changes 
+	 * can be made to it without affecting the saved snapshot
+	 * 
 	 * @param run
 	 * @throws CoreException
 	 */
