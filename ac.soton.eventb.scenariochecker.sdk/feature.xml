@@ -20,7 +20,7 @@
    </url>
 
    <includes
-         id="ac.soton.eventb.probsupport.feature"
+         id="ac.soton.eventb.scenariochecker.feature"
          version="0.0.0"/>
 
    <plugin
