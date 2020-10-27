@@ -310,11 +310,11 @@ public class ScenarioCheckerControlPanelView extends AbstractScenarioCheckerView
 		    	if (!modeButton.isDisposed()) {
 					if (mode == Mode.RECORDING) {
 						modeButton.setText("Recording");
-						modeButton.setBackground(red);
+						modeButton.setBackground(white);
 						modeButton.setForeground(red);
 					}else if (mode == Mode.PLAYBACK) {
 						modeButton.setText("Playback");
-						modeButton.setBackground(blue);
+						modeButton.setBackground(white);
 						modeButton.setForeground(blue);
 					}
 		    	}
