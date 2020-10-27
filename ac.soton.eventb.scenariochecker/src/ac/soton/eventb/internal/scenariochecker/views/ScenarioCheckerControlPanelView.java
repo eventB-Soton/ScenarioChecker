@@ -70,7 +70,7 @@ public class ScenarioCheckerControlPanelView extends AbstractScenarioCheckerView
 			buttonGroup.setLayout(null);
 			{	//INDICATOR - not a button
 				modeButton = new Button(buttonGroup, SWT.NONE);
-				modeButton.setBounds(10, 10, 110, 25);
+				modeButton.setBounds(10, 10, 110, 30);
 				modeButton.addMouseListener(new MouseAdapter() {
 					@Override
 					public void mouseUp(MouseEvent e) {
@@ -86,7 +86,7 @@ public class ScenarioCheckerControlPanelView extends AbstractScenarioCheckerView
 			}
 			{	//RESTART
 				restartButton = new Button(buttonGroup, SWT.NONE);
-				restartButton.setBounds(10, 40, 85, 25);
+				restartButton.setBounds(10, 45, 85, 30);
 				restartButton.addMouseListener(new MouseAdapter() {
 					@Override
 					public void mouseUp(MouseEvent e) {	
@@ -102,7 +102,7 @@ public class ScenarioCheckerControlPanelView extends AbstractScenarioCheckerView
 			}
 			{	//SAVE
 				saveButton = new Button(buttonGroup, SWT.NONE);
-				saveButton.setBounds(10, 70, 85, 25);
+				saveButton.setBounds(10, 80, 85, 30);
 				saveButton.addMouseListener(new MouseAdapter() {
 					@Override
 					public void mouseUp(MouseEvent e) {
@@ -116,7 +116,7 @@ public class ScenarioCheckerControlPanelView extends AbstractScenarioCheckerView
 			
 			{	//BIG STEP
 				bigStepButton = new Button(buttonGroup, SWT.NONE);
-				bigStepButton.setBounds(10, 100, 85, 25);
+				bigStepButton.setBounds(10, 115, 85, 30);
 				bigStepButton.addMouseListener(new MouseAdapter() {
 					@Override
 					public void mouseUp(MouseEvent e) {
@@ -142,7 +142,7 @@ public class ScenarioCheckerControlPanelView extends AbstractScenarioCheckerView
 						ScenarioCheckerManager.getDefault().singleStep();
 					}
 				});
-				smallStepButton.setBounds(10, 130, 85, 25);
+				smallStepButton.setBounds(10, 150, 85, 30);
 				toolkit.adapt(smallStepButton, true, true);
 				smallStepButton.setText("Sml Step");
 				smallStepButton.setToolTipText("Execute next external or internal event");
@@ -155,7 +155,7 @@ public class ScenarioCheckerControlPanelView extends AbstractScenarioCheckerView
 						ScenarioCheckerManager.getDefault().runForTicks(Integer.valueOf(stepCount.getText()));
 					}
 				});
-				severalStepsButton.setBounds(10, 160, 80, 25);
+				severalStepsButton.setBounds(10, 185, 85, 30);
 				toolkit.adapt(severalStepsButton, true, true);
 				severalStepsButton.setText("Run For");
 				severalStepsButton.setToolTipText("Execute next n events");
@@ -173,7 +173,7 @@ public class ScenarioCheckerControlPanelView extends AbstractScenarioCheckerView
 						}
 					}
 				});
-				stepCount.setBounds(80, 160, 30, 20);
+				stepCount.setBounds(95, 190, 20, 20);
 				stepCount.setText(defaultStepCount);
 				toolkit.adapt(stepCount, true, true);
 			}
