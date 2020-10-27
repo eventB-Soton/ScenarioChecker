@@ -129,13 +129,13 @@ public class ScenarioCheckerStateView extends AbstractScenarioCheckerView implem
 		            item.setText(1, result.get(i).second);
 		            item.setText(2, result.get(i).third);
 		            if ("".equals(result.get(i).third)){
-		            	item.setForeground(1,blue);		            	
-		            }else if (result.get(i).third.equals(result.get(i).second)) {
+		            	item.setForeground(1,null);		            	
+		            }else if (isEqual(result.get(i).second.trim(), result.get(i).third.trim())) {
 		            	item.setForeground(1,green);
-		            	item.setForeground(2,blue);
+		            	item.setForeground(2,null);
 		            }else {
 		            	item.setForeground(1,red);
-		            	item.setForeground(2,blue);	            	
+		            	item.setForeground(2,null);	            	
 		            }
 		        }
 		        for (int loopIndex = 0; loopIndex < 3; loopIndex++) {
