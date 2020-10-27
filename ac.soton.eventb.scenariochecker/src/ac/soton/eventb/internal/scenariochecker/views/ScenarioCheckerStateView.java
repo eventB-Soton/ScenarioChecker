@@ -10,6 +10,7 @@
  *******************************************************************************/
 package ac.soton.eventb.internal.scenariochecker.views;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.swt.SWT;
@@ -144,6 +145,40 @@ public class ScenarioCheckerStateView extends AbstractScenarioCheckerView implem
 		        stateTable.redraw();
 		    }
 		});
+	}
+	
+	/**
+	 * This checks that 2 strings representing event-B state variables have the same value.
+	 * 
+	 * If they both start with a set bracket, the contents are compared.
+	 * Each element of the first must be in the second and visa versa.
+	 * 
+	 * otherwise a simple string equals is performed.
+	 * 
+	 * @param a
+	 * @param b
+	 * @return
+	 */
+	private boolean isEqual(String a, String b) {
+		if (a.startsWith("{") && b.startsWith("{")) {
+			String a1 = a.substring(1, a.length()-1);
+			String b1 = b.substring(1, a.length()-1);
+			List<String> l1 = Arrays.asList(a1.split(",")) ;
+			List<String> l2 = Arrays.asList(b1.split(",")) ;
+			for (String e : l1) {
+				if (!l2.contains(e)) {
+					return false;
+				}
+			}
+			for (String e : l2) {
+				if (!l2.contains(e)) {
+					return false;
+				}
+			}
+			return true;
+		}else {
+			return a.equals(b);
+		}
 	}
 
 }
