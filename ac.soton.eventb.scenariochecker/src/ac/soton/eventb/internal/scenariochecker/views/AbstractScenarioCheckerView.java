@@ -36,7 +36,8 @@ import ac.soton.eventb.scenariochecker.ScenarioCheckerManager;
  *
  */
 public abstract class AbstractScenarioCheckerView extends ViewPart implements IScenarioCheckerView{
-		
+
+	protected static final Color white = Display.getCurrent().getSystemColor(SWT.COLOR_WHITE);
 	protected static final Color red = Display.getCurrent().getSystemColor(SWT.COLOR_RED);
 	protected static final Color blue = Display.getCurrent().getSystemColor(SWT.COLOR_BLUE);
 	protected static final Color green = Display.getCurrent().getSystemColor(SWT.COLOR_GREEN);	
