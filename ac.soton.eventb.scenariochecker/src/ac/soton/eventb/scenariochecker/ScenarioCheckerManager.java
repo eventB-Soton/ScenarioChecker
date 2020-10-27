@@ -301,7 +301,9 @@ public class ScenarioCheckerManager  {
 	 */
 	
 	public void currentStateChanged(IMachineRoot mchRoot) {
-		if (mchRoot.getCorrespondingResource() != this.mchRoot.getCorrespondingResource()) return;
+		
+		if (mchRoot==null || this.mchRoot!=mchRoot || mchRoot.getCorrespondingResource() != this.mchRoot.getCorrespondingResource())
+			return;
 		
 		{//update state views
 			List<Triplet <String, String, String>> result = new ArrayList<Triplet<String,String,String>>();
