@@ -476,21 +476,35 @@ public class ScenarioCheckerManager  {
 	}
 		
 	/**
-	 * finds the next operation to be executed.
-	 * when not in playback mode, it is manually (or randomly) selected from those that are enabled according to priority (internal first)
-	 * when in playback mode, external events are given by the next operation in the playback being replayed,
+	 * selects the next operation to be executed.
 	 * 
-	 * @param animator
-	 * @return
+	 * First an operation is randomly selected from those that are enabled (prioritising internal ones and using the priority annotations if any).
+	 * 
+	 * If the selected operation is external (i.e. no internal ones are enabled):
+	 * when in playback mode, the next external operation is taken from the recording;
+	 * when in recording mode, if the user has selected an operation, that is used, but if not, the one from the random selection is used.
+	 * 
+	 * whatever the outcome, any manual selection is cleared.
+	 * 
+	 * @return the operation to be executed
 	 */
-	private Operation_ pickNextOperation() {	
-		Operation_  nextOp = manuallySelectedOp!=null && isEnabled(manuallySelectedOp) ?
-							manuallySelectedOp :
-							pickFrom(prioritise(AnimationManager.getEnabledOperations(mchRoot)));
+	private Operation_ pickNextOperation() {
 		
-		if (isPlayback() && isExternal(nextOp)){
-			nextOp = playback.getNextOperation();
+		// pick an operation randomly subject to priorities (internal ones get priority and may be annotated with priorities)
+		Operation_  nextOp = pickFrom(prioritise(AnimationManager.getEnabledOperations(mchRoot)));
+
+		//if no internal operations are available, we might use a different method to get an external one
+		if (isExternal(nextOp)){
+			//in playback all externals are from the recording
+			if (isPlayback()) {	
+				nextOp = playback.getNextOperation();
+			//in recording mode the user may have selected the next external
+			}else if (manuallySelectedOp!=null && isEnabled(manuallySelectedOp)) {
+				nextOp = manuallySelectedOp;
+			}
 		}
+		//the manual selection only gets one chance to fire - it would be confusing to remember it for later
+		manuallySelectedOp=null;
 		
 		return nextOp;
 	}
