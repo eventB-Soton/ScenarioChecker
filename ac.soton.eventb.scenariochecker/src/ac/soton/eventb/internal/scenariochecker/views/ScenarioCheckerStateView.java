@@ -84,6 +84,7 @@ public class ScenarioCheckerStateView extends AbstractScenarioCheckerView implem
 	 */
 	@Override
 	public void setFocus() {
+		super.setFocus();
 		stateTable.setFocus();
 	}
 

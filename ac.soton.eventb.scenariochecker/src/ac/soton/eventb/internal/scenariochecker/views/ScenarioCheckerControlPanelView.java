@@ -234,6 +234,7 @@ public class ScenarioCheckerControlPanelView extends AbstractScenarioCheckerView
 	 */
 	@Override
 	public void setFocus() {
+		super.setFocus();
 		bigStepButton.setFocus();
 	}
 	
