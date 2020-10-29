@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>ac.soton.eventb.scenariochecker</groupId>
   <artifactId>releng</artifactId>
-  <version>0.0.0-SNAPSHOT</version>
+  <version>1.0.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   
   <properties>
