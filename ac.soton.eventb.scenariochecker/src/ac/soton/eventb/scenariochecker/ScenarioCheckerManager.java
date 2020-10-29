@@ -129,6 +129,7 @@ public class ScenarioCheckerManager  {
 	 */
 	public void stop(IMachineRoot mchRoot) {
 		if (mchRoot.getCorrespondingResource() != this.mchRoot.getCorrespondingResource()) return;
+		playback=null;
 		//stop the scenario checker views
 		for (IScenarioCheckerView scenarioCheckerView : scenarioCheckerViews) {
 			scenarioCheckerView.stop();
