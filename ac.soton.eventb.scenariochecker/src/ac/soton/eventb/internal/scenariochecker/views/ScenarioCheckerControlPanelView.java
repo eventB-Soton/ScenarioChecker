@@ -312,10 +312,14 @@ public class ScenarioCheckerControlPanelView extends AbstractScenarioCheckerView
 						modeButton.setText("Recording");
 						modeButton.setBackground(white);
 						modeButton.setForeground(red);
+						modeButton.setToolTipText("Change mode to "+Mode.PLAYBACK);
+						operations.setEnabled(true);
 					}else if (mode == Mode.PLAYBACK) {
 						modeButton.setText("Playback");
 						modeButton.setBackground(white);
 						modeButton.setForeground(blue);
+						modeButton.setToolTipText("Change mode to "+Mode.RECORDING);
+						operations.setEnabled(false);
 					}
 		    	}
 		    }
