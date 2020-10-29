@@ -183,29 +183,26 @@ public class ScenarioCheckerControlPanelView extends AbstractScenarioCheckerView
 				
 				@Override
 				public void mouseUp(MouseEvent e) {
+					//operations widget should only be enabled in recording mode
 					// Select operation for later execution
 					int index = operations.getSelectionIndex();
 					int count = operations.getItemCount();
 					if (index<0 || index>=count) return;
 					String selected = operations.getItem(index);
-					if (ScenarioCheckerManager.getDefault().isPlayback()) {
-						messageUser("Error", "Cannot select events manually while playback is in progress.", SWT.ICON_ERROR | SWT.OK);
-					}else {
-						//tell the manager about the new selection but not to fire it yet
-						ScenarioCheckerManager.getDefault().selectionChanged(selected, false);
-					}
+					//tell the manager about the new selection but not to fire it yet
+					ScenarioCheckerManager.getDefault().selectionChanged(selected, false);
 				}
 				
 				@Override
 				public void mouseDoubleClick(MouseEvent e) {
-					// Execute the selected operation (as a big step)		
-					String selected = operations.getItem(operations.getSelectionIndex());
-					if (ScenarioCheckerManager.getDefault().isPlayback()) {
-						messageUser("Error", "Cannot select events manually while playback is in progress.", SWT.ICON_ERROR | SWT.OK);
-					}else {
-						//tell the manager about the new selection and to fire it
-						ScenarioCheckerManager.getDefault().selectionChanged(selected, true);
-					}
+					//operations widget should only be enabled in recording mode
+					// Select operation for later execution
+					int index = operations.getSelectionIndex();
+					int count = operations.getItemCount();
+					if (index<0 || index>=count) return;
+					String selected = operations.getItem(index);
+					//tell the manager about the new selection and to fire it
+					ScenarioCheckerManager.getDefault().selectionChanged(selected, true);
 				}
 			});
 			FormData fd = new FormData();
