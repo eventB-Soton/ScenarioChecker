@@ -47,7 +47,6 @@ public class ScenarioCheckerControlPanelView extends AbstractScenarioCheckerView
 	private Button smallStepButton;
 	private Button severalStepsButton;
 
-
 	private Text stepCount;
 	private String defaultStepCount = "5";
 	
@@ -58,17 +57,15 @@ public class ScenarioCheckerControlPanelView extends AbstractScenarioCheckerView
 	 */
 	@Override
 	protected void doCreatePartControl() {
-		//Group buttonGroup = createButtonGroup();
 		Group buttonGroup =  new Group(container, SWT.BORDER); 
 		{ // button group
 			FormData fd_buttonGroup = new FormData();
 			fd_buttonGroup.top = new FormAttachment(0, 5);
-			//fd_buttonGroup.right = new FormAttachment(100, -700);
 			buttonGroup.setLayoutData(fd_buttonGroup);
 			toolkit.adapt(buttonGroup);
 			toolkit.paintBordersFor(buttonGroup);
 			buttonGroup.setLayout(null);
-			{	//INDICATOR - not a button
+			{	//MODE - indicates mode but also a button to change mode
 				modeButton = new Button(buttonGroup, SWT.NONE);
 				modeButton.setBounds(10, 10, 110, 30);
 				modeButton.addMouseListener(new MouseAdapter() {
@@ -183,6 +180,7 @@ public class ScenarioCheckerControlPanelView extends AbstractScenarioCheckerView
 		operations = new List(container, SWT.BORDER	| SWT.FULL_SELECTION) ;// Table(container, SWT.BORDER	| SWT.FULL_SELECTION);
 		{
 			operations.addMouseListener(new MouseAdapter() {
+				
 				@Override
 				public void mouseUp(MouseEvent e) {
 					// Select operation for later execution
@@ -219,7 +217,6 @@ public class ScenarioCheckerControlPanelView extends AbstractScenarioCheckerView
 		    operations.setToolTipText("Enabled External Operations");
 		    operations.setVisible(true);
 		    operations.add("");	//it seems to need some dummy data to get it started
-			//operations.pack();
 			operations.redraw();
 		}
 	}
@@ -288,7 +285,7 @@ public class ScenarioCheckerControlPanelView extends AbstractScenarioCheckerView
 	@Override
 	public void updateEnabledOperations (java.util.List<String> enabledOperations, int selected) {
 		Display.getDefault().asyncExec(new Runnable() {
-		    public void run() {
+			public void run() {
 		    	if (!operations.isDisposed()) {
 					operations.removeAll();
 					for (String opString : enabledOperations) {
