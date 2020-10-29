@@ -153,13 +153,28 @@ public abstract class AbstractScenarioCheckerView extends ViewPart implements IS
 		//do nothing
 	}	
 
+	
+	/**
+	 *
+	 */
 	@Override
 	public void updateDirtyStatus(boolean dirty) {
 		//do nothing
 	}
 
+	/**
+	 *
+	 */
 	@Override
 	public void updateState(List<Triplet<String, String, String>> result) {
+		//do nothing
+	}
+	
+	/**
+	 * 
+	 */
+	@Override
+	public void displayMessage(String message) {
 		//do nothing
 	}
 

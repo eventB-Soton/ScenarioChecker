@@ -73,10 +73,13 @@ public interface IScenarioCheckerView {
 	 * stop - clear any information from the view
 	 */
 	void stop();
-
+	
 	/**
-	 * start - initialise the view, ready for updates
+	 * displayMessage - display the message
+	 * @param message
+	 * @since 1.0
 	 */
-	void start();
+	void displayMessage(String message);
+
 	
 }
