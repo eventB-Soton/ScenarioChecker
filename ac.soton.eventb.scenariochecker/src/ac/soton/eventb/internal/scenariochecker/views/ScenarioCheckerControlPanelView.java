@@ -209,7 +209,7 @@ public class ScenarioCheckerControlPanelView extends AbstractScenarioCheckerView
 				}
 			});
 			FormData fd = new FormData();
-			fd.left = new FormAttachment(buttonGroup, 10);
+			fd.left = new FormAttachment(buttonGroup, 5);
 			fd.right = new FormAttachment(100, -5);
 			fd.top = new FormAttachment(0, 5);
 			fd.bottom = new FormAttachment(100, -5);
