@@ -102,7 +102,7 @@ public class ScenarioCheckerManager  {
 		OracleHandler.getOracle().initialise(recordingName, machine);
 		//start the scenario checker views
 		for (IScenarioCheckerView scenarioCheckerView : scenarioCheckerViews) {
-			scenarioCheckerView.start();
+			scenarioCheckerView.start(machine.getName());
 		}		
 		restart(mchRoot);
 	}

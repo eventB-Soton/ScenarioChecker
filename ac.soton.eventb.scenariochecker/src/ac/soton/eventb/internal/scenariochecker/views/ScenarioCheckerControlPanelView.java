@@ -245,9 +245,10 @@ public class ScenarioCheckerControlPanelView extends AbstractScenarioCheckerView
 	 * @see ac.soton.eventb.scenariochecker.IScenarioCheckerView#start()
 	 */
 	@Override
-	public void start() {
+	public void start(String machineName) {
 		Display.getDefault().asyncExec(new Runnable() {
 		    public void run() {
+				setPartName(getPartName()+" - "+machineName);	//add machine name to tab
 		    	if (!modeButton.isDisposed()) {
 					modeButton.setEnabled(true);
 					restartButton.setEnabled(true);
@@ -267,6 +268,7 @@ public class ScenarioCheckerControlPanelView extends AbstractScenarioCheckerView
 	public void stop() {
 		Display.getDefault().asyncExec(new Runnable() {
 		    public void run() {
+		    	setPartName(getPartName().substring(0, getPartName().indexOf(" - "))); //remove machine name from tab
 		    	if (!modeButton.isDisposed()) {
 					modeButton.setEnabled(false);
 					restartButton.setEnabled(false);

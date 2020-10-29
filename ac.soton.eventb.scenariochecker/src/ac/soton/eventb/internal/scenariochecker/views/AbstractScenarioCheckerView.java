@@ -125,7 +125,7 @@ public abstract class AbstractScenarioCheckerView extends ViewPart implements IS
 	 * @see ac.soton.eventb.scenariochecker.IScenarioCheckerView#start()
 	 */
 	@Override
-	public void start() {
+	public void start(String machineName) {
 		//do nothing
 	}
 	
