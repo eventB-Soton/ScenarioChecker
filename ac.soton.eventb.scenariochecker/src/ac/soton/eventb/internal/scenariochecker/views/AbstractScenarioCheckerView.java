@@ -61,13 +61,13 @@ public abstract class AbstractScenarioCheckerView extends ViewPart implements IS
 	public final void createPartControl(Composite parent) {
 		Display.getDefault().syncExec(new Runnable() {
 		    public void run() {
-			container = toolkit.createComposite(parent, SWT.V_SCROLL | SWT.H_SCROLL | SWT.NO_REDRAW_RESIZE );
-			toolkit.paintBordersFor(container);
-			container.setLayout(new FormLayout());
-							
-			doCreatePartControl();
-			
-			stop();	//initialise as stopped
+				container = toolkit.createComposite(parent, SWT.V_SCROLL | SWT.H_SCROLL | SWT.NO_REDRAW_RESIZE );
+				toolkit.paintBordersFor(container);
+				container.setLayout(new FormLayout());
+								
+				doCreatePartControl();
+				
+				stop();	//initialise as stopped
 		    }
 
 
