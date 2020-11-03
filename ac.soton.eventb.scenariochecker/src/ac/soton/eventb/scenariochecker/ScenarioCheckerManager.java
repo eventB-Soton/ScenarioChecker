@@ -48,6 +48,7 @@ import ac.soton.eventb.probsupport.data.State_;
  */
 public class ScenarioCheckerManager  {
 	
+	private static final String CAN_NOT_RUN_UNTIL_CONTEXT_SET_UP = "Can not run until context set up";
 	private static final String recordingName = "Scenario";
 	private static final String SETUP = "SETUP_CONTEXT";
 	private static final String INITIALISATION = "INITIALISATION";
@@ -102,8 +103,9 @@ public class ScenarioCheckerManager  {
 		OracleHandler.getOracle().initialise(recordingName, machine);
 		//start the scenario checker views
 		for (IScenarioCheckerView scenarioCheckerView : scenarioCheckerViews) {
-			scenarioCheckerView.start();
-		}		
+			scenarioCheckerView.start(machine.getName());
+		}
+		displayMessage("Checking "+machine.getName());
 		restart(mchRoot);
 	}
 	
@@ -129,11 +131,12 @@ public class ScenarioCheckerManager  {
 	 */
 	public void stop(IMachineRoot mchRoot) {
 		if (mchRoot.getCorrespondingResource() != this.mchRoot.getCorrespondingResource()) return;
+		playback=null;
 		//stop the scenario checker views
 		for (IScenarioCheckerView scenarioCheckerView : scenarioCheckerViews) {
 			scenarioCheckerView.stop();
 		}
-		
+		displayMessage("Stopped");
 		// clear state
 		this.mchRoot = null;
 		machine = null;
@@ -190,23 +193,47 @@ public class ScenarioCheckerManager  {
 	 * 	implements the big step behaviour where we fire the next operation and then run to completion of all internal operations
 	 */
 	public boolean bigStep() {	
-		if (inSetup()) return false;	
-		Operation_ op = pickNextOperation();
-		//Animator animator = Animator.getAnimator();
-		boolean progress = true;
-		//execute at least one
-		progress = executeOperation(op, false);
-		//continue executing any internal operations
-		List<Operation_> loop = new ArrayList<Operation_>(); //prevent infinite looping in case doesn't converge
-		while (	progress && 
-				(op = pickNextOperation())!=null &&
-				!isExternal(op) &&
-				!loop.contains(op)
-				) {
+		String message = "BigStep - " ;
+		boolean progress = false;
+		if (inSetup()) {
+			message = CAN_NOT_RUN_UNTIL_CONTEXT_SET_UP;	
+		}else {
+			Operation_ op = pickNextOperation();
+			//execute at least one
 			progress = executeOperation(op, false);
-			loop.add(op);
+			message = message+
+					(progress? "fired " : "FAILED ")+
+					(isExternal(op)?"[ext] ":"[int] ")+
+					op.inStringFormat();
+			//continue executing any internal operations
+			List<Operation_> loop = new ArrayList<Operation_>(); //prevent infinite looping in case doesn't converge
+			while (	progress && 
+					(op = pickNextOperation())!=null &&
+					!isExternal(op) &&
+					!loop.contains(op)
+					) {
+				progress = executeOperation(op, false);
+				
+				message = message+ "\n  - "+
+						(progress? "fired " : "FAILED ")+
+						"[int] "+
+						op.inStringFormat();
+				loop.add(op);
+			}
+			if (progress) {
+				if (op==null) {
+					message = message+ "\n  - Big step aborted due to deadlock ";
+				}else if (isExternal(op)){
+					message = message+ "\n  - Big step ran to completion";
+				}else if (loop.contains(op)) {
+					message = message+ "\n  - Big step aborted due to loop on "+op.inStringFormat();
+				}else {
+					message = message+ "\n  - Big step aborted for a mysterious reason";
+				}
+			}
+			updateModeIndicator();
 		}
-		updateModeIndicator();
+		displayMessage(message);
 		return progress;
 	}
 	
@@ -217,6 +244,8 @@ public class ScenarioCheckerManager  {
 		Operation_ op = pickNextOperation();
 		executeOperation(op, false);
 		updateModeIndicator();
+		String type = isExternal(op)? "[ext] ":"[int] ";
+		displayMessage("Small step - "+type+op.inStringFormat());
 	}
 	
 	/**
@@ -226,16 +255,24 @@ public class ScenarioCheckerManager  {
 	 */
 	// (when not in playback mode we stop when a non-deterministic choice is available)  <<<<<<<<<< DISABLED FOR NOW - WHICH IS BETTER?
 	public String runForTicks(Integer ticks) {
-		if (inSetup()) return "In Setup";	
-		final int endTime = clock.getValueInt()+ticks;
-		boolean progress = true;
-		while (clock.getValueInt() < endTime && progress) {
-				progress = bigStep();
+		String msg;
+		if (inSetup()) {
+			msg = CAN_NOT_RUN_UNTIL_CONTEXT_SET_UP;
+		}else{
+			final int endTime = clock.getValueInt()+ticks;
+			boolean progress = true;
+			while (clock.getValueInt() < endTime && progress) {
+					progress = bigStep();
+			}
+			int done= ticks-endTime + clock.getValueInt();
+			if (!progress) {
+				msg = "Run terminated after "+done+" of\n  "+ticks+" ticks due to lack of progress";
+			}else {
+				msg = "Completed all "+done+" ticks";
+			}
 		}
-		if (!progress) {
-			return "Run terminated due to lack of progress.";
-		}
-		return "ok";
+		displayMessage("Run For - " + msg);
+		return msg;
 	}
 
 	/**
@@ -249,6 +286,7 @@ public class ScenarioCheckerManager  {
 			playback.reset();
 		}
 		AnimationManager.restartAnimation(mchRoot);
+		displayMessage("Restarted");
 	}
 	
 	/**
@@ -262,6 +300,7 @@ public class ScenarioCheckerManager  {
 			e.printStackTrace();
 		}
 		setDirty(false);
+		displayMessage("saved "+recordingName);
 	}
 	
 	/**
@@ -278,6 +317,7 @@ public class ScenarioCheckerManager  {
 			AnimationManager.restartAnimation(mchRoot);
 		}
 		updateModeIndicator();
+		displayMessage("mode changed to "+(playback==null? Mode.RECORDING : Mode.PLAYBACK));
 	}
 	
 	
@@ -301,8 +341,28 @@ public class ScenarioCheckerManager  {
 	 */
 	
 	public void currentStateChanged(IMachineRoot mchRoot) {
-		if (mchRoot.getCorrespondingResource() != this.mchRoot.getCorrespondingResource()) return;
-		
+
+		if (mchRoot==null) {
+			for (IScenarioCheckerView scenarioCheckerView : scenarioCheckerViews) {
+				scenarioCheckerView.stop();
+			}
+			displayMessage(
+					"The Scenario Checker aborted because ProB\n"+
+					"   appears to have stopped animating the machine (i.e. sent null)");
+			return;
+		}
+		if (mchRoot!=this.mchRoot) {
+			for (IScenarioCheckerView scenarioCheckerView : scenarioCheckerViews) {
+				scenarioCheckerView.stop();
+			}
+			displayMessage(
+					"The Scenario Checker aborted because ProB\n"+
+					"   appears to be animating a different machine:\n"+
+					"   "+mchRoot.getCorrespondingResource().getName()
+					);
+			return;
+		}
+
 		{//update state views
 			List<Triplet <String, String, String>> result = new ArrayList<Triplet<String,String,String>>();
 			Map<String, String> currentState = AnimationManager.getCurrentState(mchRoot).getAllValues();
@@ -320,7 +380,7 @@ public class ScenarioCheckerManager  {
 				scenarioCheckerView.updateState(result);
 			}
 		}
-		
+
 		{//update the enabled external events views
 			enabledOperations = AnimationManager.getEnabledOperations(mchRoot);
 			List<String> operationSignatures = new ArrayList<String>();
@@ -342,7 +402,7 @@ public class ScenarioCheckerManager  {
 			}
 		}
 	}		
-		
+
 	///////////////// private utilities to help with execution ///////////////////////////
 
 	/**
@@ -474,21 +534,35 @@ public class ScenarioCheckerManager  {
 	}
 		
 	/**
-	 * finds the next operation to be executed.
-	 * when not in playback mode, it is manually (or randomly) selected from those that are enabled according to priority (internal first)
-	 * when in playback mode, external events are given by the next operation in the playback being replayed,
+	 * selects the next operation to be executed.
 	 * 
-	 * @param animator
-	 * @return
+	 * First an operation is randomly selected from those that are enabled (prioritising internal ones and using the priority annotations if any).
+	 * 
+	 * If the selected operation is external (i.e. no internal ones are enabled):
+	 * when in playback mode, the next external operation is taken from the recording;
+	 * when in recording mode, if the user has selected an operation, that is used, but if not, the one from the random selection is used.
+	 * 
+	 * whatever the outcome, any manual selection is cleared.
+	 * 
+	 * @return the operation to be executed
 	 */
-	private Operation_ pickNextOperation() {	
-		Operation_  nextOp = manuallySelectedOp!=null && isEnabled(manuallySelectedOp) ?
-							manuallySelectedOp :
-							pickFrom(prioritise(AnimationManager.getEnabledOperations(mchRoot)));
+	private Operation_ pickNextOperation() {
 		
-		if (isPlayback() && isExternal(nextOp)){
-			nextOp = playback.getNextOperation();
+		// pick an operation randomly subject to priorities (internal ones get priority and may be annotated with priorities)
+		Operation_  nextOp = pickFrom(prioritise(AnimationManager.getEnabledOperations(mchRoot)));
+
+		//if no internal operations are available, we might use a different method to get an external one
+		if (isExternal(nextOp)){
+			//in playback all externals are from the recording
+			if (isPlayback()) {	
+				nextOp = playback.getNextOperation();
+			//in recording mode the user may have selected the next external
+			}else if (manuallySelectedOp!=null && isEnabled(manuallySelectedOp)) {
+				nextOp = manuallySelectedOp;
+			}
 		}
+		//the manual selection only gets one chance to fire - it would be confusing to remember it for later
+		manuallySelectedOp=null;
 		
 		return nextOp;
 	}
@@ -574,7 +648,12 @@ public class ScenarioCheckerManager  {
 		
 		//must make sure everything else is updated BEFORE executing,
 		// as ProB will immediately call the listeners to update the views
-		AnimationManager.executeOperation(mchRoot, operation, silent);
+		try {
+			AnimationManager.executeOperation(mchRoot, operation, silent);
+		}catch (Exception e) {			
+			displayMessage("Exception in ProB while excecuting operation \n"+ e.toString());	
+			return false;
+		}
 		
 		return true;
 	}
@@ -613,5 +692,16 @@ public class ScenarioCheckerManager  {
 		return true;
 	}
 	
+	/**
+	 * 
+	 * Sends a message to the scenario checker views so they can display it
+	 * 
+	 * @param message
+	 */
+	private void displayMessage(String message) {
+		for (IScenarioCheckerView scenarioCheckerView : scenarioCheckerViews) {
+			scenarioCheckerView.displayMessage(message);
+		}
+	}
 
 }

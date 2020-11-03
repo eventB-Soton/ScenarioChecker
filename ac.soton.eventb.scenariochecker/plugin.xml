@@ -110,6 +110,13 @@
             name="%scenarioCheckerStateViewName"
             restorable="true">
       </view>
+      <view
+            category="ac.soton.scenarioChecker.viewCategory"
+            class="ac.soton.eventb.internal.scenariochecker.views.ScenarioCheckerConsoleView"
+            id="ac.soton.eventb.scenariochecker.ScenarioCheckerConsoleView"
+            name="%scenarioCheckerConsoleViewName"
+            restorable="true">
+      </view>
    </extension>
 <!-- end of scenario checker views -->
    
@@ -133,7 +140,7 @@
                id="ac.soton.eventb.scenariochecker.ScenarioCheckerControlPanelView"
                minimized="false"
                moveable="true"
-               ratio="0.6f"
+               ratio="0.4f"
                relationship="bottom"
                relative="org.eclipse.ui.editorss"
                showTitle="true"
@@ -157,6 +164,16 @@
                moveable="true"
                ratio="0.4f"
                relationship="stack"
+               relative="ac.soton.eventb.scenariochecker.ScenarioCheckerStateView"
+               visible="true">
+         </view>
+         <view
+               closeable="true"
+               id="ac.soton.eventb.scenariochecker.ScenarioCheckerConsoleView"
+               minimized="false"
+               moveable="true"
+               ratio="0.2f"
+               relationship="right"
                relative="ac.soton.eventb.scenariochecker.ScenarioCheckerStateView"
                visible="true">
          </view>
@@ -203,6 +220,9 @@
          </viewShortcut>
          <viewShortcut
                id="ac.soton.eventb.scenariochecker.ScenarioCheckerStateView">
+         </viewShortcut>
+         <viewShortcut
+               id="ac.soton.eventb.scenariochecker.ScenarioCheckerConsoleView">
          </viewShortcut>
          <viewShortcut
                id="fr.systerel.explorer.navigator.view">

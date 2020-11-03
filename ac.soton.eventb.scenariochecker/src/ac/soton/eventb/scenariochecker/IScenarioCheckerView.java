@@ -61,13 +61,25 @@ public interface IScenarioCheckerView {
 	boolean isReady();
 
 	/**
+	 * start - initialise the view, ready for updates.
+	 * The machine name is passed in case the view wants to display it
+	 * 
+	 * @param machineName
+	 * @since 1.0
+	 */
+	void start(String machineName);
+	
+	/**
 	 * stop - clear any information from the view
 	 */
 	void stop();
-
+	
 	/**
-	 * start - initialise the view, ready for updates
+	 * displayMessage - display the message
+	 * @param message
+	 * @since 1.0
 	 */
-	void start();
+	void displayMessage(String message);
+
 	
 }

@@ -4,12 +4,12 @@
   <artifactId>root</artifactId>
   <name>Scenario Checker Root</name>
   <description>Root Build for Scenario Checker</description>
-  <version>0.0.0-SNAPSHOT</version>
+  <version>1.0.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <parent>
     <groupId>ac.soton.eventb.scenariochecker</groupId>
     <artifactId>releng</artifactId>
-    <version>0.0.0-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
     <relativePath>./ac.soton.eventb.scenariochecker.releng</relativePath>
   </parent>
 
