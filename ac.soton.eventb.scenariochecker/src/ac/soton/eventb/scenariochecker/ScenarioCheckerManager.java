@@ -210,7 +210,7 @@ public class ScenarioCheckerManager  {
 			while (	progress && 
 					(op = pickNextOperation())!=null &&
 					!isExternal(op) &&
-					!loop.contains(op)
+					Collections.frequency(loop, op)<10// !loop.contains(op)
 					) {
 				progress = executeOperation(op, false);
 				
@@ -225,7 +225,7 @@ public class ScenarioCheckerManager  {
 					message = message+ "\n  - Big step aborted due to deadlock ";
 				}else if (isExternal(op)){
 					message = message+ "\n  - Big step ran to completion";
-				}else if (loop.contains(op)) {
+				}else if (Collections.frequency(loop, op)>=10) {  //loop.contains(op)) {
 					message = message+ "\n  - Big step aborted due to loop on "+op.inStringFormat();
 				}else {
 					message = message+ "\n  - Big step aborted for a mysterious reason";
