@@ -240,7 +240,7 @@ public class ScenarioCheckerControlPanelView extends AbstractScenarioCheckerView
 	 */
 	@Override
 	public void start(String machineName) {
-		Display.getDefault().asyncExec(new Runnable() {
+		Display.getDefault().syncExec(new Runnable() {		//sync to ensure start and stop in correct order
 		    public void run() {
 				setPartName(getPartName()+" - "+machineName);	//add machine name to tab
 		    	if (!modeButton.isDisposed()) {
@@ -260,10 +260,11 @@ public class ScenarioCheckerControlPanelView extends AbstractScenarioCheckerView
 	 */
 	@Override
 	public void stop() {
-		Display.getDefault().asyncExec(new Runnable() {
+		Display.getDefault().syncExec(new Runnable() {		//sync to ensure start and stop in correct order
 		    public void run() {
 		    	if (getPartName().contains(" - ")) {
 		    		setPartName(getPartName().substring(0, getPartName().indexOf(" - "))); //remove machine name from tab
+		    	}
 		    	if (!modeButton.isDisposed()) {
 					modeButton.setEnabled(false);
 					restartButton.setEnabled(false);
