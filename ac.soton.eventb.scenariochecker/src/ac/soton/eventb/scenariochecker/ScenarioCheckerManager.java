@@ -587,6 +587,7 @@ public class ScenarioCheckerManager  {
 	 */
 	private static final Random random = new Random();
 	private Operation_ pickFrom(List<Operation_> ops) {
+		if (ops.isEmpty()) return null;
 		Operation_ op = ops.get(random.nextInt(ops.size()));
 		return op;
 	}
