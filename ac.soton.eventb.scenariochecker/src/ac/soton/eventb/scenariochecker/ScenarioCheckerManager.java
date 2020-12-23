@@ -242,10 +242,14 @@ public class ScenarioCheckerManager  {
 	 */
 	public void singleStep(){
 		Operation_ op = pickNextOperation();
-		executeOperation(op, false);
-		updateModeIndicator();
-		String type = isExternal(op)? "[ext] ":"[int] ";
-		displayMessage("Small step - "+type+op.inStringFormat());
+		if (op==null) {
+			displayMessage("Small step aborted - nothing enabled");
+		}else {
+			executeOperation(op, false);
+			updateModeIndicator();
+			String type = isExternal(op)? "[ext] ":"[int] ";
+			displayMessage("Small step - "+type+op.inStringFormat());
+		}
 	}
 	
 	/**
