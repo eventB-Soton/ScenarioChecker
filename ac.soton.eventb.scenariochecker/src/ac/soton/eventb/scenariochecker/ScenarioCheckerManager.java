@@ -552,7 +552,7 @@ public class ScenarioCheckerManager  {
 		Operation_  nextOp = pickFrom(prioritise(AnimationManager.getEnabledOperations(mchRoot)));
 
 		//if no internal operations are available, we might use a different method to get an external one
-		if (isExternal(nextOp)){
+		if (nextOp!=null && isExternal(nextOp)){
 			//in playback all externals are from the recording
 			if (isPlayback()) {	
 				nextOp = playback.getNextOperation();
