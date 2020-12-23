@@ -177,7 +177,7 @@ public class ScenarioCheckerControlPanelView extends AbstractScenarioCheckerView
 
 		}
 		
-		operations = new List(container, SWT.BORDER	| SWT.FULL_SELECTION) ;// Table(container, SWT.BORDER	| SWT.FULL_SELECTION);
+		operations = new List(container, SWT.BORDER	| SWT.H_SCROLL | SWT.V_SCROLL) ;
 		{
 			operations.addMouseListener(new MouseAdapter() {
 				
