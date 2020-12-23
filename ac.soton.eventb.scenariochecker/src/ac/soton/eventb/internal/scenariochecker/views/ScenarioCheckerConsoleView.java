@@ -37,7 +37,7 @@ public class ScenarioCheckerConsoleView extends AbstractScenarioCheckerView impl
 	protected void doCreatePartControl() {
 
 		{	//Status Message Area
-			messageArea = new List(container, SWT.BORDER | SWT.MULTI);			
+			messageArea = new List(container, SWT.BORDER | SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);			
 			FormData fd = new FormData();
 			fd.left = new FormAttachment(0, 5);
 			fd.right = new FormAttachment(100, -5);
