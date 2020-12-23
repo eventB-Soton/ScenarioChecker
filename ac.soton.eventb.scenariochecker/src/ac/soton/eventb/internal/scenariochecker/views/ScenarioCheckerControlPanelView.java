@@ -262,7 +262,8 @@ public class ScenarioCheckerControlPanelView extends AbstractScenarioCheckerView
 	public void stop() {
 		Display.getDefault().asyncExec(new Runnable() {
 		    public void run() {
-		    	setPartName(getPartName().substring(0, getPartName().indexOf(" - "))); //remove machine name from tab
+		    	if (getPartName().contains(" - ")) {
+		    		setPartName(getPartName().substring(0, getPartName().indexOf(" - "))); //remove machine name from tab
 		    	if (!modeButton.isDisposed()) {
 					modeButton.setEnabled(false);
 					restartButton.setEnabled(false);

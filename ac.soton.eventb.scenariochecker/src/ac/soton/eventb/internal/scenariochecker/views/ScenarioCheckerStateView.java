@@ -97,7 +97,9 @@ public class ScenarioCheckerStateView extends AbstractScenarioCheckerView implem
 	public void stop() {
 		Display.getDefault().asyncExec(new Runnable() {
 		    public void run() {
-		    	setPartName(getPartName().substring(0, getPartName().indexOf(" - "))); //remove machine name from tab
+		    	if (getPartName().contains(" - ")) {
+		    		setPartName(getPartName().substring(0, getPartName().indexOf(" - "))); //remove machine name from tab
+		    	}
 				stateTable.removeAll();
 		    }
 		});
