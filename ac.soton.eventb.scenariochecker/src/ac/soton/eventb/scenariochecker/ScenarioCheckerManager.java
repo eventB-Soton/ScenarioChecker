@@ -12,6 +12,7 @@
 package ac.soton.eventb.scenariochecker;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -23,6 +24,7 @@ import org.eclipse.emf.common.util.EMap;
 import org.eventb.core.IMachineRoot;
 import org.eventb.emf.core.machine.Event;
 import org.eventb.emf.core.machine.Machine;
+import org.eventb.emf.core.machine.Variable;
 import org.eventb.emf.persistence.EMFRodinDB;
 
 import ac.soton.eventb.emf.oracle.OracleFactory;
@@ -68,6 +70,7 @@ public class ScenarioCheckerManager  {
 	
 	private IMachineRoot mchRoot = null;
 	private Machine machine = null;
+	private List<String> publicVariables= new ArrayList<String>();
 	private Clock clock = new Clock();	
 	private Operation_ manuallySelectedOp = null;
 	private List<Operation_> enabledOperations = null;
@@ -99,6 +102,12 @@ public class ScenarioCheckerManager  {
 		this.mchRoot = mchRoot;
 		EMFRodinDB emfRodinDB = new EMFRodinDB();
 		machine = (Machine) emfRodinDB.loadEventBComponent(mchRoot);
+		publicVariables.clear();
+		for (Variable v : machine.getVariables()) {
+			if(!v.getComment().startsWith("<PRIVATE>")) {
+				publicVariables.add(v.getName());
+			}
+		}
 		//initialise oracle file handler
 		OracleHandler.getOracle().initialise(recordingName, machine);
 		//start the scenario checker views
@@ -371,13 +380,19 @@ public class ScenarioCheckerManager  {
 			List<Triplet <String, String, String>> result = new ArrayList<Triplet<String,String,String>>();
 			Map<String, String> currentState = AnimationManager.getCurrentState(mchRoot).getAllValues();
 			// if in playback check state matches oracle
+			
 			if (isPlayback() && playback.getCurrentSnapshot()!=null) {
+				
 				for (Map.Entry<String, String> value : playback.getCurrentSnapshot().getValues()){
+					if(publicVariables.contains(value.getKey())){
 						result.add(Triplet.of(value.getKey(), currentState.get(value.getKey()), value.getValue()));
+					}
 				}
 			}else {
 				for (Map.Entry<String, String> value : currentState.entrySet()){
-					result.add(Triplet.of(value.getKey(), value.getValue(), ""));
+					if(publicVariables.contains(value.getKey())){
+						result.add(Triplet.of(value.getKey(), value.getValue(), ""));
+					}
 				}
 			}
 			for (IScenarioCheckerView scenarioCheckerView : scenarioCheckerViews) {
@@ -393,7 +408,7 @@ public class ScenarioCheckerManager  {
 					operationSignatures.add(op.inStringFormat());
 				}
 			}
-			
+
 			// find index of the next op in playback
 			int selectedOp = -1;
 			if (isPlayback() && playback.getNextOperation()!=null) {
