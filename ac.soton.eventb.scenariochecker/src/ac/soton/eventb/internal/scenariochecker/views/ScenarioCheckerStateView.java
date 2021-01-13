@@ -10,6 +10,7 @@
  *******************************************************************************/
 package ac.soton.eventb.internal.scenariochecker.views;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.swt.SWT;
@@ -83,6 +84,7 @@ public class ScenarioCheckerStateView extends AbstractScenarioCheckerView implem
 	 */
 	@Override
 	public void setFocus() {
+		super.setFocus();
 		stateTable.setFocus();
 	}
 
@@ -95,6 +97,7 @@ public class ScenarioCheckerStateView extends AbstractScenarioCheckerView implem
 	public void stop() {
 		Display.getDefault().asyncExec(new Runnable() {
 		    public void run() {
+		    	setPartName(getPartName().substring(0, getPartName().indexOf(" - "))); //remove machine name from tab
 				stateTable.removeAll();
 		    }
 		});
@@ -104,9 +107,10 @@ public class ScenarioCheckerStateView extends AbstractScenarioCheckerView implem
 	 * @see ac.soton.eventb.scenariochecker.IScenarioCheckerView#start()
 	 */
 	@Override
-	public void start() {
+	public void start(String machineName) {
 		Display.getDefault().asyncExec(new Runnable() {
 		    public void run() {
+				setPartName(getPartName()+" - "+machineName);	//add machine name to tab
 				stateTable.removeAll();
 		    }
 		});
@@ -129,13 +133,13 @@ public class ScenarioCheckerStateView extends AbstractScenarioCheckerView implem
 		            item.setText(1, result.get(i).second);
 		            item.setText(2, result.get(i).third);
 		            if ("".equals(result.get(i).third)){
-		            	item.setForeground(1,blue);		            	
-		            }else if (result.get(i).third.equals(result.get(i).second)) {
+		            	item.setForeground(1,null);		            	
+		            }else if (isEqual(result.get(i).second.trim(), result.get(i).third.trim())) {
 		            	item.setForeground(1,green);
-		            	item.setForeground(2,blue);
+		            	item.setForeground(2,null);
 		            }else {
 		            	item.setForeground(1,red);
-		            	item.setForeground(2,blue);	            	
+		            	item.setForeground(2,null);	            	
 		            }
 		        }
 		        for (int loopIndex = 0; loopIndex < 3; loopIndex++) {
@@ -144,6 +148,40 @@ public class ScenarioCheckerStateView extends AbstractScenarioCheckerView implem
 		        stateTable.redraw();
 		    }
 		});
+	}
+	
+	/**
+	 * This checks that 2 strings representing event-B state variables have the same value.
+	 * 
+	 * If they both start with a set bracket, the contents are compared.
+	 * Each element of the first must be in the second and visa versa.
+	 * 
+	 * otherwise a simple string equals is performed.
+	 * 
+	 * @param a
+	 * @param b
+	 * @return
+	 */
+	private boolean isEqual(String a, String b) {
+		if (a.startsWith("{") && b.startsWith("{")) {
+			String a1 = a.substring(1, a.length()-1);
+			String b1 = b.substring(1, a.length()-1);
+			List<String> l1 = Arrays.asList(a1.split(",")) ;
+			List<String> l2 = Arrays.asList(b1.split(",")) ;
+			for (String e : l1) {
+				if (!l2.contains(e)) {
+					return false;
+				}
+			}
+			for (String e : l2) {
+				if (!l2.contains(e)) {
+					return false;
+				}
+			}
+			return true;
+		}else {
+			return a.equals(b);
+		}
 	}
 
 }

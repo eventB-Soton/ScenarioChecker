@@ -47,7 +47,6 @@ public class ScenarioCheckerControlPanelView extends AbstractScenarioCheckerView
 	private Button smallStepButton;
 	private Button severalStepsButton;
 
-
 	private Text stepCount;
 	private String defaultStepCount = "5";
 	
@@ -58,19 +57,17 @@ public class ScenarioCheckerControlPanelView extends AbstractScenarioCheckerView
 	 */
 	@Override
 	protected void doCreatePartControl() {
-		//Group buttonGroup = createButtonGroup();
 		Group buttonGroup =  new Group(container, SWT.BORDER); 
 		{ // button group
 			FormData fd_buttonGroup = new FormData();
 			fd_buttonGroup.top = new FormAttachment(0, 5);
-			//fd_buttonGroup.right = new FormAttachment(100, -700);
 			buttonGroup.setLayoutData(fd_buttonGroup);
 			toolkit.adapt(buttonGroup);
 			toolkit.paintBordersFor(buttonGroup);
 			buttonGroup.setLayout(null);
-			{	//INDICATOR - not a button
+			{	//MODE - indicates mode but also a button to change mode
 				modeButton = new Button(buttonGroup, SWT.NONE);
-				modeButton.setBounds(10, 10, 110, 25);
+				modeButton.setBounds(10, 10, 110, 30);
 				modeButton.addMouseListener(new MouseAdapter() {
 					@Override
 					public void mouseUp(MouseEvent e) {
@@ -86,7 +83,7 @@ public class ScenarioCheckerControlPanelView extends AbstractScenarioCheckerView
 			}
 			{	//RESTART
 				restartButton = new Button(buttonGroup, SWT.NONE);
-				restartButton.setBounds(10, 40, 85, 25);
+				restartButton.setBounds(10, 45, 85, 30);
 				restartButton.addMouseListener(new MouseAdapter() {
 					@Override
 					public void mouseUp(MouseEvent e) {	
@@ -102,7 +99,7 @@ public class ScenarioCheckerControlPanelView extends AbstractScenarioCheckerView
 			}
 			{	//SAVE
 				saveButton = new Button(buttonGroup, SWT.NONE);
-				saveButton.setBounds(10, 70, 85, 25);
+				saveButton.setBounds(10, 80, 85, 30);
 				saveButton.addMouseListener(new MouseAdapter() {
 					@Override
 					public void mouseUp(MouseEvent e) {
@@ -116,7 +113,7 @@ public class ScenarioCheckerControlPanelView extends AbstractScenarioCheckerView
 			
 			{	//BIG STEP
 				bigStepButton = new Button(buttonGroup, SWT.NONE);
-				bigStepButton.setBounds(10, 100, 85, 25);
+				bigStepButton.setBounds(10, 115, 85, 30);
 				bigStepButton.addMouseListener(new MouseAdapter() {
 					@Override
 					public void mouseUp(MouseEvent e) {
@@ -142,7 +139,7 @@ public class ScenarioCheckerControlPanelView extends AbstractScenarioCheckerView
 						ScenarioCheckerManager.getDefault().singleStep();
 					}
 				});
-				smallStepButton.setBounds(10, 130, 85, 25);
+				smallStepButton.setBounds(10, 150, 85, 30);
 				toolkit.adapt(smallStepButton, true, true);
 				smallStepButton.setText("Sml Step");
 				smallStepButton.setToolTipText("Execute next external or internal event");
@@ -155,7 +152,7 @@ public class ScenarioCheckerControlPanelView extends AbstractScenarioCheckerView
 						ScenarioCheckerManager.getDefault().runForTicks(Integer.valueOf(stepCount.getText()));
 					}
 				});
-				severalStepsButton.setBounds(10, 160, 80, 25);
+				severalStepsButton.setBounds(10, 185, 85, 30);
 				toolkit.adapt(severalStepsButton, true, true);
 				severalStepsButton.setText("Run For");
 				severalStepsButton.setToolTipText("Execute next n events");
@@ -173,7 +170,7 @@ public class ScenarioCheckerControlPanelView extends AbstractScenarioCheckerView
 						}
 					}
 				});
-				stepCount.setBounds(80, 160, 30, 20);
+				stepCount.setBounds(95, 190, 20, 20);
 				stepCount.setText(defaultStepCount);
 				toolkit.adapt(stepCount, true, true);
 			}
@@ -183,35 +180,33 @@ public class ScenarioCheckerControlPanelView extends AbstractScenarioCheckerView
 		operations = new List(container, SWT.BORDER	| SWT.FULL_SELECTION) ;// Table(container, SWT.BORDER	| SWT.FULL_SELECTION);
 		{
 			operations.addMouseListener(new MouseAdapter() {
+				
 				@Override
 				public void mouseUp(MouseEvent e) {
+					//operations widget should only be enabled in recording mode
 					// Select operation for later execution
 					int index = operations.getSelectionIndex();
 					int count = operations.getItemCount();
 					if (index<0 || index>=count) return;
 					String selected = operations.getItem(index);
-					if (ScenarioCheckerManager.getDefault().isPlayback()) {
-						messageUser("Error", "Cannot select events manually while playback is in progress.", SWT.ICON_ERROR | SWT.OK);
-					}else {
-						//tell the manager about the new selection but not to fire it yet
-						ScenarioCheckerManager.getDefault().selectionChanged(selected, false);
-					}
+					//tell the manager about the new selection but not to fire it yet
+					ScenarioCheckerManager.getDefault().selectionChanged(selected, false);
 				}
 				
 				@Override
 				public void mouseDoubleClick(MouseEvent e) {
-					// Execute the selected operation (as a big step)		
-					String selected = operations.getItem(operations.getSelectionIndex());
-					if (ScenarioCheckerManager.getDefault().isPlayback()) {
-						messageUser("Error", "Cannot select events manually while playback is in progress.", SWT.ICON_ERROR | SWT.OK);
-					}else {
-						//tell the manager about the new selection and to fire it
-						ScenarioCheckerManager.getDefault().selectionChanged(selected, true);
-					}
+					//operations widget should only be enabled in recording mode
+					// Select operation for later execution
+					int index = operations.getSelectionIndex();
+					int count = operations.getItemCount();
+					if (index<0 || index>=count) return;
+					String selected = operations.getItem(index);
+					//tell the manager about the new selection and to fire it
+					ScenarioCheckerManager.getDefault().selectionChanged(selected, true);
 				}
 			});
 			FormData fd = new FormData();
-			fd.left = new FormAttachment(buttonGroup, 10);
+			fd.left = new FormAttachment(buttonGroup, 5);
 			fd.right = new FormAttachment(100, -5);
 			fd.top = new FormAttachment(0, 5);
 			fd.bottom = new FormAttachment(100, -5);
@@ -219,7 +214,6 @@ public class ScenarioCheckerControlPanelView extends AbstractScenarioCheckerView
 		    operations.setToolTipText("Enabled External Operations");
 		    operations.setVisible(true);
 		    operations.add("");	//it seems to need some dummy data to get it started
-			//operations.pack();
 			operations.redraw();
 		}
 	}
@@ -234,6 +228,7 @@ public class ScenarioCheckerControlPanelView extends AbstractScenarioCheckerView
 	 */
 	@Override
 	public void setFocus() {
+		super.setFocus();
 		bigStepButton.setFocus();
 	}
 	
@@ -244,9 +239,10 @@ public class ScenarioCheckerControlPanelView extends AbstractScenarioCheckerView
 	 * @see ac.soton.eventb.scenariochecker.IScenarioCheckerView#start()
 	 */
 	@Override
-	public void start() {
+	public void start(String machineName) {
 		Display.getDefault().asyncExec(new Runnable() {
 		    public void run() {
+				setPartName(getPartName()+" - "+machineName);	//add machine name to tab
 		    	if (!modeButton.isDisposed()) {
 					modeButton.setEnabled(true);
 					restartButton.setEnabled(true);
@@ -266,6 +262,7 @@ public class ScenarioCheckerControlPanelView extends AbstractScenarioCheckerView
 	public void stop() {
 		Display.getDefault().asyncExec(new Runnable() {
 		    public void run() {
+		    	setPartName(getPartName().substring(0, getPartName().indexOf(" - "))); //remove machine name from tab
 		    	if (!modeButton.isDisposed()) {
 					modeButton.setEnabled(false);
 					restartButton.setEnabled(false);
@@ -285,7 +282,7 @@ public class ScenarioCheckerControlPanelView extends AbstractScenarioCheckerView
 	@Override
 	public void updateEnabledOperations (java.util.List<String> enabledOperations, int selected) {
 		Display.getDefault().asyncExec(new Runnable() {
-		    public void run() {
+			public void run() {
 		    	if (!operations.isDisposed()) {
 					operations.removeAll();
 					for (String opString : enabledOperations) {
@@ -310,12 +307,16 @@ public class ScenarioCheckerControlPanelView extends AbstractScenarioCheckerView
 		    	if (!modeButton.isDisposed()) {
 					if (mode == Mode.RECORDING) {
 						modeButton.setText("Recording");
-						modeButton.setBackground(red);
+						modeButton.setBackground(white);
 						modeButton.setForeground(red);
+						modeButton.setToolTipText("Change mode to "+Mode.PLAYBACK);
+						operations.setEnabled(true);
 					}else if (mode == Mode.PLAYBACK) {
 						modeButton.setText("Playback");
-						modeButton.setBackground(blue);
+						modeButton.setBackground(white);
 						modeButton.setForeground(blue);
+						modeButton.setToolTipText("Change mode to "+Mode.RECORDING);
+						operations.setEnabled(false);
 					}
 		    	}
 		    }

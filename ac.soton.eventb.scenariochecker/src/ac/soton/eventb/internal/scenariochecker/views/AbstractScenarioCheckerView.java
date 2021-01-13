@@ -36,7 +36,8 @@ import ac.soton.eventb.scenariochecker.ScenarioCheckerManager;
  *
  */
 public abstract class AbstractScenarioCheckerView extends ViewPart implements IScenarioCheckerView{
-		
+
+	protected static final Color white = Display.getCurrent().getSystemColor(SWT.COLOR_WHITE);
 	protected static final Color red = Display.getCurrent().getSystemColor(SWT.COLOR_RED);
 	protected static final Color blue = Display.getCurrent().getSystemColor(SWT.COLOR_BLUE);
 	protected static final Color green = Display.getCurrent().getSystemColor(SWT.COLOR_GREEN);	
@@ -60,13 +61,13 @@ public abstract class AbstractScenarioCheckerView extends ViewPart implements IS
 	public final void createPartControl(Composite parent) {
 		Display.getDefault().syncExec(new Runnable() {
 		    public void run() {
-			container = toolkit.createComposite(parent, SWT.V_SCROLL | SWT.H_SCROLL | SWT.NO_REDRAW_RESIZE );
-			toolkit.paintBordersFor(container);
-			container.setLayout(new FormLayout());
-							
-			doCreatePartControl();
-			
-			stop();	//initialise as stopped
+				container = toolkit.createComposite(parent, SWT.V_SCROLL | SWT.H_SCROLL | SWT.NO_REDRAW_RESIZE );
+				toolkit.paintBordersFor(container);
+				container.setLayout(new FormLayout());
+								
+				doCreatePartControl();
+				
+				stop();	//initialise as stopped
 		    }
 
 
@@ -124,7 +125,7 @@ public abstract class AbstractScenarioCheckerView extends ViewPart implements IS
 	 * @see ac.soton.eventb.scenariochecker.IScenarioCheckerView#start()
 	 */
 	@Override
-	public void start() {
+	public void start(String machineName) {
 		//do nothing
 	}
 	
@@ -152,13 +153,28 @@ public abstract class AbstractScenarioCheckerView extends ViewPart implements IS
 		//do nothing
 	}	
 
+	
+	/**
+	 *
+	 */
 	@Override
 	public void updateDirtyStatus(boolean dirty) {
 		//do nothing
 	}
 
+	/**
+	 *
+	 */
 	@Override
 	public void updateState(List<Triplet<String, String, String>> result) {
+		//do nothing
+	}
+	
+	/**
+	 * 
+	 */
+	@Override
+	public void displayMessage(String message) {
 		//do nothing
 	}
 

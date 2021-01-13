@@ -2,7 +2,7 @@
 <feature
       id="ac.soton.eventb.scenariochecker.sdk"
       label="%featureName"
-      version="0.0.0.release"
+      version="1.0.0.qualifier"
       provider-name="%featureVendor"
       license-feature="org.rodinp.licence"
       license-feature-version="1.0.0.release">
