@@ -28,7 +28,9 @@
             
         </tocitem>
     </tocitem><tocitem target="sec:reference">Reference
-        
+        <tocitem target="sec:consoleMessages">Scenario Checker Console Messages
+            
+        </tocitem>
     </tocitem><tocitem target="sec:legal">Legal
         <tocitem target="sec:user-agreement">EPL Software User Agreement
             

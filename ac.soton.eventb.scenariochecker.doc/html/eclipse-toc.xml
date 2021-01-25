@@ -6,7 +6,9 @@
        <topic label="Setup" href="html/sec-setup.html" /><topic label="Perspective" href="html/sec-perspective.html" /><topic label="Starting" href="html/sec-starting.html" /><topic label="Setup" href="html/sect0001.html" /><topic label="Persistence" href="html/sec-persistence.html" />
     </topic><topic label="Concepts" href="html/sec-concepts.html" /><topic label="Tasks" href="html/sec-tasks.html">
        <topic label="Recording a Scenario" href="html/sec-recording.html" /><topic label="Re-playing a Scenario" href="html/sec-playback.html" />
-    </topic><topic label="Reference" href="html/sec-reference.html" /><topic label="Legal" href="html/sec-legal.html">
+    </topic><topic label="Reference" href="html/sec-reference.html">
+       <topic label="Scenario Checker Console Messages" href="html/sec-consoleMessages.html" />
+    </topic><topic label="Legal" href="html/sec-legal.html">
        <topic label="EPL Software User Agreement" href="html/sec-user-agreement.html" />
     </topic>
 </toc>

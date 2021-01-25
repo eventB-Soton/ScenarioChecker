@@ -1,0 +1,87 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="stylesheet" href="style.css" type="text/css" />
+<link rel="shortcut icon" href="icons/pyfav.png" type="image/png" />
+<link href="index.html" title="Scenario Checker User Manual" rel="start" />
+<link href="index.html" title="Scenario Checker User Manual" rel="first" />
+<link href="index.html" rel="contents" title="Contents" />
+<link rel="index" title="Index" />
+<link href="sec-legal.html" rel="next" />
+<link href="sec-reference.html" rel="prev" />
+<link href="sec-reference.html" rel="parent" />
+<meta name="aesop" content="information" />
+<title>5.1 Scenario Checker Console Messages</title>
+</head>
+<body>
+<div class="navigation">
+<div id="top-navigation-panel" xml:id="top-navigation-panel">
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class="online-navigation"><a title="5 Reference" href="sec-reference.html" rel="prev"><img src="icons/previous.png" border="0" height="32" alt="Previous Page" width="32" /></a></td>
+<td class="online-navigation"><a title="5 Reference" href="sec-reference.html" rel="parent"><img src="icons/up.png" border="0" height="32" alt="Up One Level" width="32" /></a></td>
+<td class="online-navigation"><a title="Legal" href="sec-legal.html" rel="next"><img src="icons/next.png" border="0" height="32" alt="Next Page" width="32" /></a></td>
+<td align="center" width="100%">Scenario Checker User Manual</td>
+<td class="online-navigation"><a href="index.html" rel="contents" title="Table of Contents"><img src="icons/contents.png" border="0" height="32" alt="Contents" width="32" /></a></td>
+<td class="online-navigation"><img src="icons/blank.png" border="0" height="32" alt="" width="32" /></td>
+<td class="online-navigation"><img src="icons/blank.png" border="0" height="32" width="32" /></td>
+</tr></table>
+<div class="online-navigation">
+<span><b class="navlabel">Previous:</b>
+<a href="sec-reference.html" class="sectref" rel="prev">Reference</a></span>
+<span><b class="navlabel">Up:</b>
+<a href="sec-reference.html" class="sectref" rel="parent">Reference</a></span>
+<span><b class="navlabel">Next:</b>
+<a href="sec-legal.html" class="sectref" rel="next">Legal</a></span>
+</div>
+<hr /></div>
+</div>
+
+
+
+<div><h2 id="sec:consoleMessages">5.1 Scenario Checker Console Messages</h2>
+<p>The Scenario Checker Console displays the following messages: (Placeholders shown in angle brackets <tt class="ttfamily">&lt;xxx&gt;</tt> will be replaced with actual names etc.). </p><ul class="itemize">
+<li><p><tt class="ttfamily">Checking &lt;machine name&gt;</tt> - when the scenario checker is first started or started after stopping. </p></li><li><p><tt class="ttfamily">Restarted</tt> - when the scenario checker is restarted without stopping. </p></li><li><p><tt class="ttfamily">Stopped</tt> - when the scenario checker is stopped. </p></li><li><p><tt class="ttfamily">Can not run until context is set up</tt> - if a step is attempted when the ProB setup operation is enabled. </p></li><li><p><tt class="ttfamily">saved &lt;recording name&gt;</tt> - after the scenario is saved. </p></li><li><p><tt class="ttfamily">mode changed to PLAYBACK</tt> - after the mode has been changed to playback. </p></li><li><p><tt class="ttfamily">mode changed to RECORDING</tt> - after the mode has been changed to recording. </p></li><li><p><tt class="ttfamily">BigStep - fired [ext] &lt;event signature&gt;</tt> when the Big Step button is pressed (or an event fired from the list of enabled external events) and the event is fired successfully. (Note that it is also possible to fire an internal event if the previous big step aborted. In which case, [ext] is replaced by [int]). After this message is displayed the following messages will be displayed indented as part of the Big Step run. </p><ul class="itemize">
+<li><p><tt class="ttfamily">- fired [int] &lt;event signature&gt;</tt> when an internal event is successfully fired </p></li><li><p><tt class="ttfamily">- Big step ran to completion</tt> when no internal events are enabled </p></li><li><p><tt class="ttfamily">- Big step aborted due to deadlock</tt> when no events are enabled </p></li><li><p><tt class="ttfamily">- Big step aborted due to loop on &lt;event signature&gt;</tt> when the event shown has already been fired a number of times during this Big Step. </p></li>
+</ul></li><li><p><tt class="ttfamily">Small step - &lt;event signature&gt;</tt> - when the Small Step button is pressed and an event is fired. </p></li><li><p><tt class="ttfamily">Small step aborted - nothing enabled</tt> - when the Small Step button is pressed but no events are enabled. </p></li><li><p><tt class="ttfamily">Run For - Run terminated after &lt;#done&gt; of &lt;#ticks&gt; ticks due to lack of progress</tt> - when the Run For button is pressed but a lack of progress is reported. </p></li><li><p><tt class="ttfamily">Run For - Completed all &lt;#done&gt; ticks</tt> - when the Run For button is pressed and completed </p></li>
+</ul><p>The following exceptional error messages indicate that ProB has not behaved as expected: </p><ul class="itemize">
+<li><p><tt class="ttfamily">The Scenario Checker aborted because ProB appears to have stopped animating the machine (i.e. sent null)</tt> </p></li><li><p><tt class="ttfamily">The Scenario Checker aborted because ProB appears to be animating a different machine: &lt;machine name&gt;</tt> </p></li><li><p><tt class="ttfamily">Exception in ProB while excecuting operation &lt;event signature&gt;</tt> </p></li>
+</ul></div>
+
+
+
+<div class="navigation">
+<div class="online-navigation">
+<hr />
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td class="online-navigation"><a title="5 Reference" href="sec-reference.html" rel="prev"><img src="icons/previous.png" border="0" height="32" alt="Previous Page" width="32" /></a></td>
+<td class="online-navigation"><a title="5 Reference" href="sec-reference.html" rel="parent"><img src="icons/up.png" border="0" height="32" alt="Up One Level" width="32" /></a></td>
+<td class="online-navigation"><a title="Legal" href="sec-legal.html" rel="next"><img src="icons/next.png" border="0" height="32" alt="Next Page" width="32" /></a></td>
+<td align="center" width="100%">Scenario Checker User Manual</td>
+<td class="online-navigation"><a href="index.html" rel="contents" title="Table of Contents"><img src="icons/contents.png" border="0" height="32" alt="Contents" width="32" /></a></td>
+<td class="online-navigation"><img src="icons/blank.png" border="0" height="32" alt="" width="32" /></td>
+<td class="online-navigation"><img src="icons/blank.png" border="0" height="32" width="32" /></td>
+</tr></table>
+<div class="online-navigation">
+<span><b class="navlabel">Previous:</b>
+<a href="sec-reference.html" class="sectref" rel="prev">Reference</a></span>
+<span><b class="navlabel">Up:</b>
+<a href="sec-reference.html" class="sectref" rel="parent">Reference</a></span>
+<span><b class="navlabel">Next:</b>
+<a href="sec-legal.html" class="sectref" rel="next">Legal</a></span>
+</div>
+</div>
+<hr />
+<!--
+<span class="release-info">Release 2.4.3, documentation updated on 29 March 2006.</span>
+-->
+</div>
+<!--End of Navigation Panel-->
+<!--
+<address>
+See <i><a href="about.html">About this document...</a></i> for information on suggesting changes.
+</address>
+-->
+</body>
+</html>

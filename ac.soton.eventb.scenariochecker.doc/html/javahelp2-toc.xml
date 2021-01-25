@@ -9,7 +9,9 @@
         <tocitem target="sec:setup" text="Setup" /><tocitem target="sec:perspective" text="Perspective" /><tocitem target="sec:starting" text="Starting" /><tocitem target="sec:setup" text="Setup" /><tocitem target="sec:persistence" text="Persistence" />
     </tocitem><tocitem target="sec:concepts" text="Concepts" /><tocitem target="sec:tasks" text="Tasks">
         <tocitem target="sec:recording" text="Recording a Scenario" /><tocitem target="sec:playback" text="Re-playing a Scenario" />
-    </tocitem><tocitem target="sec:reference" text="Reference" /><tocitem target="sec:legal" text="Legal">
+    </tocitem><tocitem target="sec:reference" text="Reference">
+        <tocitem target="sec:consoleMessages" text="Scenario Checker Console Messages" />
+    </tocitem><tocitem target="sec:legal" text="Legal">
         <tocitem target="sec:user-agreement" text="EPL Software User Agreement" />
     </tocitem>
 </tocitem>
