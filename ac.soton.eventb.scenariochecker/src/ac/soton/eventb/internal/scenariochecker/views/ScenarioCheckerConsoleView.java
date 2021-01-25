@@ -96,16 +96,9 @@ public class ScenarioCheckerConsoleView extends AbstractScenarioCheckerView impl
 		    	String[] lines = message.split("\n");
 		    	
 		    	for (int i=lines.length-1; i>-1; i-- ) {
-		    	//for (int i=0; i<lines.length; i++ ) {
 		    		String line = lines[i];
-		    		messageArea.add(line,0); //messageArea.getItemCount());
-		    		//messageArea.select(messageArea.getItemCount()-1);
+		    		messageArea.add(line,0); 
 		    	}
-		    	//messageArea.setSelection(messageArea.getItemCount()-1);
-		        // Scroll to the bottom (set Selection automatically scrolls)
-		    	//messageArea.setSelection(messageArea.getItemCount()-1);
-		    	//messageArea.deselectAll();
-		    	//messageArea.showSelection();
 
 		    }
 		});
