@@ -1,7 +1,38 @@
 \section{Reference}
 \label{sec:reference}
 
-This section is intentionally blank.
+\subsection{Scenario Checker Console Messages}
+\label{sec:consoleMessages}
+
+The Scenario Checker Console displays the following messages:
+(Placeholders shown in angle brackets \texttt{<xxx>} will be replaced with actual names etc.).
+\begin{itemize}
+	\item \texttt{Checking <machine name>} - when the scenario checker is first started or started after stopping.
+	\item \texttt{Restarted} - when the scenario checker is restarted without stopping.
+	\item \texttt{Stopped} - when the scenario checker is stopped.
+	\item \texttt{Can not run until context is set up} - if a step is attempted when the ProB setup operation is enabled.
+	\item \texttt{saved <recording name>} - after the scenario is saved.
+	\item \texttt{mode changed to PLAYBACK} - after the mode has been changed to playback.
+	\item \texttt{mode changed to RECORDING} - after the mode has been changed to recording.
+	\item \texttt{BigStep - fired [ext] <event signature>} when the Big Step button is pressed (or an event fired from the list of enabled external events) and the event is fired successfully. (Note that it is also possible to fire an internal event if the previous big step aborted. In which case, [ext] is replaced by [int]). After this message is displayed the following messages will be displayed indented as part of the Big Step run.
+	\begin{itemize}
+		\item \texttt{- fired [int] <event signature>} when an internal event is successfully fired
+		\item \texttt{- Big step ran to completion} when no internal events are enabled	
+		\item \texttt{- Big step aborted due to deadlock} when no events are enabled
+		\item \texttt{- Big step aborted due to loop on <event signature>} when the event shown has already been fired a number of times during this Big Step.	
+	\end{itemize}
+	\item \texttt{Small step - <event signature>} - when the Small Step button is pressed and an event is fired.
+	\item \texttt{Small step aborted - nothing enabled} - when the Small Step button is pressed but no events are enabled.
+	\item \texttt{Run For - Run terminated after <\#done> of <\#ticks> ticks due to lack of progress} - when the Run For button is pressed but a lack of progress is reported.
+	\item \texttt{Run For - Completed all <\#done> ticks} - when the Run For button is pressed and completed
+\end{itemize}
+
+The following exceptional error messages indicate that ProB has not behaved as expected:
+\begin{itemize}
+	\item \texttt{The Scenario Checker aborted because ProB appears to have stopped animating the machine (i.e. sent null)}
+	\item \texttt{The Scenario Checker aborted because ProB appears to be animating a different machine: <machine name>}
+	\item \texttt{Exception in ProB while excecuting operation <event signature>}
+\end{itemize}
 
 %%% Local Variables:
 %%% mode: latex

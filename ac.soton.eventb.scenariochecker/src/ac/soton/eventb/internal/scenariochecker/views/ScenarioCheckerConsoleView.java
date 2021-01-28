@@ -1,5 +1,5 @@
 /*******************************************************************************
- *  Copyright (c) 2019-2020 University of Southampton.
+ *  Copyright (c) 2021-2021 University of Southampton.
  *  All rights reserved. This program and the accompanying materials
  *  are made available under the terms of the Eclipse Public License v1.0
  *  which accompanies this distribution, and is available at
@@ -37,7 +37,7 @@ public class ScenarioCheckerConsoleView extends AbstractScenarioCheckerView impl
 	protected void doCreatePartControl() {
 
 		{	//Status Message Area
-			messageArea = new List(container, SWT.BORDER | SWT.MULTI);			
+			messageArea = new List(container, SWT.BORDER | SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);			
 			FormData fd = new FormData();
 			fd.left = new FormAttachment(0, 5);
 			fd.right = new FormAttachment(100, -5);
@@ -73,7 +73,9 @@ public class ScenarioCheckerConsoleView extends AbstractScenarioCheckerView impl
 	public void stop() {
 		Display.getDefault().asyncExec(new Runnable() {
 		    public void run() {
-		    	setPartName(getPartName().substring(0, getPartName().indexOf(" - "))); //remove machine name from tab
+		    	if (getPartName().contains(" - ")) {
+		    		setPartName(getPartName().substring(0, getPartName().indexOf(" - "))); //remove machine name from tab
+		    	}
 		    }
 		});
 	}	
@@ -89,11 +91,15 @@ public class ScenarioCheckerConsoleView extends AbstractScenarioCheckerView impl
 	public void displayMessage(String message) {
 		Display.getDefault().asyncExec(new Runnable() {
 		    public void run() {
+		    	messageArea.deselectAll();
+		    	
 		    	String[] lines = message.split("\n");
+		    	
 		    	for (int i=lines.length-1; i>-1; i-- ) {
 		    		String line = lines[i];
-		    		messageArea.add(line,0);
+		    		messageArea.add(line,0); 
 		    	}
+
 		    }
 		});
 	}

@@ -16,6 +16,7 @@
 <mapid target="sec:recording" url="sec-recording.html"></mapid>
 <mapid target="sec:playback" url="sec-playback.html"></mapid>
 <mapid target="sec:reference" url="sec-reference.html"></mapid>
+<mapid target="sec:consoleMessages" url="sec-consoleMessages.html"></mapid>
 <mapid target="sec:legal" url="sec-legal.html"></mapid>
 <mapid target="sec:user-agreement" url="sec-user-agreement.html"></mapid>
 </mapid>

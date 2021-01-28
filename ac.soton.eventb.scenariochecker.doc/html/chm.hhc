@@ -109,9 +109,18 @@
       <li><object type="text/sitemap">
           <param name="Name" value="Reference">
           <param name="Local" value="sec-reference.html">
-          <param name="ImageNumber" value="11">
+          
       </object></li>
-      
+      <ul>
+         
+         <li><object type="text/sitemap">
+             <param name="Name" value="Scenario Checker Console Messages">
+             <param name="Local" value="sec-consoleMessages.html">
+             <param name="ImageNumber" value="11">
+         </object></li>
+         
+         
+      </ul>
       
       <li><object type="text/sitemap">
           <param name="Name" value="Legal">

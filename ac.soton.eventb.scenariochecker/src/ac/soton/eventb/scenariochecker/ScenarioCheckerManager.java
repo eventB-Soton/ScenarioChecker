@@ -1,5 +1,5 @@
 /*******************************************************************************
- *  Copyright (c) 2019-2020 University of Southampton.
+ *  Copyright (c) 2019-2021 University of Southampton.
  *  All rights reserved. This program and the accompanying materials
  *  are made available under the terms of the Eclipse Public License v1.0
  *  which accompanies this distribution, and is available at
@@ -12,6 +12,7 @@
 package ac.soton.eventb.scenariochecker;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -23,6 +24,7 @@ import org.eclipse.emf.common.util.EMap;
 import org.eventb.core.IMachineRoot;
 import org.eventb.emf.core.machine.Event;
 import org.eventb.emf.core.machine.Machine;
+import org.eventb.emf.core.machine.Variable;
 import org.eventb.emf.persistence.EMFRodinDB;
 
 import ac.soton.eventb.emf.oracle.OracleFactory;
@@ -68,6 +70,7 @@ public class ScenarioCheckerManager  {
 	
 	private IMachineRoot mchRoot = null;
 	private Machine machine = null;
+	private List<String> publicVariables= new ArrayList<String>();
 	private Clock clock = new Clock();	
 	private Operation_ manuallySelectedOp = null;
 	private List<Operation_> enabledOperations = null;
@@ -99,6 +102,12 @@ public class ScenarioCheckerManager  {
 		this.mchRoot = mchRoot;
 		EMFRodinDB emfRodinDB = new EMFRodinDB();
 		machine = (Machine) emfRodinDB.loadEventBComponent(mchRoot);
+		publicVariables.clear();
+		for (Variable v : machine.getVariables()) {
+			if(!v.getComment().startsWith("<PRIVATE>")) {
+				publicVariables.add(v.getName());
+			}
+		}
 		//initialise oracle file handler
 		OracleHandler.getOracle().initialise(recordingName, machine);
 		//start the scenario checker views
@@ -130,7 +139,7 @@ public class ScenarioCheckerManager  {
 	 * @param mchRoot
 	 */
 	public void stop(IMachineRoot mchRoot) {
-		if (mchRoot.getCorrespondingResource() != this.mchRoot.getCorrespondingResource()) return;
+		//if (this.mchRoot==null || mchRoot.getCorrespondingResource() != this.mchRoot.getCorrespondingResource()) return;
 		playback=null;
 		//stop the scenario checker views
 		for (IScenarioCheckerView scenarioCheckerView : scenarioCheckerViews) {
@@ -210,7 +219,7 @@ public class ScenarioCheckerManager  {
 			while (	progress && 
 					(op = pickNextOperation())!=null &&
 					!isExternal(op) &&
-					!loop.contains(op)
+					Collections.frequency(loop, op)<10// !loop.contains(op)
 					) {
 				progress = executeOperation(op, false);
 				
@@ -225,7 +234,7 @@ public class ScenarioCheckerManager  {
 					message = message+ "\n  - Big step aborted due to deadlock ";
 				}else if (isExternal(op)){
 					message = message+ "\n  - Big step ran to completion";
-				}else if (loop.contains(op)) {
+				}else if (Collections.frequency(loop, op)>=10) {  //loop.contains(op)) {
 					message = message+ "\n  - Big step aborted due to loop on "+op.inStringFormat();
 				}else {
 					message = message+ "\n  - Big step aborted for a mysterious reason";
@@ -242,10 +251,14 @@ public class ScenarioCheckerManager  {
 	 */
 	public void singleStep(){
 		Operation_ op = pickNextOperation();
-		executeOperation(op, false);
-		updateModeIndicator();
-		String type = isExternal(op)? "[ext] ":"[int] ";
-		displayMessage("Small step - "+type+op.inStringFormat());
+		if (op==null) {
+			displayMessage("Small step aborted - nothing enabled");
+		}else {
+			executeOperation(op, false);
+			updateModeIndicator();
+			String type = isExternal(op)? "[ext] ":"[int] ";
+			displayMessage("Small step - "+type+op.inStringFormat());
+		}
 	}
 	
 	/**
@@ -367,13 +380,19 @@ public class ScenarioCheckerManager  {
 			List<Triplet <String, String, String>> result = new ArrayList<Triplet<String,String,String>>();
 			Map<String, String> currentState = AnimationManager.getCurrentState(mchRoot).getAllValues();
 			// if in playback check state matches oracle
+			
 			if (isPlayback() && playback.getCurrentSnapshot()!=null) {
+				
 				for (Map.Entry<String, String> value : playback.getCurrentSnapshot().getValues()){
+					if(publicVariables.contains(value.getKey())){
 						result.add(Triplet.of(value.getKey(), currentState.get(value.getKey()), value.getValue()));
+					}
 				}
 			}else {
 				for (Map.Entry<String, String> value : currentState.entrySet()){
-					result.add(Triplet.of(value.getKey(), value.getValue(), ""));
+					if(publicVariables.contains(value.getKey())){
+						result.add(Triplet.of(value.getKey(), value.getValue(), ""));
+					}
 				}
 			}
 			for (IScenarioCheckerView scenarioCheckerView : scenarioCheckerViews) {
@@ -389,7 +408,7 @@ public class ScenarioCheckerManager  {
 					operationSignatures.add(op.inStringFormat());
 				}
 			}
-			
+
 			// find index of the next op in playback
 			int selectedOp = -1;
 			if (isPlayback() && playback.getNextOperation()!=null) {
@@ -552,7 +571,7 @@ public class ScenarioCheckerManager  {
 		Operation_  nextOp = pickFrom(prioritise(AnimationManager.getEnabledOperations(mchRoot)));
 
 		//if no internal operations are available, we might use a different method to get an external one
-		if (isExternal(nextOp)){
+		if (nextOp!=null && isExternal(nextOp)){
 			//in playback all externals are from the recording
 			if (isPlayback()) {	
 				nextOp = playback.getNextOperation();
@@ -587,6 +606,7 @@ public class ScenarioCheckerManager  {
 	 */
 	private static final Random random = new Random();
 	private Operation_ pickFrom(List<Operation_> ops) {
+		if (ops.isEmpty()) return null;
 		Operation_ op = ops.get(random.nextInt(ops.size()));
 		return op;
 	}

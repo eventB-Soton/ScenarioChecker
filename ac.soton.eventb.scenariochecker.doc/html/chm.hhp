@@ -15,22 +15,23 @@ Title=Scenario Checker User Manual
 Help="Scenario Checker User Manual","chm.hhc","chm.hhk","index.html","index.html",,,,,0x73520,,0x383e,[200,200,1000,800],,,,,,,0
 
 [FILES]
-sec-overview.html
-index.html
-sec-setup.html
-sec-playback.html
-sec-tasks.html
-sec-user-agreement.html
 sec-concepts.html
-sec-persistence.html
-sec-release-notes.html
-sec-recording.html
-sec-getting-started.html
+sec-perspective.html
 sec-legal.html
 sec-reference.html
+sec-persistence.html
 sect0001.html
-sec-perspective.html
+sec-recording.html
+sec-consoleMessages.html
 sec-starting.html
+sec-user-agreement.html
+sec-overview.html
+sec-getting-started.html
+sec-setup.html
+sec-tasks.html
+sec-release-notes.html
+index.html
+sec-playback.html
 
 
 [MERGE FILES]

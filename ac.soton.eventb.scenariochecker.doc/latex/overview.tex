@@ -3,7 +3,8 @@
 
 The Scenario Checker is a tool to help develop useful Event-B models.
 The Scenario Checker focusses on a behaviour-driven approach to validate model behaviour.
-The Scenario Checker does not verify that models are consistent: Rodin automatic provers should be used to verify models.
+The Scenario Checker does not verify that models are consistent.
+ Rodin automatic provers should be used to verify models.
 The Scenario Checker uses the ProB animator to execute the model.
 
 The Scenario Checker allows scenarios to be animated and recorded while visualising the state of variables and enabledness of events in the model.
@@ -17,15 +18,29 @@ Events may also be prioritised to resolve non-deterministic choices remaining in
 \label{sec:release-notes}
 
 \begin{itemize}
-	\item \textbf{0.0.0} - prototype release
+	\item \textbf{1.0.0}
+	\begin{itemize}	
+		\item[-]	improve some rendering issues with control panel and state viewer
+		\item[-]	change perspective icon to work in dark mode and differ from animation icon
+		\item[-]	fix state comparison for sets (order of elements doesn't matter)
+		\item[-]	add new console for display of scenario checker messages
+		\item[-]	log progress and problems on new console
+		\item[-]	display machine name in view tabs
+		\item[-]	add tool tip for mode button
+		\item[-]	disable selection of operations list in playback mode and remove checks
+		\item[-]	go to record mode when stopped
+		\item[-]	bugfix - was not executing internal operations when external re-enabled
+		\item[-]	bugfix - setting focus should call super to ensure all functionality
+	\end{itemize}
+	\item \textbf{0.0.0} - First prototype release
 \end{itemize}
 
 \subsubsection{Known Issues}
 \label{sec:known-issues}
 
 \begin{itemize}
-	\item using the small step button in playback can result in errors
-	\item when restarting, BMotion Studio selects its own perspective
+	\item Using the small step button in playback can result in errors.
+	\item When restarting, BMotion Studio selects its own perspective.
 \end{itemize}
 
 

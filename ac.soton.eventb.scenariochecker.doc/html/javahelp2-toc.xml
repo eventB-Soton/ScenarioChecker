@@ -1,4 +1,18 @@
 <?xml version='1.0' encoding='ISO-8859-1' ?>
+<!--
+    Copyright (c) 2011, 2021 University of Southampton.
+   
+    This program and the accompanying materials
+    are made available under the terms of the Eclipse Public License 2.0
+    which accompanies this distribution, and is available at
+    https://www.eclipse.org/legal/epl-2.0/
+   
+    SPDX-License-Identifier: EPL-2.0
+   
+    Contributors:
+       University of Southampton - initial API and implementation
+ -->
+
 <!DOCTYPE toc PUBLIC "-//Sun Microsystems Inc.//DTD  JavaHelp TOC Version 2.0//EN"
   "http://java.sun.com/products/javahelp/toc_2_0.dtd">
 <toc version="2.0">
@@ -9,7 +23,9 @@
         <tocitem target="sec:setup" text="Setup" /><tocitem target="sec:perspective" text="Perspective" /><tocitem target="sec:starting" text="Starting" /><tocitem target="sec:setup" text="Setup" /><tocitem target="sec:persistence" text="Persistence" />
     </tocitem><tocitem target="sec:concepts" text="Concepts" /><tocitem target="sec:tasks" text="Tasks">
         <tocitem target="sec:recording" text="Recording a Scenario" /><tocitem target="sec:playback" text="Re-playing a Scenario" />
-    </tocitem><tocitem target="sec:reference" text="Reference" /><tocitem target="sec:legal" text="Legal">
+    </tocitem><tocitem target="sec:reference" text="Reference">
+        <tocitem target="sec:consoleMessages" text="Scenario Checker Console Messages" />
+    </tocitem><tocitem target="sec:legal" text="Legal">
         <tocitem target="sec:user-agreement" text="EPL Software User Agreement" />
     </tocitem>
 </tocitem>

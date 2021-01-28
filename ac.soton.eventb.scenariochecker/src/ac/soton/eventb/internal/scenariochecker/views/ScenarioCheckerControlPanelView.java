@@ -1,12 +1,15 @@
 /*******************************************************************************
- *  Copyright (c) 2019-2020 University of Southampton.
- *  All rights reserved. This program and the accompanying materials
- *  are made available under the terms of the Eclipse Public License v1.0
- *  which accompanies this distribution, and is available at
- *  http://www.eclipse.org/legal/epl-v10.html
- *   
- *  Contributors:
- *  University of Southampton - Initial implementation
+ * Copyright (c) 2011, 2020 University of Southampton.
+ *
+ * This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License 2.0
+ * which accompanies this distribution, and is available at
+ * https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ *
+ * Contributors:
+ *    University of Southampton - initial API and implementation
  *******************************************************************************/
 package ac.soton.eventb.internal.scenariochecker.views;
 
@@ -177,7 +180,7 @@ public class ScenarioCheckerControlPanelView extends AbstractScenarioCheckerView
 
 		}
 		
-		operations = new List(container, SWT.BORDER	| SWT.FULL_SELECTION) ;// Table(container, SWT.BORDER	| SWT.FULL_SELECTION);
+		operations = new List(container, SWT.BORDER	| SWT.H_SCROLL | SWT.V_SCROLL) ;
 		{
 			operations.addMouseListener(new MouseAdapter() {
 				
@@ -240,7 +243,7 @@ public class ScenarioCheckerControlPanelView extends AbstractScenarioCheckerView
 	 */
 	@Override
 	public void start(String machineName) {
-		Display.getDefault().asyncExec(new Runnable() {
+		Display.getDefault().syncExec(new Runnable() {		//sync to ensure start and stop in correct order
 		    public void run() {
 				setPartName(getPartName()+" - "+machineName);	//add machine name to tab
 		    	if (!modeButton.isDisposed()) {
@@ -260,9 +263,11 @@ public class ScenarioCheckerControlPanelView extends AbstractScenarioCheckerView
 	 */
 	@Override
 	public void stop() {
-		Display.getDefault().asyncExec(new Runnable() {
+		Display.getDefault().syncExec(new Runnable() {		//sync to ensure start and stop in correct order
 		    public void run() {
-		    	setPartName(getPartName().substring(0, getPartName().indexOf(" - "))); //remove machine name from tab
+		    	if (getPartName().contains(" - ")) {
+		    		setPartName(getPartName().substring(0, getPartName().indexOf(" - "))); //remove machine name from tab
+		    	}
 		    	if (!modeButton.isDisposed()) {
 					modeButton.setEnabled(false);
 					restartButton.setEnabled(false);
