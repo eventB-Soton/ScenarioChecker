@@ -66,6 +66,9 @@ public class ScenarioCheckerHandler extends AbstractHandler implements IHandler 
 			AnimationManager.startAnimation(mchRoot);
 		}
 		
+		// we need to do a restart to actually get started
+		AnimationManager.restartAnimation(mchRoot);
+		
 		// Switch to Scenario Checker perspective.
 		IWorkbench workbench = PlatformUI.getWorkbench();
 		try {
