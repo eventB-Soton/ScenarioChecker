@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <!--
-    Copyright (c) 2011, 2020 University of Southampton.
+    Copyright (c) 2019, 2021 University of Southampton.
    
     This program and the accompanying materials
     are made available under the terms of the Eclipse Public License 2.0
@@ -17,25 +17,6 @@
 <plugin>
 
 <!-- this category (and others?) should probabbly be moved to a separate common feature for soton Event-B-->
-   <extension
-         point="org.eclipse.ui.menus">
-      <menuContribution
-            allPopups="false"
-            locationURI="popup:fr.systerel.explorer.navigator.view">
-         <menu
-               id="ac.soton.umlb.ui.simulationMenu"
-               label="%simulationMenu"
-               mnemonic="%simulationMenuMnemonic"
-               tooltip="%simulationMenuTooltip">
-            <visibleWhen
-                  checkEnabled="false">
-               <reference
-                     definitionId="ac.soton.umlb.ui.SingleMachineRootSelected">
-               </reference>
-            </visibleWhen>
-         </menu>
-      </menuContribution>
-   </extension>
    <extension
          point="org.eclipse.core.expressions.definitions">
       <definition
@@ -79,13 +60,14 @@
          point="org.eclipse.ui.menus">
       <menuContribution
             allPopups="true"
-            locationURI="popup:ac.soton.umlb.ui.simulationMenu">
+            locationURI="popup:ac.soton.eventb.probsupport.animationMenu">
          <command
                commandId="ac.soton.eventb.scenariochecker.simulateCommand"
-               label="%simulateCommandLabel"
+               icon="icons/RunningMan.png"
+               label="%scenarioChecker.command.name.start"
                mnemonic="S"
                style="push"
-               tooltip="%simulateCommandTooltip">
+               tooltip="%scenarioChecker.command.tooltip">
          </command>
       </menuContribution>
    </extension>
@@ -129,7 +111,7 @@
             class="ac.soton.eventb.internal.scenariochecker.perspectives.ScenarioCheckerPerspective"
             icon = "icons/RunningMan.png"
             id="ac.soton.eventb.scenariochecker.scenarioCheckerPerspective"
-            name="%simPerspectiveName">
+            name="%scenarioChecker.perspective.name">
       </perspective>
    </extension>
    
