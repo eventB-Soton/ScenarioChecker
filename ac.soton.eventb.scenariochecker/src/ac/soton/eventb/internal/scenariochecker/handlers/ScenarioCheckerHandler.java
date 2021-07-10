@@ -19,7 +19,7 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.IHandler;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.ui.IWorkbench;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.WorkbenchException;
 import org.eclipse.ui.handlers.HandlerUtil;
@@ -30,14 +30,14 @@ import ac.soton.eventb.probsupport.AnimationManager;
 
 
 /**
- * This handler is the same as the ProB support handlers but will switch to the scenario checker perspective.
+ * This handler is the same as the ProB support handlers but will make sure the scenario checker is open and 
+ * will switch to the scenario checker perspective.
  * 
  * @author cfsnook
  *
  */
 
 public class ScenarioCheckerHandler extends AbstractHandler implements IHandler {
-
 	
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
@@ -59,9 +59,26 @@ public class ScenarioCheckerHandler extends AbstractHandler implements IHandler 
 		// Return if the current selection is not a machine root.
 		if (mchRoot == null) return null;
 
-		// If a machine is selected, start the animations for it
-		// This starts all animation participants that have open views/editors..
-		// ... including the scenario checker if it is open
+		// a runnable to switch to the scenario checker perspective
+		Runnable scenarioPerspectiveswitcher = new Runnable() {
+			@Override
+			public void run() {
+				try {
+					PlatformUI.getWorkbench().showPerspective(ScenarioCheckerPerspective.PERSPECTIVE_ID, HandlerUtil.getActiveWorkbenchWindow(event));
+				} catch (WorkbenchException e) {
+					e.printStackTrace();
+				}
+			}
+		};
+
+		// Switch to Scenario Checker perspective.
+		// .. this ensures the scenario checker views are open  
+		Display.getDefault().syncExec(scenarioPerspectiveswitcher);
+		
+		
+		// If a machine is selected, initialise the animations for it
+		// This initialises all animation participants that have open views/editors..
+		// ... including the scenario checker which we opened above
 		if (mchRoot != null) {
 			AnimationManager.startAnimation(mchRoot);
 		}
@@ -70,14 +87,11 @@ public class ScenarioCheckerHandler extends AbstractHandler implements IHandler 
 		AnimationManager.restartAnimation(mchRoot);
 		
 		// Switch to Scenario Checker perspective.
-		IWorkbench workbench = PlatformUI.getWorkbench();
-		try {
-			workbench.showPerspective(ScenarioCheckerPerspective.PERSPECTIVE_ID, HandlerUtil.getActiveWorkbenchWindow(event));   //activeWorkbenchWindow);
-		} catch (WorkbenchException e) {
-			e.printStackTrace();
-		}
- 
+		// .. BMotion studio tries to use its perspective.. but we can try to get it back to our perspective
+		Display.getDefault().asyncExec(scenarioPerspectiveswitcher);
+					
 		return null;
 	}
 
+	
 }
