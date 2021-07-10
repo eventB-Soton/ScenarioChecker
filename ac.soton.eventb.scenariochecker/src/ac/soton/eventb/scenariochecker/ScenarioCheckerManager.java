@@ -115,7 +115,7 @@ public class ScenarioCheckerManager  {
 			scenarioCheckerView.start(machine.getName());
 		}
 		displayMessage("Checking "+machine.getName());
-		restart(mchRoot);
+
 	}
 	
 	/**
