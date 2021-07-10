@@ -354,7 +354,7 @@ public class ScenarioCheckerManager  {
 	 */
 	
 	public void currentStateChanged(IMachineRoot mchRoot) {
-
+		if (this.mchRoot==null) return;  // not yet running
 		if (mchRoot==null) {
 			for (IScenarioCheckerView scenarioCheckerView : scenarioCheckerViews) {
 				scenarioCheckerView.stop();
