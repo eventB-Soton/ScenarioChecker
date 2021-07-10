@@ -76,7 +76,7 @@ public class ScenarioCheckerManager  {
 	private List<Operation_> enabledOperations = null;
 	private boolean dirty = false;
 	private Playback playback = null;
-	private static List<IScenarioCheckerView> scenarioCheckerViews = new ArrayList<IScenarioCheckerView>();
+	private List<IScenarioCheckerView> scenarioCheckerViews = new ArrayList<IScenarioCheckerView>();
 	
 	/**
 	 * add a scenario checker view to those registered to receive notifications from the Scenario Checker Manager
