@@ -12,7 +12,6 @@
     Contributors:
        University of Southampton - initial API and implementation
  -->
-
 <feature
       id="ac.soton.eventb.scenariochecker.feature"
       label="%featureName"
@@ -43,7 +42,7 @@
       <import plugin="org.eventb.emf.persistence" version="3.0.0" match="compatible"/>
       <import plugin="ac.soton.eventb.emf.oracle" version="1.0.0" match="compatible"/>
       <import plugin="org.eclipse.ui.forms" version="3.7.1" match="compatible"/>
-      <import plugin="ac.soton.eventb.probsupport" version="0.0.0" match="compatible"/>
+      <import plugin="ac.soton.eventb.probsupport" version="0.0.1" match="compatible"/>
       <import plugin="org.rodinp.core" version="1.7.1" match="compatible"/>
       <import plugin="org.eclipse.help" version="3.8.800" match="compatible"/>
    </requires>
