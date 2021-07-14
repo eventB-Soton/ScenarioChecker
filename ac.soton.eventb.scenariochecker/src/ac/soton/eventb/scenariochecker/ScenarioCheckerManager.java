@@ -76,7 +76,7 @@ public class ScenarioCheckerManager  {
 	private List<Operation_> enabledOperations = null;
 	private boolean dirty = false;
 	private Playback playback = null;
-	private static List<IScenarioCheckerView> scenarioCheckerViews = new ArrayList<IScenarioCheckerView>();
+	private List<IScenarioCheckerView> scenarioCheckerViews = new ArrayList<IScenarioCheckerView>();
 	
 	/**
 	 * add a scenario checker view to those registered to receive notifications from the Scenario Checker Manager
@@ -115,7 +115,7 @@ public class ScenarioCheckerManager  {
 			scenarioCheckerView.start(machine.getName());
 		}
 		displayMessage("Checking "+machine.getName());
-		restart(mchRoot);
+
 	}
 	
 	/**
@@ -354,7 +354,7 @@ public class ScenarioCheckerManager  {
 	 */
 	
 	public void currentStateChanged(IMachineRoot mchRoot) {
-
+		if (this.mchRoot==null) return;  // not yet running
 		if (mchRoot==null) {
 			for (IScenarioCheckerView scenarioCheckerView : scenarioCheckerViews) {
 				scenarioCheckerView.stop();
