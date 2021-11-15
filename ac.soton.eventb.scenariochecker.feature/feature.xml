@@ -15,7 +15,7 @@
 <feature
       id="ac.soton.eventb.scenariochecker.feature"
       label="%featureName"
-      version="1.0.0.release"
+      version="1.1.0.release"
       provider-name="%featureVendor"
       plugin="ac.soton.eventb.scenariochecker.branding"
       license-feature="org.rodinp.licence"
