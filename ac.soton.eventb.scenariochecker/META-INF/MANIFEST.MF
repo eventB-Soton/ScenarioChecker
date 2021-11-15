@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Localization: plugin
 Bundle-Name: %pluginName
 Bundle-SymbolicName: ac.soton.eventb.scenariochecker;singleton:=true
-Bundle-Version: 1.0.0.release
+Bundle-Version: 1.1.0.qualifier
 Bundle-Activator: ac.soton.eventb.scenariochecker.Activator
 Bundle-Vendor: %providerName
 Require-Bundle: org.eclipse.ui;bundle-version="[3.7.0,4.0.0)",
