@@ -24,8 +24,8 @@
     <tycho-version>2.0.0</tycho-version>
     <maven-resources-plugin-version>3.2.0</maven-resources-plugin-version>
     <maven-antrun-plugin-version>3.0.0</maven-antrun-plugin-version>
-    <!-- URL for Eclipse Updates repository (4.16) -->
-    <eclipse_updates-repo.url>http://download.eclipse.org/eclipse/updates/4.16/</eclipse_updates-repo.url>
+    <!-- URL for Eclipse Updates repository -->
+    <eclipse_updates-repo.url>http://download.eclipse.org/eclipse/updates/4.22/</eclipse_updates-repo.url>
     <!-- URL for Eclipse Releases repository (2020-06) -->
     <eclipse_releases-repo.url>http://download.eclipse.org/releases/2020-06</eclipse_releases-repo.url>
     <!-- URL for Rodin Platform (3.5) -->
