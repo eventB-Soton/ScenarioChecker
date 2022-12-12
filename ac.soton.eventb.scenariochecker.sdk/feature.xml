@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-    Copyright (c) 2019, 2020 University of Southampton.
+    Copyright (c) 2014, 2021 University of Southampton.
    
     This program and the accompanying materials
     are made available under the terms of the Eclipse Public License 2.0
@@ -12,11 +12,10 @@
     Contributors:
        University of Southampton - initial API and implementation
  -->
-
 <feature
       id="ac.soton.eventb.scenariochecker.sdk"
       label="%featureName"
-      version="1.0.0.release"
+      version="1.1.0.release"
       provider-name="%featureVendor"
       license-feature="org.rodinp.licence"
       license-feature-version="1.0.0.release">
